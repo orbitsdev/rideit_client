@@ -59,7 +59,7 @@ class _TricycleAppState extends State<TricycleApp> {
         GetPage(name: TripHistoryScreen.screenName, page: () => TripHistoryScreen()),
         GetPage(name: MeScreen.screenName, page: () => MeScreen()),
 
-         GetPage(name: TestsignScreen.screenName, page: () => TestsignScreen()),
+        //  GetPage(name: TestsignScreen.screenName, page: () => TestsignScreen()),
       ],
       debugShowCheckedModeBanner: false,
     );
