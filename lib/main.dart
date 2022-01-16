@@ -53,13 +53,18 @@ class _TricycleAppState extends State<TricycleApp> {
       getPages: [
         GetPage(name: SigupScreen.screenName, page: () => SigupScreen()),
         GetPage(name: SigninScreen.screenName, page: () => SigninScreen()),
-        GetPage(name: HomeScreenManager.screenName,page: () => HomeScreenManager()),
+        GetPage(
+            name: HomeScreenManager.screenName,
+            page: () => HomeScreenManager()),
         GetPage(name: HomeScreen.screenName, page: () => HomeScreen()),
-        GetPage(name: RequestTricycleSreen.screenName, page: () => RequestTricycleSreen()),
-        GetPage(name: TripHistoryScreen.screenName, page: () => TripHistoryScreen()),
+        GetPage(
+            name: RequestTricycleSreen.screenName,
+            page: () => RequestTricycleSreen()),
+        GetPage(
+            name: TripHistoryScreen.screenName,
+            page: () => TripHistoryScreen()),
         GetPage(name: MeScreen.screenName, page: () => MeScreen()),
-
-        //  GetPage(name: TestsignScreen.screenName, page: () => TestsignScreen()),
+        GetPage(name: TestsignScreen.screenName, page: () => TestsignScreen()),
       ],
       debugShowCheckedModeBanner: false,
     );
