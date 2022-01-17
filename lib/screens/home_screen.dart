@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/widgets/map/firststep.dart';
 import 'package:tricycleapp/widgets/map/maketricyclerequest.dart';
+import 'package:tricycleapp/widgets/map/search.dart';
 
 enum MapSelected { normal, satelite, hybrid }
 
@@ -39,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     cameraposition = CameraPosition(
         target:
             LatLng(getinitialposition.latitude, getinitialposition.longitude),
-        zoom: 15);
+        zoom: 16.500);
 
     if (getinitialpositionString.isNotEmpty) {
       setMapIsReady(true);
@@ -92,7 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
         desiredAccuracy: LocationAccuracy.high);
     LatLng newcameraposition =
         LatLng(currentPosition!.latitude, currentPosition!.longitude);
-    cameraposition = CameraPosition(target: newcameraposition, zoom: 17);
+    cameraposition = CameraPosition(
+      target: newcameraposition,
+      zoom: 16.999,
+      tilt: 40,
+      bearing: -800,
+    );
     _newgooglemapcontroller!.animateCamera(
         CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
     // maxcontroller.currentAddressCoorDinate(newcameraposition);
@@ -103,10 +109,16 @@ class _HomeScreenState extends State<HomeScreen> {
   LatLng? _placedMarkerLocation;
 
   void placeMarker(LatLng position) {
+
+    
     setState(() {
       _placedMarkerLocation = position;
     });
 
+    print("from marker");
+    print("____________");
+    print(position);
+    // print("____________");
     maxcontroller.placeMarkerAddressCoordinate(_placedMarkerLocation as LatLng);
   }
 
@@ -125,7 +137,22 @@ class _HomeScreenState extends State<HomeScreen> {
   void backToStartRequest() {
     setRequestState(RequestTricycleState.start);
     _placedMarkerLocation = null;
+    // maxcontroller.picklocation('No Destination was seleced');
+  }
 
+  //search
+  bool isSearchingLocation = false;
+
+  void setisSearchingLocation(bool value) {
+    setState(() {
+      isSearchingLocation = value;
+    });
+  }
+
+  void selectedLocationFromSearch(LatLng position) {
+    setState(() {
+      _placedMarkerLocation = position;
+    });
   }
 
   @override
@@ -170,6 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+
         isMapReady == false
             ? Expanded(
                 child: Center(
@@ -179,9 +207,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ))
             : Expanded(
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
                     GoogleMap(
-                      padding: EdgeInsets.only(bottom: 30),
+                      padding: EdgeInsets.only(top: 70, bottom: 5, left: 5),
                       mapType: MapType.normal,
                       initialCameraPosition: cameraposition as CameraPosition,
                       zoomControlsEnabled: true,
@@ -204,14 +233,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                   markerId: MarkerId('m1'),
                                   position: _placedMarkerLocation as LatLng)
                             },
-                    )
+                    ),
+                    // if (requestformstate == RequestTricycleState.picklocation)
+                    //   Search(
+                    //     passcontext: context,
+                    //     setisSearchingLocation: setisSearchingLocation,
+                    //     selectedLocationFromSearch: selectedLocationFromSearch,
+                    //   ),
                   ],
                 ),
               ),
         AnimatedSwitcher(
           duration: Duration(milliseconds: 200),
           reverseDuration: Duration(milliseconds: 200),
-          child: requestformBuilder(),
+          child: isSearchingLocation ? Container() : requestformBuilder(),
         ),
 
         // Maketricyclerequest(),
@@ -221,9 +256,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget requestformBuilder() {
     if (requestformstate == RequestTricycleState.picklocation) {
-      return Firststep(
-        backToStartRequest: backToStartRequest,
-      );
+      //hide if the user search
+      if (!isSearchingLocation) {
+        return Firststep(
+          backToStartRequest: backToStartRequest,
+        );
+      }
     }
     return Maketricyclerequest(
       startRequest: startRequest,
