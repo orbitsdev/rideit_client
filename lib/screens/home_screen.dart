@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
       target: newcameraposition,
       zoom: 16.999,
       tilt: 40,
-      bearing: -800,
+      bearing: -1000,
     );
     _newgooglemapcontroller!.animateCamera(
         CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
@@ -109,8 +109,6 @@ class _HomeScreenState extends State<HomeScreen> {
   LatLng? _placedMarkerLocation;
 
   void placeMarker(LatLng position) {
-
-    
     setState(() {
       _placedMarkerLocation = position;
     });
@@ -152,6 +150,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void selectedLocationFromSearch(LatLng position) {
     setState(() {
       _placedMarkerLocation = position;
+      cameraposition = CameraPosition(
+        target: position,
+        zoom: 16.999,
+        tilt: 40,
+        bearing: 985,
+      );
+      _newgooglemapcontroller!.animateCamera(
+          CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
     });
   }
 
@@ -234,12 +240,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   position: _placedMarkerLocation as LatLng)
                             },
                     ),
-                    // if (requestformstate == RequestTricycleState.picklocation)
-                    //   Search(
-                    //     passcontext: context,
-                    //     setisSearchingLocation: setisSearchingLocation,
-                    //     selectedLocationFromSearch: selectedLocationFromSearch,
-                    //   ),
+                    if (requestformstate == RequestTricycleState.picklocation)
+                      Search(
+                        passcontext: context,
+                        setisSearchingLocation: setisSearchingLocation,
+                        selectedLocationFromSearch: selectedLocationFromSearch,
+                      ),
                   ],
                 ),
               ),

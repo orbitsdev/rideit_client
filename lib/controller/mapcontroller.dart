@@ -7,9 +7,10 @@ import 'package:tricycleapp/model/prediction_place.dart';
 import 'package:tricycleapp/services/mapservices.dart';
 
 class Mapcontroller extends GetxController {
-  var isaddresloading = false.obs;
   var placeprediction = [].obs;
+  var isaddresloading = false.obs;
   var isfetching = false.obs;
+  var issettingnewmarker = false.obs;
   var dropofflocation = Placeaddress().obs;
   LatLng? markerPositon;
 
@@ -28,10 +29,8 @@ class Mapcontroller extends GetxController {
     String url =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     var response = await Mapservices.mapRequest(url);
-
     var data = response['results'][0];
-
-    placeDetails(data['place_id']);
+    setDropOffLocationFromSearch((data['place_id']));
   }
 
   void searchPlace(String placename) async {
@@ -50,35 +49,58 @@ class Mapcontroller extends GetxController {
     }
   }
 
-  void placeDetails(String placeid) async {
-    if (isaddresloading == false) {
-      isaddresloading(true);
-    }
-
+  Future<dynamic> placeDetails(String placeid) async {
     String url =
         "https://maps.googleapis.com/maps/api/place/details/json?&place_id=${placeid}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
 
     var response = await Mapservices.mapRequest(url);
-    isaddresloading(false);
-    var data = response['result'];
 
-    Placeaddress selectedaddress = Placeaddress();
+    return response;
+  }
+
+  Future<bool> setDropOffLocationFromSearch(String placeid) async {
+    if (isaddresloading == false) {
+      isaddresloading(true);
+    }
+    issettingnewmarker(true);
+    var response = await placeDetails(placeid);
+
+    var data = response['result'];
+    if (response['status'] == "OK") {
+
+       Placeaddress selectedaddress = Placeaddress();
     selectedaddress.placeformattedaddress = data['formatted_address'];
     selectedaddress.placeName = data['name'];
     selectedaddress.placeid = placeid;
     selectedaddress.latitude = data['geometry']['location']['lat'];
     selectedaddress.longitude = data['geometry']['location']['lng'];
 
-    markerPositon = LatLng(selectedaddress.latitude as double,
+    var newmarkerpostion = LatLng(selectedaddress.latitude as double,
         selectedaddress.longitude as double);
 
     dropofflocation(selectedaddress);
-    print(markerPositon);
+    setNewMarker(newmarkerpostion);
+    isaddresloading(false);
+
     print('_________selecteddress details');
     print(dropofflocation.value.placeformattedaddress);
     print(dropofflocation.value.placeName);
     print(dropofflocation.value.placeid);
     print(dropofflocation.value.latitude);
     print(dropofflocation.value.longitude);
+      return true;
+    } else {
+
+      issettingnewmarker(true);
+
+      return false;
+    }
+
+   
+  }
+
+  void setNewMarker(LatLng position) async {
+    markerPositon = position;
+    issettingnewmarker(false);
   }
 }

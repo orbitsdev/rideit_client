@@ -131,14 +131,23 @@ class _SearchState extends State<Search> {
   Widget bulidPredictionTile(PredictionPlace predictionplace) {
     return Material(
       child: InkWell(
-        onTap: () {
-          mapxcontroller.placeDetails(predictionplace.placeId as String);
-          widget.selectedLocationFromSearch(mapxcontroller.markerPositon);
+        onTap: () async {
+        var isseetingmarker = await mapxcontroller
+              .setDropOffLocationFromSearch(predictionplace.placeId as String);
 
-          setState(() {
-            searchcontroller.close();
-            mapxcontroller.placeprediction.clear();
-          });
+
+            if(isseetingmarker){
+               widget.selectedLocationFromSearch(mapxcontroller.markerPositon);
+
+            setState(() {
+              searchcontroller.close();
+              mapxcontroller.placeprediction.clear();
+            });
+            }
+
+
+          
+          
         },
         child: Container(
           child: Column(
