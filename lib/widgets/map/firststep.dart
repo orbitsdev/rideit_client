@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/model/placeaddress.dart';
 
 class Firststep extends StatelessWidget {
   final Function backToStartRequest;
+  final Function drawRoutes;
 
-  Firststep({required this.backToStartRequest});
+  Firststep({required this.backToStartRequest, required this.drawRoutes});
 
   @override
   Widget build(BuildContext context) {
@@ -106,16 +109,36 @@ class Firststep extends StatelessWidget {
                           mapxcontroller.dropofflocation = Placeaddress().obs;
                         },
                         label: Text('CLOSE')),
-                    ElevatedButton.icon(
-                        icon: FaIcon(FontAwesomeIcons.arrowCircleRight),
-                        onPressed: mapxcontroller.dropofflocation.value
-                                    .placeformattedaddress ==
-                                null
-                            ? null
-                            : () {
-                                backToStartRequest();
-                              },
-                        label: Text('NEXT')),
+                    mapxcontroller.isPrepairingDetails.value == true
+                        ? SizedBox(
+                            height: 15,
+                            width: 15,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : ElevatedButton.icon(
+                            icon: FaIcon(FontAwesomeIcons.arrowCircleRight),
+                            onPressed: mapxcontroller.dropofflocation.value
+                                        .placeformattedaddress ==
+                                    null
+                                ? null
+                                : () async {
+                                    var isDetailsset = await mapxcontroller
+                                        .prepairRequestDetails();
+                                    if (isDetailsset) {
+                                      print(mapxcontroller.routedirectiontwo
+                                          .value.polylines_encoded);
+                                      drawRoutes(
+                                          mapxcontroller.routedirectiontwo.value
+                                              .polylines_encoded,
+                                          mapxcontroller
+                                              .routedirectiontwo.value.bound_ne,
+                                          mapxcontroller.routedirectiontwo.value
+                                              .bound_sw);
+                                    }
+                                  },
+                            label: Text('NEXT')),
                   ],
                 ),
               ],

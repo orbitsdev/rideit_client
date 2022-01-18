@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,6 +9,7 @@ import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/widgets/map/firststep.dart';
 import 'package:tricycleapp/widgets/map/maketricyclerequest.dart';
 import 'package:tricycleapp/widgets/map/search.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 enum MapSelected { normal, satelite, hybrid }
 
@@ -30,6 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
   CameraPosition? cameraposition;
   bool isMapReady = false;
   Position? markerPosition;
+
+  List<LatLng> plineCoordinates = [];
+  Set<Polyline> _polyline = {};
+
+  int _polylincecounter = 1;
 
   void setMapCameraInitialValue() async {
     LocationPermission permission;
@@ -161,6 +168,97 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void drawRoutes(String polylincecode) {
+    PolylinePoints polylinepoints = PolylinePoints();
+
+    List<PointLatLng> decodePolylinesResultPoint =
+        polylinepoints.decodePolyline(polylincecode);
+    plineCoordinates.clear();
+
+    if (decodePolylinesResultPoint.isNotEmpty) {
+      decodePolylinesResultPoint.forEach((PointLatLng points) {
+        plineCoordinates.add(LatLng(points.latitude, points.longitude));
+      });
+    }
+
+    _polyline.cast();
+    setState(() {
+      Polyline polyline = Polyline(
+        polylineId: PolylineId('polylineId'),
+        color: Colors.pink,
+        jointType: JointType.round,
+        points: plineCoordinates,
+        width: 5,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        geodesic: true,
+      );
+      _polyline.add(polyline);
+    });
+
+    LatLngBounds latlngbounds;
+
+    LatLng pick = LatLng(maxcontroller.pickuplocation.value.latitude as double,
+        maxcontroller.pickuplocation.value.longitude as double);
+    LatLng drop = LatLng(maxcontroller.dropofflocation.value.latitude as double,
+        maxcontroller.dropofflocation.value.longitude as double);
+
+    if (pick.latitude > drop.longitude && pick.longitude > drop.longitude) {
+      latlngbounds = LatLngBounds(southwest: drop, northeast: pick);
+    } else if (pick.longitude > drop.longitude) {
+      latlngbounds = LatLngBounds(
+          southwest: LatLng(pick.latitude, drop.longitude),
+          northeast: LatLng(drop.latitude, pick.longitude));
+    } else if (pick.latitude > drop.latitude) {
+      latlngbounds = LatLngBounds(
+          southwest: LatLng(drop.latitude, pick.longitude),
+          northeast: LatLng(pick.latitude, drop.longitude));
+    } else {
+      latlngbounds =
+          latlngbounds = LatLngBounds(southwest: pick, northeast: drop);
+    }
+
+    _newgooglemapcontroller!
+        .animateCamera(CameraUpdate.newLatLngBounds(latlngbounds, 70));
+  }
+
+  void setPolyLine(List<PointLatLng> points, LatLng sw, LatLng ne) {
+    String polylineIdVal = "polyline_id${_polylincecounter}";
+    _polyline.clear();
+    setState(() {
+      _polylincecounter++;
+      _polyline.add(
+        Polyline(
+            polylineId: PolylineId(polylineIdVal),
+            width: 5,
+            color: Colors.blue,
+            points:
+                points.map((e) => LatLng(e.latitude, e.longitude)).toList()),
+      );
+    });
+
+    // LatLngBounds latlngbounds;
+    // LatLng pick = ne;
+    // LatLng drop = sw;
+    // if (pick.latitude > drop.longitude && pick.longitude > drop.longitude) {
+    //   latlngbounds = LatLngBounds(southwest: drop, northeast: pick);
+    // } else if (pick.longitude > drop.longitude) {
+    //   latlngbounds = LatLngBounds(
+    //       southwest: LatLng(pick.latitude, drop.longitude),
+    //       northeast: LatLng(drop.latitude, pick.longitude));
+    // } else if (pick.latitude > drop.latitude) {
+    //   latlngbounds = LatLngBounds(
+    //       southwest: LatLng(drop.latitude, pick.longitude),
+    //       northeast: LatLng(pick.latitude, drop.longitude));
+    // } else {
+    //   latlngbounds =
+    //       latlngbounds = LatLngBounds(southwest: pick, northeast: drop);
+    // }
+
+    _newgooglemapcontroller!
+        .animateCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: ne, northeast: sw), 35));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -179,9 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             width: double.infinity,
             decoration: BoxDecoration(color: Colors.white,
-                // borderRadius: BorderRadius.only(
-                //     bottomLeft: Radius.circular(12),
-                //     bottomRight: Radius.circular(12)),
+               
                 boxShadow: [
                   BoxShadow(
                       color: Colors.black54,
@@ -217,12 +313,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     GoogleMap(
                       padding: EdgeInsets.only(top: 70, bottom: 5, left: 5),
-                      mapType: MapType.normal,
+                      mapType: MapType.hybrid,
                       initialCameraPosition: cameraposition as CameraPosition,
                       zoomControlsEnabled: true,
                       zoomGesturesEnabled: true,
                       myLocationButtonEnabled: true,
                       myLocationEnabled: true,
+                      polylines: _polyline,
                       onMapCreated: (GoogleMapController mapcontroller) {
                         _googlemapcontroller.complete(mapcontroller);
                         _newgooglemapcontroller = mapcontroller;
@@ -266,6 +363,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!isSearchingLocation) {
         return Firststep(
           backToStartRequest: backToStartRequest,
+          drawRoutes: setPolyLine,
         );
       }
     }
