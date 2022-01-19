@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -5,8 +6,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/config/mapconfig.dart';
+import 'package:tricycleapp/helper/firebasehelper.dart';
+import 'package:tricycleapp/model/direction_details.dart';
 import 'package:tricycleapp/model/directiondetails.dart';
-import 'package:tricycleapp/model/directiontwo.dart';
 import 'package:tricycleapp/model/placeaddress.dart';
 import 'package:tricycleapp/model/prediction_place.dart';
 import 'package:tricycleapp/services/mapservices.dart';
@@ -20,8 +22,7 @@ class Mapcontroller extends GetxController {
 
   var dropofflocation = Placeaddress().obs;
   var pickuplocation = Placeaddress().obs;
-  var routedirection = Directiondetails().obs;
-  var routedirectiontwo = Directiontwo().obs;
+  var routedirectiondetails = DirectionDetails().obs;
 
   LatLng? markerPositon;
 
@@ -40,6 +41,7 @@ class Mapcontroller extends GetxController {
     if (isrouteset) {
       print('______');
       print('nice ');
+      calculateFee();
       return true;
     } else {
       print('______');
@@ -79,9 +81,7 @@ class Mapcontroller extends GetxController {
       currentaddress.placeid = placeid;
       currentaddress.latitude = data['geometry']['location']['lat'];
       currentaddress.longitude = data['geometry']['location']['lng'];
-      var newmarkerpostion = LatLng(currentaddress.latitude as double,
-          currentaddress.longitude as double);
-      pickuplocation(currentaddress);
+      var newmarkerpostion = LatLng(currentaddress.latitude as double, currentaddress.longitude as double); pickuplocation(currentaddress);
 
       print('_________pickuplocation details');
       print(pickuplocation.value.placeformattedaddress);
@@ -177,7 +177,7 @@ class Mapcontroller extends GetxController {
 
     //String url = "https://maps.googleapis.com/maps/api/directions/json?origin=${picklocation.latitude},${picklocation.longitude}&destination=${droplocation.latitude},${droplocation.longitude}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     String url =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
+        "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     var response = await Mapservices.mapRequest(url);
 
     if (response == "failed") {
@@ -190,49 +190,85 @@ class Mapcontroller extends GetxController {
     var startlocations = response['routes'][0]['legs'][0]['start_location'];
     var endlocation = response['routes'][0]['legs'][0]['end_location'];
 
-    Directiontwo directiontwo = Directiontwo();
-    directiontwo.bound_ne = LatLng(boundne['lat'], boundne['lng']);
-    directiontwo.bound_sw = LatLng(boundswe['lat'], boundswe['lng']);
-    directiontwo.startlocation =
-        LatLng(startlocations['lat'], startlocations['lng']);
-    directiontwo.endlocation = LatLng(endlocation['lat'], endlocation['lng']);
-    directiontwo.polylines =
-        response['routes'][0]['overview_polyline']['points'];
-    directiontwo.polylines_encoded = PolylinePoints()
-        .decodePolyline(response['routes'][0]['overview_polyline']['points']);
-    // Directiondetails directiondetails = Directiondetails();
-    // directiondetails.distanceText =
-    //     response['routes'][0]['legs'][0]['distance']['text'];
-    // directiondetails.distanceValue =
-    //     response['routes'][0]['legs'][0]['distance']['value'];
-    // directiondetails.durationText =
-    //     response['routes'][0]['legs'][0]['duration']['text'];
-    // directiondetails.durationValue =
-    //     response['routes'][0]['legs'][0]['duration']['value'];
-    // directiondetails.encodePoints =
-    //     response['routes'][0]['overview_polyline']['points'];
+    DirectionDetails directiondetails = DirectionDetails();
+    directiondetails.bound_ne = LatLng(boundne['lat'], boundne['lng']);
+    directiondetails.bound_sw = LatLng(boundswe['lat'], boundswe['lng']);
+    directiondetails.startlocation = LatLng(startlocations['lat'], startlocations['lng']);
+    directiondetails.endlocation = LatLng(endlocation['lat'], endlocation['lng']);
+    directiondetails.polylines =response['routes'][0]['overview_polyline']['points'];
+    directiondetails.polylines_encoded = PolylinePoints().decodePolyline(response['routes'][0]['overview_polyline']['points']);
+    directiondetails.distanceText = response['routes'][0]['legs'][0]['distance']['text'];
+    directiondetails.distanceValue = response['routes'][0]['legs'][0]['distance']['value'];
+    directiondetails.durationText = response['routes'][0]['legs'][0]['duration']['text'];
+    directiondetails.durationValue = response['routes'][0]['legs'][0]['duration']['value'];
+   
+    routedirectiondetails = directiondetails.obs;
 
-    // routedirection = directiondetails.obs;
-
-    // print('___________ polylines');
-    // print(routedirection.value.distanceText);
-    // print(routedirection.value.distanceValue);
-    // print(routedirection.value.durationText);
-    // print(routedirection.value.durationValue);
-
-    // print('___________ polylines');
-    // print(routedirection.value.encodePoints);
-    routedirectiontwo = directiontwo.obs;
-
-    print('__________ route');
-    print(routedirectiontwo.value.bound_ne);
-    print(routedirectiontwo.value.bound_sw);
-    print(routedirectiontwo.value.startlocation);
-    print(routedirectiontwo.value.endlocation);
-    print(routedirectiontwo.value.polylines);
-    print(routedirectiontwo.value.polylines_encoded);
+    print('__________ routedirection details');
+    print(routedirectiondetails.value.bound_ne);
+    print(routedirectiondetails.value.bound_sw);
+    print(routedirectiondetails.value.startlocation);
+    print(routedirectiondetails.value.endlocation);
+    print(routedirectiondetails.value.polylines);
+    print(routedirectiondetails.value.distanceText);
+    print(routedirectiondetails.value.distanceValue);
+    print(routedirectiondetails.value.durationText);
+    print(routedirectiondetails.value.durationValue);
     isPrepairingDetails(false);
+
+
+    print(response);
 
     return true;
   }
+
+  void clearRequest(){
+     
+   dropofflocation = Placeaddress().obs;
+   pickuplocation = Placeaddress().obs;
+   routedirectiondetails = DirectionDetails().obs;
+
+
+   }
+
+
+    int calculateFee(){
+
+     double distanceTraveledFare;
+     // =  (routedirectiondetails.value.distanceValue! / 1500 ) * 10 ;
+     double totalfare;
+
+
+     if(routedirectiondetails.value.distanceValue! < 2000 && routedirectiondetails.value.distanceValue! > 500 ){
+
+          totalfare = 10.00;
+     }else{
+          distanceTraveledFare  = (routedirectiondetails.value.distanceValue! /1500) *10;
+          totalfare = distanceTraveledFare;
+     }
+
+     double totaLocalAmount = totalfare ;
+      print('duration');
+      print(routedirectiondetails.value.durationValue);
+      print('distance');
+      print(routedirectiondetails.value.distanceValue);
+      print('______fee');
+      print(totaLocalAmount.truncate());
+     return totaLocalAmount.truncate();
+   }
+
+
+   void senRequest() async{
+
+     CollectionReference collecctionrefference = firestore.collection('request');
+
+
+    //  Map<String, dynamic> data ={
+    //    "name": ,
+    //    "phone": ,
+    //    "pickuplocation": ,
+    //    "dropoflocation": ,
+    //  } ;
+
+   }
 }

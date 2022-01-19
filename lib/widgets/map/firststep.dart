@@ -5,21 +5,24 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/model/placeaddress.dart';
+import 'package:tricycleapp/screens/home_screen.dart';
+import 'package:tricycleapp/widgets/closerequest.dart';
 
 class Firststep extends StatelessWidget {
-  final Function backToStartRequest;
-  final Function drawRoutes;
+  final Function setRequestState;
+  final Function setPolyLine;
 
-  Firststep({required this.backToStartRequest, required this.drawRoutes});
+
+  Firststep({required this.setRequestState, required this.setPolyLine});
 
   @override
   Widget build(BuildContext context) {
     var mapxcontroller = Get.put(Mapcontroller());
 
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: 4,
-      ),
+      // margin: EdgeInsets.symmetric(
+      //   horizontal: 4,
+      // ),
       padding: EdgeInsets.only(top: 20, left: 30, right: 30, bottom: 12),
       width: double.infinity,
       decoration: BoxDecoration(
@@ -36,6 +39,7 @@ class Firststep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+                Closerequest(closerequest: setRequestState,),
           Text(
             'Select Location',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -102,13 +106,12 @@ class Firststep extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ElevatedButton.icon(
-                        icon: FaIcon(FontAwesomeIcons.solidTimesCircle),
+                        icon: FaIcon(FontAwesomeIcons.arrowCircleLeft),
                         onPressed: () {
-                          backToStartRequest();
-
-                          mapxcontroller.dropofflocation = Placeaddress().obs;
+                          setRequestState(RequestTricycleState.start);
+                         
                         },
-                        label: Text('CLOSE')),
+                        label: Text('BACK')),
                     mapxcontroller.isPrepairingDetails.value == true
                         ? SizedBox(
                             height: 15,
@@ -127,14 +130,16 @@ class Firststep extends StatelessWidget {
                                     var isDetailsset = await mapxcontroller
                                         .prepairRequestDetails();
                                     if (isDetailsset) {
-                                      print(mapxcontroller.routedirectiontwo
+
+                                      setRequestState(RequestTricycleState.checkrequest);
+                                      print(mapxcontroller.routedirectiondetails
                                           .value.polylines_encoded);
-                                      drawRoutes(
-                                          mapxcontroller.routedirectiontwo.value
+                                      setPolyLine(
+                                          mapxcontroller.routedirectiondetails.value
                                               .polylines_encoded,
                                           mapxcontroller
-                                              .routedirectiontwo.value.bound_ne,
-                                          mapxcontroller.routedirectiontwo.value
+                                              .routedirectiondetails.value.bound_ne,
+                                          mapxcontroller.routedirectiondetails.value
                                               .bound_sw);
                                     }
                                   },

@@ -46,8 +46,8 @@ class _TricycleAppState extends State<TricycleApp> {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       theme: ThemeData(
-        primaryColor: Colors.redAccent,
-        primarySwatch: Colors.red,
+        primaryColor: Colors.blueAccent,
+        primarySwatch: Colors.blue,
       ),
       home: HomeScreenManager(),
       getPages: [

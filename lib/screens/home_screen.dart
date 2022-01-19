@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
+import 'package:tricycleapp/widgets/map/checkrequest.dart';
 import 'package:tricycleapp/widgets/map/firststep.dart';
 import 'package:tricycleapp/widgets/map/maketricyclerequest.dart';
 import 'package:tricycleapp/widgets/map/search.dart';
@@ -13,7 +14,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 enum MapSelected { normal, satelite, hybrid }
 
-enum RequestTricycleState { start, picklocation, checkingpayment, sendrequest }
+enum RequestTricycleState { start, picklocation, checkrequest, sendrequest }
 
 class HomeScreen extends StatefulWidget {
   static const screenName = '/home';
@@ -144,6 +145,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _placedMarkerLocation = null;
     // maxcontroller.picklocation('No Destination was seleced');
   }
+
+  void prepairrequest(){
+     setRequestState(RequestTricycleState.checkrequest);
+  }
+
 
   //search
   bool isSearchingLocation = false;
@@ -333,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? {}
                           : {
                               Marker(
-                                  markerId: MarkerId('m1'),
+                                  markerId: MarkerId('m1  '),
                                   position: _placedMarkerLocation as LatLng)
                             },
                     ),
@@ -347,28 +353,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
         AnimatedSwitcher(
-          duration: Duration(milliseconds: 200),
-          reverseDuration: Duration(milliseconds: 200),
+          duration: Duration(milliseconds: 400),
+          reverseDuration: Duration(milliseconds: 400),
           child: isSearchingLocation ? Container() : requestformBuilder(),
         ),
 
-        // Maketricyclerequest(),
       ],
     );
   }
 
   Widget requestformBuilder() {
-    if (requestformstate == RequestTricycleState.picklocation) {
+
+    if(requestformstate == RequestTricycleState.start){
+
+      return Maketricyclerequest(
+      startRequest: startRequest,
+    );
+
+    }else if (requestformstate == RequestTricycleState.picklocation) {
       //hide if the user search
       if (!isSearchingLocation) {
         return Firststep(
-          backToStartRequest: backToStartRequest,
-          drawRoutes: setPolyLine,
+          setRequestState: setRequestState,
+          setPolyLine: setPolyLine,
+         
         );
       }
+    }else if (requestformstate == RequestTricycleState.checkrequest){
+
+
+ return Checkrequest(
+
+     setRequestState : setRequestState,
+     setPolyLine: setPolyLine,
+   );
     }
-    return Maketricyclerequest(
+
+     return Maketricyclerequest(
       startRequest: startRequest,
     );
+  
+
+    
+
+
+    
   }
 }
