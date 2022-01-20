@@ -11,10 +11,12 @@ import 'package:tricycleapp/widgets/closerequest.dart';
 class Checkrequest extends StatelessWidget {
   final Function setRequestState;
   final Function setPolyLine;
+  final Function clearPolylines;
 
   Checkrequest({
     required this.setRequestState,
     required this.setPolyLine,
+    required this.clearPolylines,
   });
 
   @override
@@ -41,7 +43,7 @@ class Checkrequest extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Closerequest(closerequest: setRequestState),
+            Closerequest(closerequest: setRequestState,clearPolylines: clearPolylines,),
             Text(
               'Request Details',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Position? markerPosition;
 
   List<LatLng> plineCoordinates = [];
-  Set<Polyline> _polyline = {};
+  Set<Polyline> polyline = {};
 
   int _polylincecounter = 1;
 
@@ -187,9 +187,9 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
 
-    _polyline.cast();
+    polyline.clear();
     setState(() {
-      Polyline polyline = Polyline(
+      Polyline polylines = Polyline(
         polylineId: PolylineId('polylineId'),
         color: Colors.pink,
         jointType: JointType.round,
@@ -199,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
         endCap: Cap.roundCap,
         geodesic: true,
       );
-      _polyline.add(polyline);
+      polyline.add(polylines);
     });
 
     LatLngBounds latlngbounds;
@@ -230,10 +230,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void setPolyLine(List<PointLatLng> points, LatLng sw, LatLng ne) {
     String polylineIdVal = "polyline_id${_polylincecounter}";
-    _polyline.clear();
+    polyline.clear();
     setState(() {
       _polylincecounter++;
-      _polyline.add(
+      polyline.add(
         Polyline(
             polylineId: PolylineId(polylineIdVal),
             width: 5,
@@ -263,6 +263,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _newgooglemapcontroller!
         .animateCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: ne, northeast: sw), 35));
+  }
+
+  void clearPolyLines(){
+    setState(() {
+      
+    polyline = {} ;
+    });
   }
 
   @override
@@ -325,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       zoomGesturesEnabled: true,
                       myLocationButtonEnabled: true,
                       myLocationEnabled: true,
-                      polylines: _polyline,
+                      polylines: polyline,
                       onMapCreated: (GoogleMapController mapcontroller) {
                         _googlemapcontroller.complete(mapcontroller);
                         _newgooglemapcontroller = mapcontroller;
@@ -335,11 +342,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           requestformstate == RequestTricycleState.picklocation
                               ? placeMarker
                               : null,
-                      markers: _placedMarkerLocation == null
+                      markers: requestformstate == RequestTricycleState.start ? {} :  _placedMarkerLocation == null
                           ? {}
                           : {
                               Marker(
-                                  markerId: MarkerId('m1  '),
+                                  markerId: MarkerId('m1'),
                                   position: _placedMarkerLocation as LatLng)
                             },
                     ),
@@ -376,6 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Firststep(
           setRequestState: setRequestState,
           setPolyLine: setPolyLine,
+          clearPolylines:clearPolyLines ,
          
         );
       }
@@ -386,6 +394,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
      setRequestState : setRequestState,
      setPolyLine: setPolyLine,
+      clearPolylines:clearPolyLines ,
    );
     }
 

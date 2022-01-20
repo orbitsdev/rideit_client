@@ -11,9 +11,10 @@ import 'package:tricycleapp/widgets/closerequest.dart';
 class Firststep extends StatelessWidget {
   final Function setRequestState;
   final Function setPolyLine;
+  final Function clearPolylines;
 
 
-  Firststep({required this.setRequestState, required this.setPolyLine});
+  Firststep({required this.setRequestState, required this.setPolyLine, required this.clearPolylines, });
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class Firststep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-                Closerequest(closerequest: setRequestState,),
+                Closerequest(closerequest: setRequestState, clearPolylines: clearPolylines,),
           Text(
             'Select Location',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
