@@ -6,6 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/config/mapconfig.dart';
+import 'package:tricycleapp/controller/authcontroller.dart';
+import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/model/direction_details.dart';
 import 'package:tricycleapp/model/directiondetails.dart';
@@ -14,6 +16,9 @@ import 'package:tricycleapp/model/prediction_place.dart';
 import 'package:tricycleapp/services/mapservices.dart';
 
 class Mapcontroller extends GetxController {
+
+  var userFromAuthcontroller = Get.find<Authcontroller>().user;
+
   var placeprediction = [].obs;
   var isaddresloading = false.obs;
   var isfetching = false.obs;
@@ -29,13 +34,19 @@ class Mapcontroller extends GetxController {
   Future<bool> prepairRequestDetails() async {
     var isrouteset;
     isPrepairingDetails(true);
+    progressDialog('Getting current location');
     Position getposition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    LatLng userposition = LatLng(getposition.latitude, getposition.longitude);
+      Get.back();  
 
+     progressDialog('Setting up pickup location');
+    LatLng userposition = LatLng(getposition.latitude, getposition.longitude);
     var ispicklocationready = await getcurrentLocation(userposition);
+    Get.back();
     if (ispicklocationready) {
+      progressDialog('Prepairing route');
       isrouteset = await getroutedirection();
+      Get.back();
     }
 
     if (isrouteset) {
@@ -235,7 +246,6 @@ class Mapcontroller extends GetxController {
     int calculateFee(){
 
      double distanceTraveledFare;
-     // =  (routedirectiondetails.value.distanceValue! / 1500 ) * 10 ;
      double totalfare;
 
 
@@ -260,15 +270,42 @@ class Mapcontroller extends GetxController {
 
    void senRequest() async{
 
-     CollectionReference collecctionrefference = firestore.collection('request');
+      Map locationtopick ={
+        "latitude": pickuplocation.value.latitude.toString(),
+        "longitude": pickuplocation.value.longitude.toString(),
+      };
+
+      Map locationtodrop ={
+        "latitude": dropofflocation.value.latitude.toString(),
+        "longitude": dropofflocation.value.longitude.toString(),
+      };
+
+      print(userFromAuthcontroller.value.name);
+      print(userFromAuthcontroller.value.email);
+      print(userFromAuthcontroller.value.name);
+  
 
 
-    //  Map<String, dynamic> data ={
-    //    "name": ,
-    //    "phone": ,
-    //    "pickuplocation": ,
-    //    "dropoflocation": ,
-    //  } ;
+      Map<String, dynamic> requestdata ={
+        
+        "driver_id": "null",
+        "phone": userFromAuthcontroller.value.phone,
+        "pickuplocation": locationtopick,
+        "dropoflocation": locationtodrop,
+        "status": "waiting",
+        "created_at":  DateTime.now().toString(),
+        "pickup_address":  pickuplocation.value.placeformattedaddress,
+        "drop_address": dropofflocation.value.placeName,
+      } ;
+
+
+      print(requestdata);
+
+      requestcollecctionrefference.add(requestdata);
+
+
+
+  
 
    }
 }

@@ -12,7 +12,7 @@ class SigupformWidget extends StatefulWidget {
 class _SigupformWidgetState extends State<SigupformWidget> {
   PageState currentPageState = PageState.siningUpPagegSate;
 
-  var autxcontroller = Get.put(Authcontroller());
+  var autxcontroller = Get.find<Authcontroller>();
 
   var name = TextEditingController();
 

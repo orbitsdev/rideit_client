@@ -17,7 +17,7 @@ class Firststep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var mapxcontroller = Get.put(Mapcontroller());
+    var mapxcontroller =Get.find<Mapcontroller>();
 
     return Container(
       // margin: EdgeInsets.symmetric(
@@ -112,22 +112,18 @@ class Firststep extends StatelessWidget {
                          
                         },
                         label: Text('BACK')),
-                    mapxcontroller.isPrepairingDetails.value == true
-                        ? SizedBox(
-                            height: 15,
-                            width: 15,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : ElevatedButton.icon(
+                    ElevatedButton.icon(
                             icon: FaIcon(FontAwesomeIcons.arrowCircleRight),
                             onPressed: mapxcontroller.dropofflocation.value
                                         .placeformattedaddress ==
                                     null
                                 ? null
                                 : () async {
-                                    var isDetailsset = await mapxcontroller
+
+                                    if(mapxcontroller.pickuplocation.value.placeid != null){
+                                          setRequestState(RequestTricycleState.checkrequest);
+                                    }else{
+                                         var isDetailsset = await mapxcontroller
                                         .prepairRequestDetails();
                                     if (isDetailsset) {
 
@@ -142,6 +138,8 @@ class Firststep extends StatelessWidget {
                                           mapxcontroller.routedirectiondetails.value
                                               .bound_sw);
                                     }
+                                    }
+                                   
                                   },
                             label: Text('NEXT')),
                   ],

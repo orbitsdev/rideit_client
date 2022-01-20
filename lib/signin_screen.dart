@@ -11,7 +11,7 @@ class SigninScreen extends StatefulWidget {
 }
 
 class _SigninScreenState extends State<SigninScreen> {
-  var authxcontroller = Get.put(Authcontroller());
+  var authxcontroller = Get.find<Authcontroller>();
   var email = TextEditingController();
   var password = TextEditingController();
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();

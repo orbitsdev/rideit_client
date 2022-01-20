@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tricycleapp/binding/gextbinding.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
@@ -45,11 +46,13 @@ class _TricycleAppState extends State<TricycleApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      smartManagement: SmartManagement.keepFactory,
+      initialBinding: Gextbinding(),
       theme: ThemeData(
         primaryColor: Colors.blueAccent,
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreenManager(),
+      home:  authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
       getPages: [
         GetPage(name: SigupScreen.screenName, page: () => SigupScreen()),
         GetPage(name: SigninScreen.screenName, page: () => SigninScreen()),

@@ -26,7 +26,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   //prepairing map
 
-  var maxcontroller = Get.put(Mapcontroller());
+  var maxcontroller = Get.find<Mapcontroller>();
   Completer<GoogleMapController> _googlemapcontroller = Completer();
   GoogleMapController? _newgooglemapcontroller;
   Position? currentPosition;

@@ -5,13 +5,17 @@ import 'package:get/get.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
+import 'package:tricycleapp/model/users.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 
 class Authcontroller extends GetxController {
+  
+  var user = Users().obs;
   late TwilioPhoneVerify _twilioPhoneVerify;
   var isSignUpLoading = false.obs;
   var isCodeSent = false.obs;
   var isVerifying = false.obs;
+
 
   String? gname;
   String? gphone;
@@ -94,7 +98,6 @@ class Authcontroller extends GetxController {
         isVerifying(false);
         progressDialog('Authenticating...');
         Future.delayed(Duration(seconds: 1), () {
-         
           Get.back();
           clearFields();
           Get.offAndToNamed(HomeScreenManager.screenName);
@@ -124,10 +127,20 @@ class Authcontroller extends GetxController {
           .doc(authuser.user!.uid)
           .get()
           .then((querySnapshot) {
-        print('_______');
-        print(querySnapshot.data());
-
         if (querySnapshot.data() != null) {
+          print(querySnapshot.data());
+
+          Users userdata = Users();
+          userdata.id = authuser.user!.uid;
+          userdata.name = querySnapshot.data()!['name'];
+          userdata.email = querySnapshot.data()!['email'];
+          userdata.phone = querySnapshot.data()!['phone'];
+
+
+          //make global variable    
+          firebaseuser = authuser.user;
+          user = userdata.obs;
+          
           Get.back();
           Get.offAllNamed(HomeScreenManager.screenName);
         } else {

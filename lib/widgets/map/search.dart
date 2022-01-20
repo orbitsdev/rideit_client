@@ -19,7 +19,7 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  var mapxcontroller = Get.put(Mapcontroller());
+  var mapxcontroller =Get.find<Mapcontroller>();
   var searchcontroller = FloatingSearchBarController();
 
   @override
