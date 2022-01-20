@@ -137,6 +137,7 @@ class _SigupformWidgetState extends State<SigupformWidget> {
                   return null;
                 },
                 decoration: InputDecoration(
+                  hintText: '9123456799',
                   border: OutlineInputBorder(),
                   label: Text(
                     'phone',

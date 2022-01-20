@@ -52,7 +52,7 @@ class _TricycleAppState extends State<TricycleApp> {
         primaryColor: Colors.blueAccent,
         primarySwatch: Colors.blue,
       ),
-      home:  authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
+      home:   authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
       getPages: [
         GetPage(name: SigupScreen.screenName, page: () => SigupScreen()),
         GetPage(name: SigninScreen.screenName, page: () => SigninScreen()),
