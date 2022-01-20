@@ -31,7 +31,7 @@ class Authcontroller extends GetxController {
     _twilioPhoneVerify = TwilioPhoneVerify(
         accountSid: 'ACfa5afa56e26142d2b2e3b35d64a460bf',
         serviceSid: 'VAd4e02437ddd341cbae2fcbe9ebd96ca8',
-        authToken: '09bd7a7da82aa46f7e446815f1346b66');
+        authToken: '1230f6d2f548075045f6eaebd5dc6f7e');
   }
 
   void createUser(String name, String phone, String email, String password,
@@ -65,7 +65,7 @@ class Authcontroller extends GetxController {
         context: context,
         dialogType: DialogType.ERROR,
         animType: AnimType.BOTTOMSLIDE,
-        title: 'Faild',
+        title: e.message.toString(),
         desc: e.message.toString(),
         btnOkOnPress: () {},
       )..show();
@@ -82,6 +82,8 @@ class Authcontroller extends GetxController {
     } else {
       isSignUpLoading(false);
       isCodeSent(false);
+      print('______from twiilio');
+      print(twilioResponse.statusCode);
       notificationDialog(context, twilioResponse.errorMessage.toString());
       print(twilioResponse.errorMessage);
     }
