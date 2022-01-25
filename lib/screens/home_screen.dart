@@ -1,16 +1,24 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geo_firestore_flutter/geo_firestore_flutter.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
+import 'package:tricycleapp/helper/Geofirehelper.dart';
+import 'package:tricycleapp/helper/firebasehelper.dart';
+import 'package:tricycleapp/model/nearbydriver.dart';
 import 'package:tricycleapp/widgets/map/checkrequest.dart';
 import 'package:tricycleapp/widgets/map/firststep.dart';
 import 'package:tricycleapp/widgets/map/maketricyclerequest.dart';
 import 'package:tricycleapp/widgets/map/search.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:rxdart/rxdart.dart';
 
 enum MapSelected { normal, satelite, hybrid }
 
@@ -33,83 +41,41 @@ class _HomeScreenState extends State<HomeScreen> {
   CameraPosition? cameraposition;
   bool isMapReady = false;
   Position? markerPosition;
-
   List<LatLng> plineCoordinates = [];
   Set<Polyline> polyline = {};
 
+  Set<Marker> markerSet = {};
+
+
+bool isnearAvailableDriverKeysReaload = true;
+
+
+  
   int _polylincecounter = 1;
-
   void setMapCameraInitialValue() async {
-    LocationPermission permission;
-    permission = await Geolocator.requestPermission();
-    var getinitialposition = await Geolocator.getCurrentPosition();
-    String? getinitialpositionString = getinitialposition.latitude.toString() +
-        getinitialposition.longitude.toString();
-    cameraposition = CameraPosition(
-        target:
-            LatLng(getinitialposition.latitude, getinitialposition.longitude),
-        zoom: 16.500);
-
-    if (getinitialpositionString.isNotEmpty) {
-      setMapIsReady(true);
-    } else {
-      setMapIsReady(false);
-    }
+    var mapisready =  await maxcontroller.setMapCameraInitialValue();  
+    setMapIsReady(mapisready);
+    cameraposition = maxcontroller.cameraposition;
+    
   }
 
-  void setMapIsReady(bool value) {
+
+void setMapIsReady(bool value) {
     setState(() {
       isMapReady = value;
     });
   }
+  
 
   void _moveMapCameraToCurrentPosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    LatLng newcameraposition =
-        LatLng(currentPosition!.latitude, currentPosition!.longitude);
-    cameraposition = CameraPosition(
-      target: newcameraposition,
-      zoom: 16.999,
-      tilt: 40,
-      bearing: -1000,
-    );
-    _newgooglemapcontroller!.animateCamera(
-        CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
-    // maxcontroller.currentAddressCoorDinate(newcameraposition);
+    var loccationpermisiion = await maxcontroller.requestLocationPermision();
+    if(loccationpermisiion){
+      cameraposition = await maxcontroller.moveMapCameraToCurrentPosition();
+    initGeoFireListener();
+    print('inithey');
+     }
+    _newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
+   
   }
 
   //placing marker in map
@@ -117,14 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
   LatLng? _placedMarkerLocation;
 
   void placeMarker(LatLng position) {
+
     setState(() {
       _placedMarkerLocation = position;
     });
-
-    print("from marker");
-    print("____________");
-    print(position);
-    // print("____________");
     maxcontroller.placeMarkerAddressCoordinate(_placedMarkerLocation as LatLng);
   }
 
@@ -146,10 +108,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // maxcontroller.picklocation('No Destination was seleced');
   }
 
-  void prepairrequest(){
-     setRequestState(RequestTricycleState.checkrequest);
+  void prepairrequest() {
+    setRequestState(RequestTricycleState.checkrequest);
   }
-
 
   //search
   bool isSearchingLocation = false;
@@ -261,25 +222,134 @@ class _HomeScreenState extends State<HomeScreen> {
     //       latlngbounds = LatLngBounds(southwest: pick, northeast: drop);
     // }
 
-    _newgooglemapcontroller!
-        .animateCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: ne, northeast: sw), 35));
+    _newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
+        LatLngBounds(southwest: ne, northeast: sw), 35));
   }
 
-  void clearPolyLines(){
+  void clearPolyLines() {
     setState(() {
-      
-    polyline = {} ;
+      polyline = {};
     });
   }
+
+  String field = 'position';
+
+ 
+  void initGeoFireListener() async {
+
+    currentPosition = maxcontroller.currentPosition;
+  print('___________');    
+
+
+    Geofire.initialize('availableDrivers');
+
+    Geofire.queryAtLocation(currentPosition!.latitude, currentPosition!.longitude, 15)!.listen((map) {
+        print(map);
+        if (map != null) {
+          var callBack = map['callBack'];
+
+          //latitude will be retrieved from map['latitude']
+          //longitude will be retrieved from map['longitude']
+
+          switch (callBack) {
+            case Geofire.onKeyEntered:
+            Nearbydriver neardriver = Nearbydriver();
+            neardriver.key = map["key"];
+            neardriver.latitude = map["latitude"];
+            neardriver.longitude = map["longitude"];
+            Geofirehelper.nearbydrivercollection.add(neardriver);
+            if(isnearAvailableDriverKeysReaload == true){
+              updateAvailableDriver();
+            }
+             // keysRetrieved.add(map["key"]);
+              break;
+
+            case Geofire.onKeyExited:
+            Geofirehelper.removeDriverFromList(map["key"]);
+             // keysRetrieved.remove(map["key"]);
+            updateAvailableDriver();
+              break;
+
+            case Geofire.onKeyMoved:
+              Nearbydriver neardriver = Nearbydriver();
+            neardriver.key = map["key"];
+            neardriver.latitude = map["latitude"];
+            neardriver.longitude = map["longitude"];
+            Geofirehelper.updateDriverNearByLocation(neardriver);
+            updateAvailableDriver();
+            // Update your key's location
+              break;
+
+            case Geofire.onGeoQueryReady:
+            // All Intial Data is loaded
+           // print(map['result'])
+                updateAvailableDriver();
+              break;
+          }
+        }
+
+        setState(() {});
+
+    });
+
+  }
+
+  void updateAvailableDriver(){
+    setState(() {
+      
+      markerSet.clear();
+
+    });
+
+    Set<Marker> tmarker = Set<Marker>();
+
+    for(Nearbydriver driver in Geofirehelper.nearbydrivercollection){
+
+      LatLng driverpostition  = LatLng(driver.latitude as double, driver.longitude as double);
+
+      Marker marker =  Marker(
+        markerId: MarkerId("driver${driver.key}"),
+        position: driverpostition,
+        icon: nearByIcon as BitmapDescriptor,
+        rotation: Geofirehelper.createRandomNumber(360),
+
+         );
+
+         tmarker.add(marker);
+
+    }
+
+    setState(() {
+      markerSet = tmarker;
+    });
+  }
+
+
+  BitmapDescriptor? nearByIcon;
+
+  void creatIconsMarker(){
+
+    if(nearByIcon == null){
+      ImageConfiguration imageconfigiration =   createLocalImageConfiguration(context, size:Size(2, 2));
+      BitmapDescriptor.fromAssetImage(imageconfigiration, "assets/images/car_android.png").then((value) {
+        nearByIcon = value;
+      });
+    }
+  }
+
 
   @override
   void initState() {
     super.initState();
+
     setMapCameraInitialValue();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    creatIconsMarker();
+
     return Column(
       children: [
         if (requestformstate == RequestTricycleState.start)
@@ -289,15 +359,13 @@ class _HomeScreenState extends State<HomeScreen> {
               horizontal: 30,
             ),
             width: double.infinity,
-            decoration: BoxDecoration(color: Colors.white,
-               
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black54,
-                      blurRadius: 6.5,
-                      spreadRadius: 6.0,
-                      offset: Offset(0.7, 0.7)),
-                ]),
+            decoration: BoxDecoration(color: Colors.white, boxShadow: [
+              BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: 6.5,
+                  spreadRadius: 6.0,
+                  offset: Offset(0.7, 0.7)),
+            ]),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -312,7 +380,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-
         isMapReady == false
             ? Expanded(
                 child: Center(
@@ -342,13 +409,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           requestformstate == RequestTricycleState.picklocation
                               ? placeMarker
                               : null,
-                      markers: requestformstate == RequestTricycleState.start ? {} :  _placedMarkerLocation == null
-                          ? {}
-                          : {
-                              Marker(
-                                  markerId: MarkerId('m1'),
-                                  position: _placedMarkerLocation as LatLng)
-                            },
+                      markers: markerSet
+                          //Set<Marker>.of(markers.values) ,
+                          // requestformstate == RequestTricycleState.start
+                          //     ? {}
+                          //     : _placedMarkerLocation == null
+                          //         ? {}
+                          //         : {
+                          //             Marker(
+                          //                 markerId: MarkerId('m1'),
+                          //                 position:
+                          //                     _placedMarkerLocation as LatLng)
+                          //           },
                     ),
                     if (requestformstate == RequestTricycleState.picklocation)
                       Search(
@@ -364,48 +436,34 @@ class _HomeScreenState extends State<HomeScreen> {
           reverseDuration: Duration(milliseconds: 400),
           child: isSearchingLocation ? Container() : requestformBuilder(),
         ),
-
       ],
     );
   }
 
   Widget requestformBuilder() {
-
-    if(requestformstate == RequestTricycleState.start){
-
+    if (requestformstate == RequestTricycleState.start) {
       return Maketricyclerequest(
-      startRequest: startRequest,
-    );
-
-    }else if (requestformstate == RequestTricycleState.picklocation) {
+        startRequest: startRequest,
+      );
+    } else if (requestformstate == RequestTricycleState.picklocation) {
       //hide if the user search
       if (!isSearchingLocation) {
         return Firststep(
           setRequestState: setRequestState,
           setPolyLine: setPolyLine,
-          clearPolylines:clearPolyLines ,
-         
+          clearPolylines: clearPolyLines,
         );
       }
-    }else if (requestformstate == RequestTricycleState.checkrequest){
-
-
- return Checkrequest(
-
-     setRequestState : setRequestState,
-     setPolyLine: setPolyLine,
-      clearPolylines:clearPolyLines ,
-   );
+    } else if (requestformstate == RequestTricycleState.checkrequest) {
+      return Checkrequest(
+        setRequestState: setRequestState,
+        setPolyLine: setPolyLine,
+        clearPolylines: clearPolyLines,
+      );
     }
 
-     return Maketricyclerequest(
+    return Maketricyclerequest(
       startRequest: startRequest,
     );
-  
-
-    
-
-
-    
   }
 }

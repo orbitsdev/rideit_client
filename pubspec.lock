@@ -139,6 +139,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_geofire:
+    dependency: "direct main"
+    description:
+      name: flutter_geofire
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -177,6 +184,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.2.0"
+  geo_firestore_flutter:
+    dependency: "direct main"
+    description:
+      name: geo_firestore_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.4"
+  geoflutterfire:
+    dependency: "direct main"
+    description:
+      name: geoflutterfire
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.2"
   geolocator:
     dependency: "direct main"
     description:
@@ -317,6 +338,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  rxdart:
+    dependency: transitive
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.27.3"
   simple_animations:
     dependency: transitive
     description:

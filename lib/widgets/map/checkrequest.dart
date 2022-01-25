@@ -163,35 +163,49 @@ class Checkrequest extends StatelessWidget {
               thickness: 2,
               color: Colors.grey[300],
             ),
-//             StreamBuilder(
-//                 stream: requestcollecctionrefference
-//                     .orderBy('created_at')
-//                     .snapshots(),
-//                 builder:
-//                     (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
-//                   if (snapshot.connectionState == ConnectionState.waiting) {
-//                     SizedBox(
-//                       height: 15,
-//                       width: 15,
-//                       child: CircularProgressIndicator(
-//                         strokeWidth: 2,
-//                         valueColor: AlwaysStoppedAnimation(Colors.white),
-//                       ),
-//                     );
-//                   } 
+            StreamBuilder(
+                stream: requestcollecctionrefference
+                    .orderBy('created_at')
+                    .snapshots(),
+                builder:
+                    (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    SizedBox(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                      ),
+                    );
+                  } 
 
-//                   if(snapshot.hasData){
-// var documents = snapshot.data!.docs;
-//                     return ListView.builder(
-//                         shrinkWrap: true,
-//                         itemCount: documents.length,
-//                         itemBuilder: (context, index) {
-//                           return Text(documents[index]['drop_address']);
-//                         });
-//                   }
-//                     return Container();
-//                   }
-//             )
+                  if(snapshot.hasData){
+var documents = snapshot.data!.docs;
+
+                      if(documents.length >0 ){
+  return Column(
+                      children: [
+                        ElevatedButton(onPressed: (){
+                          mapxcontroller.cancelRequest();
+                        }, child: Text('cancel')),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: documents.length,
+                            itemBuilder: (context, index) {
+                              return Text(documents[index]['drop_address']);
+                            }),
+                      ],
+                    );
+                      }
+                  
+                  }
+                    return Container();
+                  }
+            )
           ],
         ),
       ),

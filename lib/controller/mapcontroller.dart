@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -28,8 +30,91 @@ class Mapcontroller extends GetxController {
   var dropofflocation = Placeaddress().obs;
   var pickuplocation = Placeaddress().obs;
   var routedirectiondetails = DirectionDetails().obs;
-
+  Position? currentPosition;
+  CameraPosition? cameraposition;
   LatLng? markerPositon;
+
+  Future<bool> setMapCameraInitialValue() async {
+
+    bool? isMapIsReady;
+    
+    var localpermission = await requestLocationPermision();
+    if(localpermission){
+        currentPosition = await Geolocator.getCurrentPosition();
+          
+       String? getinitialpositionString = currentPosition!.latitude.toString() + currentPosition!.longitude.toString();
+        cameraposition = CameraPosition( target: LatLng(currentPosition!.latitude, currentPosition!.longitude), zoom: 16.500);
+
+        if (getinitialpositionString.isNotEmpty) {
+      isMapIsReady = true;
+
+    } else {
+      isMapIsReady = false;
+    }
+
+    }else{
+      isMapIsReady = false;
+    }
+
+    return isMapIsReady;
+     
+   
+
+     
+   
+  }
+
+  Future<CameraPosition> moveMapCameraToCurrentPosition() async{
+    
+    currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    LatLng newcameraposition =
+        LatLng(currentPosition!.latitude, currentPosition!.longitude);
+    cameraposition = CameraPosition(
+      target: newcameraposition,
+      zoom: 16.999,
+      tilt: 40,
+      bearing: -1000,
+    );
+
+    return cameraposition as CameraPosition;
+
+
+  }
+
+  Future<bool> requestLocationPermision() async{
+     bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return serviceEnabled;
+  }
 
   Future<bool> prepairRequestDetails() async {
     var isrouteset;
@@ -300,12 +385,33 @@ class Mapcontroller extends GetxController {
 
 
       print(requestdata);
+        requestcollecctionrefference.doc(authinstance.currentUser!.uid).get().then((snapshot) {
 
-      requestcollecctionrefference.add(requestdata);
+          if(snapshot.exists){
+              print(' you have 1 request pending. you can only send request 1 at a time. if you wish to creat new request cancel the pending request firest');
+          }else{
 
+             requestcollecctionrefference.doc(authinstance.currentUser!.uid).set(requestdata);  
+          }
 
-
-  
+      });
 
    }
+
+   void cancelRequest() async{
+
+      
+  
+           requestcollecctionrefference.doc(authinstance.currentUser!.uid).delete().then((value) => print('deleted'));
+
+   }
+
+  double createRandomeNumber(int num){
+  var random = Random();
+  int randomNumber = random.nextInt(num);
+  return randomNumber.toDouble();
+}
+
+
+
 }

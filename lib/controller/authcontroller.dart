@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:tricycleapp/config/twilioconfig.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
@@ -29,9 +30,9 @@ class Authcontroller extends GetxController {
     super.onInit();
 
     _twilioPhoneVerify = TwilioPhoneVerify(
-        accountSid: 'ACfa5afa56e26142d2b2e3b35d64a460bf',
-        serviceSid: 'VAd4e02437ddd341cbae2fcbe9ebd96ca8',
-        authToken: '1230f6d2f548075045f6eaebd5dc6f7e');
+        accountSid: Twilioconfig.ACCOUNT_SID,
+        serviceSid:  Twilioconfig.SERVICE_SID,
+        authToken: Twilioconfig.AUTH_TOKEN);
   }
 
   void createUser(String name, String phone, String email, String password,
@@ -137,6 +138,7 @@ class Authcontroller extends GetxController {
           userdata.name = querySnapshot.data()!['name'];
           userdata.email = querySnapshot.data()!['email'];
           userdata.phone = querySnapshot.data()!['phone'];
+          
 
 
           //make global variable    

@@ -46,6 +46,10 @@ dependencies:
   http: ^0.13.4
   material_floating_search_bar: ^0.3.6
   flutter_polyline_points: ^1.0.0
+  geo_firestore_flutter: ^0.1.4
+  geoflutterfire: ^3.0.2
+  flutter_geofire: ^2.0.1
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -74,8 +78,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/car_android.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

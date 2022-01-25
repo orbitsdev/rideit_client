@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
@@ -13,7 +14,7 @@ class HomeScreenManager extends StatefulWidget {
 }
 
 class _HomeScreenManagerState extends State<HomeScreenManager> {
-  
+  var maxcontroller = Get.find<Mapcontroller>();
   List<Widget> _pages = [
     HomeScreen(),
     RequestTricycleSreen(),
@@ -43,8 +44,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager> {
         currentIndex: _pageIndex,
         onTap: _selectPage,
         items: [
-          bottomNavigator(Icons.home, 'Home'),
-          bottomNavigator(Icons.location_on, 'Request'),
+          bottomNavigator(Icons.home, 'Home'), bottomNavigator(Icons.location_on, 'Request'),
           bottomNavigator(Icons.history, 'Trips'),
           bottomNavigator(Icons.account_circle, 'Me'),
           // BottomNavigationBarItem(

@@ -6,14 +6,22 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 
 
-
-
-class GeoTest extends StatefulWidget {
-  @override
-  _GeoTestState createState() => _GeoTestState();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MaterialApp(
+    title: 'Geo Flutter Fire example',
+    home: MyApp(),
+    debugShowCheckedModeBanner: false,
+  ));
 }
 
-class _GeoTestState extends State<GeoTest> {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   GoogleMapController? _mapController;
   TextEditingController? _latitudeController, _longitudeController;
 
@@ -21,6 +29,7 @@ class _GeoTestState extends State<GeoTest> {
   final radius = BehaviorSubject<double>.seeded(1.0);
   final _firestore = FirebaseFirestore.instance;
   final markers = <MarkerId, Marker>{};
+
   late Stream<List<DocumentSnapshot>> stream;
   late Geoflutterfire geo;
 
@@ -79,9 +88,7 @@ class _GeoTestState extends State<GeoTest> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return Container(
-                child: Text('data'),
-              );
+              return Container();
             }));
           },
           child: Icon(Icons.navigate_next),

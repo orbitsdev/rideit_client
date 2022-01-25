@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/binding/gextbinding.dart';
+import 'package:tricycleapp/config/firebaseconfig.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
@@ -16,13 +20,8 @@ import 'package:tricycleapp/testsign_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    await Firebase.initializeApp(
-        options: FirebaseOptions(
-            apiKey: "AIzaSyBAu_0jNcwH8OC8Mva4f_5ARKEgsu6Hz5U",
-            appId: "1:162571879335:android:8b1e81380c3c34f417ac82",
-            messagingSenderId: "162571879335",
-            projectId: "tricyleapp-f8fff"));
+try {
+    await Firebaseconfig.firebaseinitilizeapp();
   } on FirebaseException catch (e) {
     if (e.code == 'duplicate-app') {
     } else {
@@ -43,8 +42,35 @@ class TricycleApp extends StatefulWidget {
 }
 
 class _TricycleAppState extends State<TricycleApp> {
+
+    late StreamSubscription<User?> user;
+
+  @override
+  void initState() {
+    super.initState();
+
+    user = FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in!');
+      }
+    });
+    
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    user.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+  
+
+  
     return GetMaterialApp(
       smartManagement: SmartManagement.keepFactory,
       initialBinding: Gextbinding(),
@@ -52,22 +78,18 @@ class _TricycleAppState extends State<TricycleApp> {
         primaryColor: Colors.blueAccent,
         primarySwatch: Colors.blue,
       ),
-      home:   authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
+      home:
+      //SigninScreen(),
+         authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
       getPages: [
         GetPage(name: SigupScreen.screenName, page: () => SigupScreen()),
         GetPage(name: SigninScreen.screenName, page: () => SigninScreen()),
-        GetPage(
-            name: HomeScreenManager.screenName,
-            page: () => HomeScreenManager()),
+        GetPage(  name: HomeScreenManager.screenName,  page: () => HomeScreenManager()),
         GetPage(name: HomeScreen.screenName, page: () => HomeScreen()),
-        GetPage(
-            name: RequestTricycleSreen.screenName,
-            page: () => RequestTricycleSreen()),
-        GetPage(
-            name: TripHistoryScreen.screenName,
-            page: () => TripHistoryScreen()),
+        GetPage( name: RequestTricycleSreen.screenName,page: () => RequestTricycleSreen()),
+        GetPage( name: TripHistoryScreen.screenName, page: () => TripHistoryScreen()),
         GetPage(name: MeScreen.screenName, page: () => MeScreen()),
-        GetPage(name: TestsignScreen.screenName, page: () => TestsignScreen()),
+      
       ],
       debugShowCheckedModeBanner: false,
     );

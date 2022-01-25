@@ -9,8 +9,10 @@ class MeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ElevatedButton(
-        onPressed: () {
-          authinstance.signOut().then((value) => Get.offAllNamed(SigninScreen.screenName) );
+        onPressed: () async {
+         await authinstance.signOut().then((value) {
+            
+            Get.offAllNamed(SigninScreen.screenName) ;} );
         },
         child: Text('Signout'),
       ),
