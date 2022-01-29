@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +14,11 @@ import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
 import 'package:tricycleapp/screens/trip_history_screen.dart';
 import 'package:tricycleapp/signin_screen.dart';
 import 'package:tricycleapp/sigup_screen.dart';
+import 'package:tricycleapp/testcloudfunction.dart';
 import 'package:tricycleapp/testotp.dart';
 import 'package:tricycleapp/testsign_screen.dart';
+import 'package:tricycleapp/testwidgets/dashboard.dart';
+import 'package:tricycleapp/uiconstant/constant.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,22 +71,23 @@ class _TricycleAppState extends State<TricycleApp> {
 
   @override
   Widget build(BuildContext context) {
-  
+
+    
+    double screenWidth = window.physicalSize.width;
 
   
     return GetMaterialApp(
       smartManagement: SmartManagement.keepFactory,
       initialBinding: Gextbinding(),
-      theme: ThemeData(
-        primaryColor: Colors.blueAccent,
-        primarySwatch: Colors.blue,
-      ),
-      home:
+      theme: ThemeData(primaryColor: COLOR_WHITE, accentColor: COLOR_DARK_BLUE, textTheme: screenWidth < 500 ? TEXT_THEME_SMALL : TEXT_THEME_DEFAULT  ),
+      home:HomeScreenManager(),
+      //Testcloudfunction(),
       //SigninScreen(),
-         authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
+     //  authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
       getPages: [
         GetPage(name: SigupScreen.screenName, page: () => SigupScreen()),
         GetPage(name: SigninScreen.screenName, page: () => SigninScreen()),
+        GetPage(name: Dashboard.screenName, page: () => Dashboard()),
         GetPage(  name: HomeScreenManager.screenName,  page: () => HomeScreenManager()),
         GetPage(name: HomeScreen.screenName, page: () => HomeScreen()),
         GetPage( name: RequestTricycleSreen.screenName,page: () => RequestTricycleSreen()),

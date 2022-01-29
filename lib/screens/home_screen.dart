@@ -1,249 +1,123 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:geo_firestore_flutter/geo_firestore_flutter.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lottie/lottie.dart' as lotie;
 import 'package:tricycleapp/controller/mapcontroller.dart';
-import 'package:tricycleapp/helper/Geofirehelper.dart';
-import 'package:tricycleapp/helper/firebasehelper.dart';
+import 'package:tricycleapp/helper/geofirehelper.dart';
 import 'package:tricycleapp/model/nearbydriver.dart';
-import 'package:tricycleapp/widgets/map/checkrequest.dart';
-import 'package:tricycleapp/widgets/map/firststep.dart';
-import 'package:tricycleapp/widgets/map/maketricyclerequest.dart';
-import 'package:tricycleapp/widgets/map/search.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:tricycleapp/uiconstant/constant.dart';
+import 'package:tricycleapp/uiconstant/widget_function.dart';
 
-enum MapSelected { normal, satelite, hybrid }
 
-enum RequestTricycleState { start, picklocation, checkrequest, sendrequest }
+enum tricycleRequestState{
+  starting,
+  requesting
+  
+}
 
 class HomeScreen extends StatefulWidget {
   static const screenName = '/home';
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  //prepairing map
-
-  var maxcontroller = Get.find<Mapcontroller>();
-  Completer<GoogleMapController> _googlemapcontroller = Completer();
-  GoogleMapController? _newgooglemapcontroller;
-  Position? currentPosition;
-  CameraPosition? cameraposition;
-  bool isMapReady = false;
-  Position? markerPosition;
-  List<LatLng> plineCoordinates = [];
-  Set<Polyline> polyline = {};
-
-  Set<Marker> markerSet = {};
-
-
-bool isnearAvailableDriverKeysReaload = true;
-
-
+  var mapxcontroller = Get.find<Mapcontroller>();
   
-  int _polylincecounter = 1;
-  void setMapCameraInitialValue() async {
-    var mapisready =  await maxcontroller.setMapCameraInitialValue();  
-    setMapIsReady(mapisready);
-    cameraposition = maxcontroller.cameraposition;
+
+  //_____________ gor google map
+  Completer<GoogleMapController> _googlmapcompleter = Completer();
+  GoogleMapController? _newgooglemapcontroller;
+  Position? currenpositon;
+  CameraPosition? cameraposition;
+  LatLng? cameralatlng;
+  bool isMapReady = false;
+  Set<Polyline>? polylinesSet = {};
+  Set<Marker>? markersSet = {};
+  List<Nearbydriver> nearbydriverlist = [];
+  bool nearDriverIsLoad = false;
+  BitmapDescriptor? nearTricycleIcon;
+
+
+
+
+
+  //_____________ for the page
+
+  tricycleRequestState currentrequestpagestate = tricycleRequestState.starting;
+
+  bool isSwitch = false;
+  double _containerHeight = 200;
+
+
+
+   setCameraInitialValue() async {
+    var mapIsReady = await mapxcontroller.setMapCameraInitialValue();
+
+    if(mapIsReady){
+     setMapIsReady(mapIsReady);
+     showNearDriver();
+
+    }
+    print(isMapReady);
+
     
+    cameraposition = mapxcontroller.cameraposition;
   }
 
-
-void setMapIsReady(bool value) {
+  void setMapIsReady(bool value) {
     setState(() {
       isMapReady = value;
     });
   }
+
+  void setCurrentRequestState(tricycleRequestState value){
+    setState(() {
+      currentrequestpagestate = value;
+    });
+  }
+
+
+  void _moveCameraToCurrentPostion() async {
+    cameraposition = await mapxcontroller.moveMapCameraToCurrentPosition();
+
+    _newgooglemapcontroller!.animateCamera(
+        CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
+  }
+
+@override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+@override
+  void dispose() {
+    _newgooglemapcontroller!.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    setCameraInitialValue();
+ 
+    super.initState();
+  }
+
   
 
-  void _moveMapCameraToCurrentPosition() async {
-    var loccationpermisiion = await maxcontroller.requestLocationPermision();
-    if(loccationpermisiion){
-      cameraposition = await maxcontroller.moveMapCameraToCurrentPosition();
-    initGeoFireListener();
-    print('inithey');
-     }
-    _newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
-   
-  }
+  void showNearDriver() async{
+   await  Geofire.initialize("availableDrivers");
 
-  //placing marker in map
-
-  LatLng? _placedMarkerLocation;
-
-  void placeMarker(LatLng position) {
-
-    setState(() {
-      _placedMarkerLocation = position;
-    });
-    maxcontroller.placeMarkerAddressCoordinate(_placedMarkerLocation as LatLng);
-  }
-
-  RequestTricycleState requestformstate = RequestTricycleState.start;
-
-  void setRequestState(RequestTricycleState requeststate) {
-    setState(() {
-      requestformstate = requeststate;
-    });
-  }
-
-  void startRequest() {
-    setRequestState(RequestTricycleState.picklocation);
-  }
-
-  void backToStartRequest() {
-    setRequestState(RequestTricycleState.start);
-    _placedMarkerLocation = null;
-    // maxcontroller.picklocation('No Destination was seleced');
-  }
-
-  void prepairrequest() {
-    setRequestState(RequestTricycleState.checkrequest);
-  }
-
-  //search
-  bool isSearchingLocation = false;
-
-  void setisSearchingLocation(bool value) {
-    setState(() {
-      isSearchingLocation = value;
-    });
-  }
-
-  void selectedLocationFromSearch(LatLng position) {
-    setState(() {
-      _placedMarkerLocation = position;
-      cameraposition = CameraPosition(
-        target: position,
-        zoom: 16.999,
-        tilt: 40,
-        bearing: 985,
-      );
-      _newgooglemapcontroller!.animateCamera(
-          CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
-    });
-  }
-
-  void drawRoutes(String polylincecode) {
-    PolylinePoints polylinepoints = PolylinePoints();
-
-    List<PointLatLng> decodePolylinesResultPoint =
-        polylinepoints.decodePolyline(polylincecode);
-    plineCoordinates.clear();
-
-    if (decodePolylinesResultPoint.isNotEmpty) {
-      decodePolylinesResultPoint.forEach((PointLatLng points) {
-        plineCoordinates.add(LatLng(points.latitude, points.longitude));
-      });
-    }
-
-    polyline.clear();
-    setState(() {
-      Polyline polylines = Polyline(
-        polylineId: PolylineId('polylineId'),
-        color: Colors.pink,
-        jointType: JointType.round,
-        points: plineCoordinates,
-        width: 5,
-        startCap: Cap.roundCap,
-        endCap: Cap.roundCap,
-        geodesic: true,
-      );
-      polyline.add(polylines);
-    });
-
-    LatLngBounds latlngbounds;
-
-    LatLng pick = LatLng(maxcontroller.pickuplocation.value.latitude as double,
-        maxcontroller.pickuplocation.value.longitude as double);
-    LatLng drop = LatLng(maxcontroller.dropofflocation.value.latitude as double,
-        maxcontroller.dropofflocation.value.longitude as double);
-
-    if (pick.latitude > drop.longitude && pick.longitude > drop.longitude) {
-      latlngbounds = LatLngBounds(southwest: drop, northeast: pick);
-    } else if (pick.longitude > drop.longitude) {
-      latlngbounds = LatLngBounds(
-          southwest: LatLng(pick.latitude, drop.longitude),
-          northeast: LatLng(drop.latitude, pick.longitude));
-    } else if (pick.latitude > drop.latitude) {
-      latlngbounds = LatLngBounds(
-          southwest: LatLng(drop.latitude, pick.longitude),
-          northeast: LatLng(pick.latitude, drop.longitude));
-    } else {
-      latlngbounds =
-          latlngbounds = LatLngBounds(southwest: pick, northeast: drop);
-    }
-
-    _newgooglemapcontroller!
-        .animateCamera(CameraUpdate.newLatLngBounds(latlngbounds, 70));
-  }
-
-  void setPolyLine(List<PointLatLng> points, LatLng sw, LatLng ne) {
-    String polylineIdVal = "polyline_id${_polylincecounter}";
-    polyline.clear();
-    setState(() {
-      _polylincecounter++;
-      polyline.add(
-        Polyline(
-            polylineId: PolylineId(polylineIdVal),
-            width: 5,
-            color: Colors.blue,
-            points:
-                points.map((e) => LatLng(e.latitude, e.longitude)).toList()),
-      );
-    });
-
-    // LatLngBounds latlngbounds;
-    // LatLng pick = ne;
-    // LatLng drop = sw;
-    // if (pick.latitude > drop.longitude && pick.longitude > drop.longitude) {
-    //   latlngbounds = LatLngBounds(southwest: drop, northeast: pick);
-    // } else if (pick.longitude > drop.longitude) {
-    //   latlngbounds = LatLngBounds(
-    //       southwest: LatLng(pick.latitude, drop.longitude),
-    //       northeast: LatLng(drop.latitude, pick.longitude));
-    // } else if (pick.latitude > drop.latitude) {
-    //   latlngbounds = LatLngBounds(
-    //       southwest: LatLng(drop.latitude, pick.longitude),
-    //       northeast: LatLng(pick.latitude, drop.longitude));
-    // } else {
-    //   latlngbounds =
-    //       latlngbounds = LatLngBounds(southwest: pick, northeast: drop);
-    // }
-
-    _newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
-        LatLngBounds(southwest: ne, northeast: sw), 35));
-  }
-
-  void clearPolyLines() {
-    setState(() {
-      polyline = {};
-    });
-  }
-
-  String field = 'position';
-
- 
-  void initGeoFireListener() async {
-
-    currentPosition = maxcontroller.currentPosition;
-  print('___________');    
-
-
-    Geofire.initialize('availableDrivers');
-
-    Geofire.queryAtLocation(currentPosition!.latitude, currentPosition!.longitude, 15)!.listen((map) {
+    Geofire.queryAtLocation(mapxcontroller.currentPosition!.latitude, mapxcontroller.currentPosition!.longitude , 5)!.listen((map) {
         print(map);
         if (map != null) {
           var callBack = map['callBack'];
@@ -253,217 +127,349 @@ void setMapIsReady(bool value) {
 
           switch (callBack) {
             case Geofire.onKeyEntered:
-            Nearbydriver neardriver = Nearbydriver();
-            neardriver.key = map["key"];
-            neardriver.latitude = map["latitude"];
-            neardriver.longitude = map["longitude"];
-            Geofirehelper.nearbydrivercollection.add(neardriver);
-            if(isnearAvailableDriverKeysReaload == true){
-              updateAvailableDriver();
+            Nearbydriver driver =  Nearbydriver();
+            driver.key = map["key"];
+            driver.latitude = map["latitude"];
+            driver.longitude = map["longitude"];
+            Geofirehelper.nearAvailableDriber.add(driver);
+            if(nearDriverIsLoad == true){
+              updateAvailableDriverOnMap();
             }
              // keysRetrieved.add(map["key"]);
               break;
 
             case Geofire.onKeyExited:
             Geofirehelper.removeDriverFromList(map["key"]);
+            updateAvailableDriverOnMap();
+
              // keysRetrieved.remove(map["key"]);
-            updateAvailableDriver();
               break;
 
             case Geofire.onKeyMoved:
-              Nearbydriver neardriver = Nearbydriver();
-            neardriver.key = map["key"];
-            neardriver.latitude = map["latitude"];
-            neardriver.longitude = map["longitude"];
-            Geofirehelper.updateDriverNearByLocation(neardriver);
-            updateAvailableDriver();
+            Nearbydriver driver =  Nearbydriver();
+            driver.key = map["key"];
+            driver.latitude = map["latitude"];
+            driver.longitude = map["longitude"];
+            Geofirehelper.updateDriverNearByLocation(driver);
+            updateAvailableDriverOnMap();
             // Update your key's location
               break;
 
             case Geofire.onGeoQueryReady:
+            updateAvailableDriverOnMap();
             // All Intial Data is loaded
            // print(map['result'])
-                updateAvailableDriver();
+
               break;
           }
         }
 
         setState(() {});
-
     });
+
 
   }
 
-  void updateAvailableDriver(){
-    setState(() {
-      
-      markerSet.clear();
+  void updateAvailableDriverOnMap(){
 
+setState(() {
+        markersSet!.clear();
     });
+
+    for(Nearbydriver drivers in Geofirehelper.nearAvailableDriber)
+    {
+
+      
+        
+      print('______  hey testing');
+      print(drivers.latitude);
+      print(drivers.longitude);
+      LatLng driverposition = LatLng(drivers.latitude as double, drivers.longitude as double);
+      print(driverposition);
+    }
+
+    
 
     Set<Marker> tmarker = Set<Marker>();
 
-    for(Nearbydriver driver in Geofirehelper.nearbydrivercollection){
 
-      LatLng driverpostition  = LatLng(driver.latitude as double, driver.longitude as double);
+    for(Nearbydriver driver  in Geofirehelper.nearAvailableDriber){
+        LatLng driverpostion = LatLng(driver.latitude as double , driver.longitude as double);
+        Marker newMarker = Marker(
+          markerId: MarkerId(driver.key as String),
+          position: driverpostion,
+          icon: nearTricycleIcon as BitmapDescriptor,
+         
 
-      Marker marker =  Marker(
-        markerId: MarkerId("driver${driver.key}"),
-        position: driverpostition,
-        icon: nearByIcon as BitmapDescriptor,
-        rotation: Geofirehelper.createRandomNumber(360),
 
-         );
+           );
 
-         tmarker.add(marker);
+      tmarker.add(newMarker);
+          
 
     }
-
     setState(() {
-      markerSet = tmarker;
+      markersSet = tmarker; 
     });
+
+
   }
 
+  void  createCustomMarker(){
+    if(nearTricycleIcon == null){
+       ImageConfiguration imageconfiguration = createLocalImageConfiguration(context, size: Size(12, 12));
+       BitmapDescriptor.fromAssetImage(imageconfiguration,"assets/images/Motorcycle_8.png").then((value) {
+         nearTricycleIcon = value;
+       });
 
-  BitmapDescriptor? nearByIcon;
-
-  void creatIconsMarker(){
-
-    if(nearByIcon == null){
-      ImageConfiguration imageconfigiration =   createLocalImageConfiguration(context, size:Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageconfigiration, "assets/images/car_android.png").then((value) {
-        nearByIcon = value;
-      });
     }
-  }
-
-
-  @override
-  void initState() {
-    super.initState();
-
-    setMapCameraInitialValue();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    creatIconsMarker();
-
-    return Column(
-      children: [
-        if (requestformstate == RequestTricycleState.start)
-          Container(
-            padding: EdgeInsets.symmetric(
-              vertical: 20,
-              horizontal: 30,
+    createCustomMarker();
+    return Column(children: [
+      isMapReady == false
+          ? Expanded(
+            child:lotie.Lottie.asset('assets/images/52141-balancing-loader.json',
+            //animate: true,
             ),
-            width: double.infinity,
-            decoration: BoxDecoration(color: Colors.white, boxShadow: [
-              BoxShadow(
-                  color: Colors.black54,
-                  blurRadius: 6.5,
-                  spreadRadius: 6.0,
-                  offset: Offset(0.7, 0.7)),
-            ]),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            )
+          : Expanded(
+              child: Stack(
+              fit: StackFit.expand,
               children: [
-                Text(
-                  'Hi There',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Text('Where  would you like to go?')
+                GoogleMap(
+                    padding: EdgeInsets.only(top: 70, bottom: 5, left: 5),
+                    mapType: MapType.normal,
+                    initialCameraPosition: cameraposition as CameraPosition,
+                    zoomControlsEnabled: true,
+                    zoomGesturesEnabled: true,
+                    myLocationButtonEnabled: true,
+                    myLocationEnabled: true,
+                    markers: markersSet as  Set<Marker>,
+                    polylines: polylinesSet as Set<Polyline>,
+                    onMapCreated: (GoogleMapController mapcontroller) {
+                          if(!_googlmapcompleter.isCompleted){
+                      _googlmapcompleter.complete(mapcontroller);
+                      _newgooglemapcontroller = mapcontroller;
+                      _moveCameraToCurrentPostion();
+
+
+                          }
+                    }
+
+                    //           },
+                    ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: AnimatedContainer(
+                    constraints: BoxConstraints(minHeight: _containerHeight),
+                    duration: Duration(milliseconds: 1500),
+                    curve: Curves.fastOutSlowIn,
+                    decoration: BoxDecoration(
+                     
+                    ),
+                    child: AnimatedSwitcher(
+                      reverseDuration: Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeInOutBack,
+                      duration: Duration(milliseconds: 300),
+                      transitionBuilder: (child, animatin) => ScaleTransition(
+                        scale: animatin,
+                        child: child,
+                      ),
+                      child: isSwitch == false
+                          ? findTricycle(context)
+                          : requestForm(context),
+                    ),
+                  ),
+                )
               ],
+            ))
+    ]);
+  }
+
+  int _currentStep = 0;
+
+  List<Step> _getSteps() => [
+        Step(
+          state: _currentStep > 0 ? StepState.complete : StepState.indexed,
+            isActive: _currentStep >= 0,
+            title: Text('Destination'),
+            subtitle: Text('Picking'),
+            content: Container(
+              child: Text('a'),
+            )),
+        Step(
+              state: _currentStep > 1 ? StepState.complete : StepState.indexed,
+            isActive: _currentStep >= 1,
+            title: Text('Optional'),
+            content: Container(
+              child: Text('b'),
+            )),
+        Step(
+           state: _currentStep > 2 ? StepState.complete : StepState.indexed,
+            isActive: _currentStep >= 2,
+            title: Text('Send'),
+            content: Container(
+              child: Text('c'),
+            )),
+      ];
+
+  Widget requestForm(BuildContext context) {
+    return Container(
+      height: 300,
+      color: COLOR_SECONDARY_WHITE,
+      key: Key('2'),
+      child: Column(
+        children: [
+          SizedBox(
+            width: 80,
+            child: ElevatedButton(onPressed: (){
+              switchContainer();
+            }, child: Text('close')),
+          ),
+          Expanded(
+            child: Stepper(
+              onStepTapped: (step)=> setState(() => _currentStep = step),
+              currentStep: _currentStep,
+              type: StepperType.horizontal,
+              steps: _getSteps(),
+              onStepContinue: () {
+                final lastStep = _currentStep == _getSteps().length - 1;
+
+                if (lastStep) {
+                  print('compledted');
+                } else {
+                  setState(() {
+                    _currentStep += 1;
+                  });
+                }
+              },
+              onStepCancel: _currentStep == 0
+                  ? null
+                  : () {
+                      setState(() {
+                        _currentStep -= 1;
+                      });
+                    },
             ),
           ),
-        isMapReady == false
-            ? Expanded(
-                child: Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                ),
-              ))
-            : Expanded(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    GoogleMap(
-                      padding: EdgeInsets.only(top: 70, bottom: 5, left: 5),
-                      mapType: MapType.hybrid,
-                      initialCameraPosition: cameraposition as CameraPosition,
-                      zoomControlsEnabled: true,
-                      zoomGesturesEnabled: true,
-                      myLocationButtonEnabled: true,
-                      myLocationEnabled: true,
-                      polylines: polyline,
-                      onMapCreated: (GoogleMapController mapcontroller) {
-                        _googlemapcontroller.complete(mapcontroller);
-                        _newgooglemapcontroller = mapcontroller;
-                        _moveMapCameraToCurrentPosition();
-                      },
-                      onTap:
-                          requestformstate == RequestTricycleState.picklocation
-                              ? placeMarker
-                              : null,
-                      markers: markerSet
-                          //Set<Marker>.of(markers.values) ,
-                          // requestformstate == RequestTricycleState.start
-                          //     ? {}
-                          //     : _placedMarkerLocation == null
-                          //         ? {}
-                          //         : {
-                          //             Marker(
-                          //                 markerId: MarkerId('m1'),
-                          //                 position:
-                          //                     _placedMarkerLocation as LatLng)
-                          //           },
-                    ),
-                    if (requestformstate == RequestTricycleState.picklocation)
-                      Search(
-                        passcontext: context,
-                        setisSearchingLocation: setisSearchingLocation,
-                        selectedLocationFromSearch: selectedLocationFromSearch,
-                      ),
-                  ],
-                ),
+        ],
+      ),
+    );
+    // return Container(
+    //        key: Key('2'),
+
+    //               margin:
+    //                   EdgeInsets.only(top: 0,right: 20,left: 20,bottom: 40),
+    //               padding: EdgeInsets.all(25),
+    //               decoration: BoxDecoration(
+    //                 color: COLOR_WHITE,
+    //                 borderRadius: BorderRadius.only(
+    //                     topLeft: Radius.circular(12),
+    //                     topRight: Radius.circular(12)),
+    //                 boxShadow: [
+    //                   BoxShadow(
+    //                       color: COLOR_BLACK.withAlpha(21),
+    //                       blurRadius: 6.0,
+    //                       spreadRadius: 0.7,
+    //                       offset: Offset(0, 10))
+    //                 ],
+    //               ),
+    //               child: Column(
+    //                 children: [
+    //                   Text(
+    //                     'Hellow',
+    //                     style: Theme.of(context).textTheme.headline2,
+    //                   ),
+    //                   addVerticalSpace(15),
+    //                   SizedBox(
+    //                     width: double.infinity,
+    //                     child: ElevatedButton(
+    //                       onPressed: () {
+    //                          switchContainer();
+    //                       },
+    //                       child: Text('FIND TRICYCLE'),
+    //                       style: ButtonStyle(
+    //                         backgroundColor:
+    //                             MaterialStateProperty.all<Color>(
+    //                                 COLOR_PURPLE_BUTTON),
+    //                       ),
+    //                     ),
+    //                   )
+    //                 ],
+    //               ),
+    //             );
+  }
+
+  Container findTricycle(BuildContext context) {
+    return Container(
+      key: Key('1'),
+      margin: EdgeInsets.only(top: 0, right: 20, left: 20, bottom: 40),
+      padding: EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        color: COLOR_WHITE,
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+        boxShadow: [
+          BoxShadow(
+              color: COLOR_BLACK.withAlpha(21),
+              blurRadius: 6.0,
+              spreadRadius: 0.7,
+              offset: Offset(0, 10))
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Where would you like to go?',
+            style: Theme.of(context).textTheme.headline2,
+          ),
+          addVerticalSpace(15),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                switchContainer();
+              },
+              child: Text('FIND TRICYCLE'),
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(COLOR_PURPLE_BUTTON),
               ),
-        AnimatedSwitcher(
-          duration: Duration(milliseconds: 400),
-          reverseDuration: Duration(milliseconds: 400),
-          child: isSearchingLocation ? Container() : requestformBuilder(),
-        ),
-      ],
+            ),
+          )
+        ],
+      ),
     );
   }
 
-  Widget requestformBuilder() {
-    if (requestformstate == RequestTricycleState.start) {
-      return Maketricyclerequest(
-        startRequest: startRequest,
-      );
-    } else if (requestformstate == RequestTricycleState.picklocation) {
-      //hide if the user search
-      if (!isSearchingLocation) {
-        return Firststep(
-          setRequestState: setRequestState,
-          setPolyLine: setPolyLine,
-          clearPolylines: clearPolyLines,
-        );
-      }
-    } else if (requestformstate == RequestTricycleState.checkrequest) {
-      return Checkrequest(
-        setRequestState: setRequestState,
-        setPolyLine: setPolyLine,
-        clearPolylines: clearPolyLines,
-      );
+  
+  void showRequestForm(){
+      setCurrentRequestState(tricycleRequestState.requesting);
+  }
+
+  Widget _requestFormLogic(){
+
+   if(currentrequestpagestate == tricycleRequestState.requesting){
+      return requestForm(context);
     }
 
-    return Maketricyclerequest(
-      startRequest: startRequest,
-    );
+    return findTricycle(context);
+
+  }
+
+  void switchContainer() {
+    setState(() {
+      isSwitch = !isSwitch;
+      if (_containerHeight == 200) {
+        _containerHeight = 300;
+      } else {
+        _containerHeight = 200;
+      }
+    });
   }
 }

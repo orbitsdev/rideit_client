@@ -29,6 +29,8 @@ class Mapcontroller extends GetxController {
 
   var dropofflocation = Placeaddress().obs;
   var pickuplocation = Placeaddress().obs;
+  String? lastpickedlocation;
+
   var routedirectiondetails = DirectionDetails().obs;
   Position? currentPosition;
   CameraPosition? cameraposition;
@@ -131,13 +133,16 @@ class Mapcontroller extends GetxController {
     if (ispicklocationready) {
       progressDialog('Prepairing route');
       isrouteset = await getroutedirection();
+      
       Get.back();
     }
 
     if (isrouteset) {
       print('______');
       print('nice ');
+      lastpickedlocation  = dropofflocation.value.placeid;
       calculateFee();
+     
       return true;
     } else {
       print('______');
@@ -243,6 +248,8 @@ class Mapcontroller extends GetxController {
           selectedaddress.longitude as double);
 
       dropofflocation(selectedaddress);
+      
+
       setNewMarker(newmarkerpostion);
       isaddresloading(false);
 
@@ -300,6 +307,7 @@ class Mapcontroller extends GetxController {
    
     routedirectiondetails = directiondetails.obs;
 
+
     print('__________ routedirection details');
     print(routedirectiondetails.value.bound_ne);
     print(routedirectiondetails.value.bound_sw);
@@ -323,6 +331,7 @@ class Mapcontroller extends GetxController {
    dropofflocation = Placeaddress().obs;
    pickuplocation = Placeaddress().obs;
    routedirectiondetails = DirectionDetails().obs;
+   lastpickedlocation = null;
 
 
    }
