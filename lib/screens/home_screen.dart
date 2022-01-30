@@ -225,8 +225,14 @@ class _HomeScreenState extends State<HomeScreen> {
       markersSet!.add(dropoffmarker as Marker);
     });
 
-    _newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(target: position, zoom: 16.999),
+    _moveCamera(position);
+
+   
+  }
+
+  void _moveCamera(LatLng position){
+     _newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(target: position, zoom: 17.999),
     ));
   }
 
@@ -247,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 GoogleMap(
                   padding: EdgeInsets.only(top: 100, bottom: mpappading),
-                  mapType: MapType.hybrid,
+                  mapType: MapType.normal,
                   initialCameraPosition: cameraposition as CameraPosition,
                   zoomControlsEnabled: true,
                   zoomGesturesEnabled: true,
@@ -349,32 +355,42 @@ class _HomeScreenState extends State<HomeScreen> {
                             ))
                           ],
                         ),
-                        Row(
-                          children: [
-                            Container(
-                                width: 30,
-                                height: 30,
-                                child: Center(
-                                    child: FaIcon(
-                                  FontAwesomeIcons.mapMarkerAlt,
-                                  size: 30,
-                                ))),
-                            addHorizontalSpace(15),
-                            mapxcontroller.isaddresloading.value
-                                ? Container(
-                                    width: 100,
-                                    height: 100,
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: (){
+                        
+                                LatLng droposition = LatLng(mapxcontroller.dropofflocation.value.latitude as double, (mapxcontroller.dropofflocation.value.longitude as double));
+                              _moveCamera(droposition);
+                            },
+                            child: Row(
+                              children: [
+                                Container(
+                                    width: 30,
+                                    height: 30,
                                     child: Center(
-                                        child: lotie.Lottie.asset(
-                                      "assets/images/84272-loading-colour.json",
-                                    )))
-                                : Expanded(
-                                    child: Text(
-                                    '${mapxcontroller.dropofflocation.value.placeformattedaddress}',
-                                    style:
-                                        Theme.of(context).textTheme.bodyText1,
-                                  ))
-                          ],
+                                        child: FaIcon(
+                                      FontAwesomeIcons.mapMarkerAlt,
+                                      size: 30,
+                                    ))),
+                                addHorizontalSpace(15),
+                                mapxcontroller.isaddresloading.value
+                                    ? Container(
+                                        width: 100,
+                                        height: 100,
+                                        child: Center(
+                                            child: lotie.Lottie.asset(
+                                          "assets/images/84272-loading-colour.json",
+                                        )))
+                                    : Expanded(
+                                        child: Text(
+                                        '${mapxcontroller.dropofflocation.value.placeformattedaddress}',
+                                        style:
+                                            Theme.of(context).textTheme.bodyText1,
+                                      ))
+                              ],
+                            ),
+                          ),
                         )
                       ],
                     );
