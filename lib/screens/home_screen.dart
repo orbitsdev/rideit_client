@@ -308,35 +308,42 @@ class _HomeScreenState extends State<HomeScreen> {
         Step(
             state: _currentStep > 0 ? StepState.complete : StepState.indexed,
             isActive: _currentStep >= 0,
-            title: Text('Destination'),
+            title: Text('Select Destination'),
             content: Container(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Select Dropoff Location',
+                 
+                  Obx(() {
+                    if (mapxcontroller
+                            .dropofflocation.value.placeformattedaddress ==
+                        null) {
+                      return Column(
+                        children: [
+                           Text(
+                    'Choose Destination',
                     style: Theme.of(context).textTheme.headline2,
                   ),
                   Text(
-                    'Tap the map or use search input to pick location',
+                    ' Tap the map or use search bar to select location ' ,textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   addVerticalSpace(8),
                   Divider(
                     height: 2,
                   ),
-                  Obx(() {
-                    if (mapxcontroller
-                            .dropofflocation.value.placeformattedaddress ==
-                        null) {
-                      return Container(
-                          height: 125,
-                          child: Center(
-                              child: lotie.Lottie.asset(
-                                  "assets/images/86234-select-location.json")));
+                          Container(
+                              height: 125,
+                              child: Center(
+                                  child: lotie.Lottie.asset(
+                                      "assets/images/86234-select-location.json"))),
+                        ],
+                      );
                     }
                     return Column(
                       children: [
+
+                        
                         Row(
                           children: [
                             Container(
@@ -405,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Step(
             state: _currentStep > 1 ? StepState.complete : StepState.indexed,
             isActive: _currentStep >= 1,
-            title: Text('Complete'),
+            title: Text('Send Request'),
             content: Container(
               child: Text('b'),
             )),
@@ -562,6 +569,7 @@ class _HomeScreenState extends State<HomeScreen> {
           markersSet!.clear();
           polylinesSet!.clear();
           isPicking =false;
+          _currentStep = 0;
         currentrequestpagestate = tricycleRequestState.starting;
       });
     }
