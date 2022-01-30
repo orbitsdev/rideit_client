@@ -53,6 +53,7 @@ dependencies:
   motion_tab_bar_v2: ^0.2.5
   flutter_svg: ^1.0.3
   lottie: ^1.2.1
+  animated_text_kit: ^4.2.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -86,6 +87,8 @@ flutter:
     - assets/images/car_android.png
     - assets/images/Motorcycle_8.png
     - assets/images/52141-balancing-loader.json
+    - assets/images/84272-loading-colour.json
+    - assets/images/86234-select-location.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

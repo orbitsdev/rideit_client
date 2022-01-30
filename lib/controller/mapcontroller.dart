@@ -42,10 +42,10 @@ class Mapcontroller extends GetxController {
     
     var localpermission = await requestLocationPermision();
     if(localpermission){
-        currentPosition = await Geolocator.getCurrentPosition();
+        currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
           
        String? getinitialpositionString = currentPosition!.latitude.toString() + currentPosition!.longitude.toString();
-        cameraposition = CameraPosition( target: LatLng(currentPosition!.latitude, currentPosition!.longitude), zoom: 16.500);
+        cameraposition = CameraPosition( target: LatLng(currentPosition!.latitude, currentPosition!.longitude), zoom:  16.500);
 
         if (getinitialpositionString.isNotEmpty) {
       isMapIsReady = true;
@@ -68,8 +68,7 @@ class Mapcontroller extends GetxController {
 
   Future<CameraPosition> moveMapCameraToCurrentPosition() async{
     
-    currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    currentPosition = await Geolocator.getCurrentPosition( desiredAccuracy: LocationAccuracy.best);
     LatLng newcameraposition =
         LatLng(currentPosition!.latitude, currentPosition!.longitude);
     cameraposition = CameraPosition(
@@ -332,6 +331,7 @@ class Mapcontroller extends GetxController {
    pickuplocation = Placeaddress().obs;
    routedirectiondetails = DirectionDetails().obs;
    lastpickedlocation = null;
+   
 
 
    }
