@@ -79,7 +79,7 @@ class _TricycleAppState extends State<TricycleApp> {
     return GetMaterialApp(
       smartManagement: SmartManagement.keepFactory,
       initialBinding: Gextbinding(),
-      theme: ThemeData(primaryColor: COLOR_WHITE, accentColor: COLOR_DARK_BLUE, textTheme: screenWidth < 500 ? TEXT_THEME_SMALL : TEXT_THEME_DEFAULT  ),
+      theme: ThemeData(primaryColor: COLOR_PURPLE_BUTTON, accentColor: COLOR_DARK_BLUE, textTheme: screenWidth < 500 ? TEXT_THEME_SMALL : TEXT_THEME_DEFAULT  ),
       home:HomeScreenManager(),
       //Testcloudfunction(),
       //SigninScreen(),

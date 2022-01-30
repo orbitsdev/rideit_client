@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -11,6 +12,7 @@ import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/helper/geofirehelper.dart';
 import 'package:tricycleapp/model/nearbydriver.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
+import 'package:tricycleapp/uiconstant/hex_color.dart';
 import 'package:tricycleapp/uiconstant/widget_function.dart';
 
 
@@ -43,6 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Nearbydriver> nearbydriverlist = [];
   bool nearDriverIsLoad = false;
   BitmapDescriptor? nearTricycleIcon;
+
+  double mpappading = 0;
 
 
 
@@ -240,7 +244,7 @@ setState(() {
               fit: StackFit.expand,
               children: [
                 GoogleMap(
-                    padding: EdgeInsets.only(top: 70, bottom: 5, left: 5),
+                    padding: EdgeInsets.only(top: 40, bottom: mpappading),
                     mapType: MapType.normal,
                     initialCameraPosition: cameraposition as CameraPosition,
                     zoomControlsEnabled: true,
@@ -281,7 +285,7 @@ setState(() {
                         child: child,
                       ),
                       child: isSwitch == false
-                          ? findTricycle(context)
+                          ? startSearching(context)
                           : requestForm(context),
                     ),
                   ),
@@ -293,55 +297,93 @@ setState(() {
 
   int _currentStep = 0;
 
+
+
   List<Step> _getSteps() => [
         Step(
           state: _currentStep > 0 ? StepState.complete : StepState.indexed,
             isActive: _currentStep >= 0,
             title: Text('Destination'),
-            subtitle: Text('Picking'),
+
             content: Container(
-              child: Text('a'),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Select Dropoff Location', style: Theme.of(context).textTheme.headline2,),
+                  Text('Tap the map or use search input to pick location', style: Theme.of(context).textTheme.subtitle1                                                                      ,),
+                  addVerticalSpace(8),
+                  Divider(
+                    height: 2,
+                  ),
+                  addVerticalSpace(8),
+                  Row(
+                    children: [
+                      Container(
+                    
+                        width: 30,
+                        height: 30,
+                        child: Center(child: FaIcon(FontAwesomeIcons.map, size: 30,))),
+                      addHorizontalSpace(15),
+                      Expanded(child: Text('Selected Location', style:  Theme.of(context).textTheme.bodyText1,))
+                    ],
+                  ),
+             
+                  Row(
+                  
+                    children: [
+                      Container(  
+                        
+                        width: 30,
+                        height: 30,
+                        child: Center(child: FaIcon(FontAwesomeIcons.mapMarkerAlt, size: 30,))),
+                      addHorizontalSpace(15),
+                      Expanded(child: Text('Kalawag 22 Central Plaza Kalawag 22 Central Plaza Kalawag 22 Central Plaza', style:  Theme.of(context).textTheme.bodyText1,))
+                    ],
+                  ),
+                    addVerticalSpace(12),
+                    Divider(
+                    height: 2,
+                  ),
+
+                ],
+              ),
             )),
         Step(
               state: _currentStep > 1 ? StepState.complete : StepState.indexed,
             isActive: _currentStep >= 1,
-            title: Text('Optional'),
+            title: Text('Complete'),
             content: Container(
               child: Text('b'),
             )),
-        Step(
-           state: _currentStep > 2 ? StepState.complete : StepState.indexed,
-            isActive: _currentStep >= 2,
-            title: Text('Send'),
-            content: Container(
-              child: Text('c'),
-            )),
+        
       ];
 
   Widget requestForm(BuildContext context) {
     return Container(
+
+
       height: 300,
-      color: COLOR_SECONDARY_WHITE,
+      color: COLOR_WHITE,
       key: Key('2'),
-      child: Column(
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        fit: StackFit.expand,
         children: [
-          SizedBox(
-            width: 80,
-            child: ElevatedButton(onPressed: (){
-              switchContainer();
-            }, child: Text('close')),
-          ),
-          Expanded(
-            child: Stepper(
+        
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Theme(data: Theme.of(context).copyWith(colorScheme: ColorScheme.light(primary: iconcolorsecondary)),child: Stepper(
               onStepTapped: (step)=> setState(() => _currentStep = step),
               currentStep: _currentStep,
               type: StepperType.horizontal,
               steps: _getSteps(),
               onStepContinue: () {
                 final lastStep = _currentStep == _getSteps().length - 1;
-
+                
                 if (lastStep) {
                   print('compledted');
+
                 } else {
                   setState(() {
                     _currentStep += 1;
@@ -355,8 +397,45 @@ setState(() {
                         _currentStep -= 1;
                       });
                     },
+            controlsBuilder:(BuildContext context, ControlsDetails detail){
+              final lastStep = _currentStep == _getSteps().length -1; 
+              return Container(
+                padding: EdgeInsets.only(top: 8),
+                child: Row(
+                  children: [     
+                    Expanded(child: ElevatedButton(child: Text(lastStep ? "CONFIRM" : "NEXT"), onPressed: detail.onStepContinue )),
+                    addHorizontalSpace(12),
+                    if(_currentStep !=0)
+                    Expanded(child: ElevatedButton(child: Text("BACK"), onPressed: detail.onStepCancel  )),
+
+                  ],
+                ),
+              );
+            } ,
+
+            ), 
+            
             ),
           ),
+           Positioned(
+             top: -25,
+             child: ClipRRect(
+
+               borderRadius: BorderRadius.circular(40),
+               child: InkWell(
+                 onTap: (){
+                   switchContainer();
+                 },
+                 child: Container(
+                   padding: EdgeInsets.all(5),
+                   color: COLOR_WHITE,
+                   height: 50,
+                   width: 50,
+                   child: Center(child: FaIcon(FontAwesomeIcons.timesCircle)),),
+               )
+             ),
+           )
+         ,
         ],
       ),
     );
@@ -405,7 +484,7 @@ setState(() {
     //             );
   }
 
-  Container findTricycle(BuildContext context) {
+  Container startSearching(BuildContext context) {
     return Container(
       key: Key('1'),
       margin: EdgeInsets.only(top: 0, right: 20, left: 20, bottom: 40),
@@ -458,7 +537,7 @@ setState(() {
       return requestForm(context);
     }
 
-    return findTricycle(context);
+    return startSearching(context);
 
   }
 
@@ -466,9 +545,11 @@ setState(() {
     setState(() {
       isSwitch = !isSwitch;
       if (_containerHeight == 200) {
-        _containerHeight = 300;
+        _containerHeight = 250;
+        mpappading = 300;
       } else {
         _containerHeight = 200;
+        mpappading = 0;
       }
     });
   }
