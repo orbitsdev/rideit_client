@@ -89,6 +89,7 @@ flutter:
     - assets/images/52141-balancing-loader.json
     - assets/images/84272-loading-colour.json
     - assets/images/86234-select-location.json
+    - assets/images/locationmarker.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

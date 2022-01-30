@@ -41,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Nearbydriver> nearbydriverlist = [];
   bool nearDriverIsLoad = false;
   BitmapDescriptor? nearTricycleIcon;
+  BitmapDescriptor? selectedLocationIcon;
   double mpappading = 200;
   Marker? pickupmarker;
   Marker? dropoffmarker;
@@ -215,10 +216,28 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void createCustomLocationMarker() {
+    if (nearTricycleIcon == null) {
+      ImageConfiguration imageconfiguration =
+          createLocalImageConfiguration(context, size: Size(12, 12));
+      BitmapDescriptor.fromAssetImage(
+              imageconfiguration, "assets/images/locationmarker.png")
+          .then((value) {
+        selectedLocationIcon = value;
+      });
+    }
+  }
+
+
   void setDropOffMarker(LatLng position) {
+      
+
+     
+
     dropoffmarker = Marker(
       markerId: MarkerId('dropmarker'),
       position: position,
+      icon: selectedLocationIcon as BitmapDescriptor
     );
 
     setState(() {
@@ -226,19 +245,51 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     _moveCamera(position);
-
-   
   }
 
-  void _moveCamera(LatLng position){
-     _newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(
+  void _moveCamera(LatLng position) {
+    _newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(target: position, zoom: 17.999),
     ));
+  }
+
+  int _polylincecounter = 1;
+  void prepaireRequest() async {
+    var isRequestReady = await mapxcontroller.prepairRequestDetails();
+    String polylineIdVal = "polyline_id${_polylincecounter}";
+    polylinesSet!.clear();
+    setState(() {
+      _polylincecounter++;
+      polylinesSet!.add(
+        Polyline(
+            polylineId: PolylineId(polylineIdVal),
+            width: 5,
+            color: iconcolorsecondary,
+            points: mapxcontroller
+                .routedirectiondetails.value.polylines_encoded!
+                .map((e) => LatLng(e.latitude, e.longitude))
+                .toList()),
+      );
+    });
+    _caneraBoundToRoute();
+  }
+
+  void _caneraBoundToRoute() {
+    var bound_sw = mapxcontroller.routedirectiondetails.value.bound_sw as LatLng;
+    var bound_ne = mapxcontroller.routedirectiondetails.value.bound_ne as LatLng;
+    
+    print("____sw");
+    print(bound_sw);
+     print("____sw");
+    print(bound_ne);
+    _newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
+        LatLngBounds(southwest: bound_sw, northeast: bound_ne), 45));
   }
 
   @override
   Widget build(BuildContext context) {
     createCustomMarker();
+    createCustomLocationMarker();
     return Column(children: [
       isMapReady == false
           ? Expanded(
@@ -313,25 +364,25 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 
                   Obx(() {
                     if (mapxcontroller
                             .dropofflocation.value.placeformattedaddress ==
                         null) {
                       return Column(
                         children: [
-                           Text(
-                    'Choose Destination',
-                    style: Theme.of(context).textTheme.headline2,
-                  ),
-                  Text(
-                    ' Tap the map or use search bar to select location ' ,textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                  addVerticalSpace(8),
-                  Divider(
-                    height: 2,
-                  ),
+                          Text(
+                            'Choose Destination',
+                            style: Theme.of(context).textTheme.headline2,
+                          ),
+                          Text(
+                            ' Tap the map or use search bar to select location ',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          addVerticalSpace(8),
+                          Divider(
+                            height: 2,
+                          ),
                           Container(
                               height: 125,
                               child: Center(
@@ -342,8 +393,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                     return Column(
                       children: [
-
-                        
                         Row(
                           children: [
                             Container(
@@ -365,9 +414,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: (){
-                        
-                                LatLng droposition = LatLng(mapxcontroller.dropofflocation.value.latitude as double, (mapxcontroller.dropofflocation.value.longitude as double));
+                            onTap: () {
+                              LatLng droposition = LatLng(
+                                  mapxcontroller.dropofflocation.value.latitude
+                                      as double,
+                                  (mapxcontroller.dropofflocation.value
+                                      .longitude as double));
                               _moveCamera(droposition);
                             },
                             child: Row(
@@ -392,8 +444,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     : Expanded(
                                         child: Text(
                                         '${mapxcontroller.dropofflocation.value.placeformattedaddress}',
-                                        style:
-                                            Theme.of(context).textTheme.bodyText1,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1,
                                       ))
                               ],
                             ),
@@ -443,6 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   if (lastStep) {
                     print('compledted');
+                    prepaireRequest();
                   } else {
                     setState(() {
                       _currentStep += 1;
@@ -464,10 +518,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         Expanded(child: Obx(() {
-                          
                           return ElevatedButton(
                               child: Text(lastStep ? "CONFIRM" : "NEXT"),
-                              onPressed: mapxcontroller.dropofflocation.value.placeformattedaddress ==null ? null : detail.onStepContinue);
+                              onPressed: mapxcontroller.dropofflocation.value
+                                          .placeformattedaddress ==
+                                      null
+                                  ? null
+                                  : detail.onStepContinue);
                         })),
                         addHorizontalSpace(12),
                         if (_currentStep != 0)
@@ -561,31 +618,18 @@ class _HomeScreenState extends State<HomeScreen> {
         currentrequestpagestate = tricycleRequestState.requesting;
       });
     } else {
-         mapxcontroller.clearRequest();
+      mapxcontroller.clearRequest();
       setState(() {
         isPicking = false;
         _containerHeight = 200;
         mpappading = 200;
-          markersSet!.clear();
-          polylinesSet!.clear();
-          isPicking =false;
-          _currentStep = 0;
+        markersSet!.clear();
+        polylinesSet!.clear();
+        isPicking = false;
+        _currentStep = 0;
         currentrequestpagestate = tricycleRequestState.starting;
       });
     }
-  }
-
-  void switchContainer() {
-    setState(() {
-      isSwitch = !isSwitch;
-      if (_containerHeight == 200) {
-        _containerHeight = 250;
-        mpappading = 300;
-      } else {
-        _containerHeight = 200;
-        mpappading = 0;
-      }
-    });
   }
 
   bool isSearchFocus = false;
@@ -618,8 +662,6 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           //close
           setSearchFocus(false);
-         
-
         }
       },
       onQueryChanged: (query) {

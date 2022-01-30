@@ -18,7 +18,6 @@ import 'package:tricycleapp/model/prediction_place.dart';
 import 'package:tricycleapp/services/mapservices.dart';
 
 class Mapcontroller extends GetxController {
-
   var userFromAuthcontroller = Get.find<Authcontroller>().user;
 
   var placeprediction = [].obs;
@@ -37,38 +36,34 @@ class Mapcontroller extends GetxController {
   LatLng? markerPositon;
 
   Future<bool> setMapCameraInitialValue() async {
-
     bool? isMapIsReady;
-    
+
     var localpermission = await requestLocationPermision();
-    if(localpermission){
-        currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-          
-       String? getinitialpositionString = currentPosition!.latitude.toString() + currentPosition!.longitude.toString();
-        cameraposition = CameraPosition( target: LatLng(currentPosition!.latitude, currentPosition!.longitude), zoom:  16.500);
+    if (localpermission) {
+      currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
 
-        if (getinitialpositionString.isNotEmpty) {
-      isMapIsReady = true;
+      String? getinitialpositionString = currentPosition!.latitude.toString() +
+          currentPosition!.longitude.toString();
+      cameraposition = CameraPosition(
+          target: LatLng(currentPosition!.latitude, currentPosition!.longitude),
+          zoom: 16.500);
 
+      if (getinitialpositionString.isNotEmpty) {
+        isMapIsReady = true;
+      } else {
+        isMapIsReady = false;
+      }
     } else {
       isMapIsReady = false;
     }
 
-    }else{
-      isMapIsReady = false;
-    }
-
     return isMapIsReady;
-     
-   
-
-     
-   
   }
 
-  Future<CameraPosition> moveMapCameraToCurrentPosition() async{
-    
-    currentPosition = await Geolocator.getCurrentPosition( desiredAccuracy: LocationAccuracy.best);
+  Future<CameraPosition> moveMapCameraToCurrentPosition() async {
+    currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best);
     LatLng newcameraposition =
         LatLng(currentPosition!.latitude, currentPosition!.longitude);
     cameraposition = CameraPosition(
@@ -79,12 +74,10 @@ class Mapcontroller extends GetxController {
     );
 
     return cameraposition as CameraPosition;
-
-
   }
 
-  Future<bool> requestLocationPermision() async{
-     bool serviceEnabled;
+  Future<bool> requestLocationPermision() async {
+    bool serviceEnabled;
     LocationPermission permission;
 
     // Test if location services are enabled.
@@ -123,25 +116,25 @@ class Mapcontroller extends GetxController {
     progressDialog('Getting current location');
     Position getposition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-      Get.back();  
+    Get.back();
 
-     progressDialog('Setting up pickup location');
+    progressDialog('Setting up pickup location');
     LatLng userposition = LatLng(getposition.latitude, getposition.longitude);
     var ispicklocationready = await getcurrentLocation(userposition);
     Get.back();
     if (ispicklocationready) {
       progressDialog('Prepairing route');
       isrouteset = await getroutedirection();
-      
+
       Get.back();
     }
 
     if (isrouteset) {
       print('______');
       print('nice ');
-      lastpickedlocation  = dropofflocation.value.placeid;
+      lastpickedlocation = dropofflocation.value.placeid;
       calculateFee();
-     
+
       return true;
     } else {
       print('______');
@@ -181,7 +174,9 @@ class Mapcontroller extends GetxController {
       currentaddress.placeid = placeid;
       currentaddress.latitude = data['geometry']['location']['lat'];
       currentaddress.longitude = data['geometry']['location']['lng'];
-      var newmarkerpostion = LatLng(currentaddress.latitude as double, currentaddress.longitude as double); pickuplocation(currentaddress);
+      var newmarkerpostion = LatLng(currentaddress.latitude as double,
+          currentaddress.longitude as double);
+      pickuplocation(currentaddress);
 
       print('_________pickuplocation details');
       print(pickuplocation.value.placeformattedaddress);
@@ -247,7 +242,6 @@ class Mapcontroller extends GetxController {
           selectedaddress.longitude as double);
 
       dropofflocation(selectedaddress);
-      
 
       setNewMarker(newmarkerpostion);
       isaddresloading(false);
@@ -295,17 +289,24 @@ class Mapcontroller extends GetxController {
     DirectionDetails directiondetails = DirectionDetails();
     directiondetails.bound_ne = LatLng(boundne['lat'], boundne['lng']);
     directiondetails.bound_sw = LatLng(boundswe['lat'], boundswe['lng']);
-    directiondetails.startlocation = LatLng(startlocations['lat'], startlocations['lng']);
-    directiondetails.endlocation = LatLng(endlocation['lat'], endlocation['lng']);
-    directiondetails.polylines =response['routes'][0]['overview_polyline']['points'];
-    directiondetails.polylines_encoded = PolylinePoints().decodePolyline(response['routes'][0]['overview_polyline']['points']);
-    directiondetails.distanceText = response['routes'][0]['legs'][0]['distance']['text'];
-    directiondetails.distanceValue = response['routes'][0]['legs'][0]['distance']['value'];
-    directiondetails.durationText = response['routes'][0]['legs'][0]['duration']['text'];
-    directiondetails.durationValue = response['routes'][0]['legs'][0]['duration']['value'];
-   
-    routedirectiondetails = directiondetails.obs;
+    directiondetails.startlocation =
+        LatLng(startlocations['lat'], startlocations['lng']);
+    directiondetails.endlocation =
+        LatLng(endlocation['lat'], endlocation['lng']);
+    directiondetails.polylines =
+        response['routes'][0]['overview_polyline']['points'];
+    directiondetails.polylines_encoded = PolylinePoints()
+        .decodePolyline(response['routes'][0]['overview_polyline']['points']);
+    directiondetails.distanceText =
+        response['routes'][0]['legs'][0]['distance']['text'];
+    directiondetails.distanceValue =
+        response['routes'][0]['legs'][0]['distance']['value'];
+    directiondetails.durationText =
+        response['routes'][0]['legs'][0]['duration']['text'];
+    directiondetails.durationValue =
+        response['routes'][0]['legs'][0]['duration']['value'];
 
+    routedirectiondetails = directiondetails.obs;
 
     print('__________ routedirection details');
     print(routedirectiondetails.value.bound_ne);
@@ -319,108 +320,93 @@ class Mapcontroller extends GetxController {
     print(routedirectiondetails.value.durationValue);
     isPrepairingDetails(false);
 
-
     print(response);
 
     return true;
   }
 
-  void clearRequest(){
-     
-   dropofflocation = Placeaddress().obs;
-   pickuplocation = Placeaddress().obs;
-   routedirectiondetails = DirectionDetails().obs;
-   lastpickedlocation = null;
-   
+  void clearRequest() {
+    dropofflocation = Placeaddress().obs;
+    pickuplocation = Placeaddress().obs;
+    routedirectiondetails = DirectionDetails().obs;
+    lastpickedlocation = null;
+  }
 
+  int calculateFee() {
+    double distanceTraveledFare;
+    double totalfare;
 
-   }
+    if (routedirectiondetails.value.distanceValue! < 2000 &&
+        routedirectiondetails.value.distanceValue! > 500) {
+      totalfare = 10.00;
+    } else {
+      distanceTraveledFare =
+          (routedirectiondetails.value.distanceValue! / 1500) * 10;
+      totalfare = distanceTraveledFare;
+    }
 
+    double totaLocalAmount = totalfare;
+    print('duration');
+    print(routedirectiondetails.value.durationValue);
+    print('distance');
+    print(routedirectiondetails.value.distanceValue);
+    print('______fee');
+    print(totaLocalAmount.truncate());
+    return totaLocalAmount.truncate();
+  }
 
-    int calculateFee(){
+  void senRequest() async {
+    Map locationtopick = {
+      "latitude": pickuplocation.value.latitude.toString(),
+      "longitude": pickuplocation.value.longitude.toString(),
+    };
 
-     double distanceTraveledFare;
-     double totalfare;
+    Map locationtodrop = {
+      "latitude": dropofflocation.value.latitude.toString(),
+      "longitude": dropofflocation.value.longitude.toString(),
+    };
 
+    print(userFromAuthcontroller.value.name);
+    print(userFromAuthcontroller.value.email);
+    print(userFromAuthcontroller.value.name);
 
-     if(routedirectiondetails.value.distanceValue! < 2000 && routedirectiondetails.value.distanceValue! > 500 ){
+    Map<String, dynamic> requestdata = {
+      "driver_id": "null",
+      "phone": userFromAuthcontroller.value.phone,
+      "pickuplocation": locationtopick,
+      "dropoflocation": locationtodrop,
+      "status": "waiting",
+      "created_at": DateTime.now().toString(),
+      "pickup_address": pickuplocation.value.placeformattedaddress,
+      "drop_address": dropofflocation.value.placeName,
+    };
 
-          totalfare = 10.00;
-     }else{
-          distanceTraveledFare  = (routedirectiondetails.value.distanceValue! /1500) *10;
-          totalfare = distanceTraveledFare;
-     }
+    print(requestdata);
+    requestcollecctionrefference
+        .doc(authinstance.currentUser!.uid)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        print(
+            ' you have 1 request pending. you can only send request 1 at a time. if you wish to creat new request cancel the pending request firest');
+      } else {
+        requestcollecctionrefference
+            .doc(authinstance.currentUser!.uid)
+            .set(requestdata);
+      }
+    });
+  }
 
-     double totaLocalAmount = totalfare ;
-      print('duration');
-      print(routedirectiondetails.value.durationValue);
-      print('distance');
-      print(routedirectiondetails.value.distanceValue);
-      print('______fee');
-      print(totaLocalAmount.truncate());
-     return totaLocalAmount.truncate();
-   }
+  void cancelRequest() async {
+    requestcollecctionrefference
+        .doc(authinstance.currentUser!.uid)
+        .delete()
+        .then((value) => print('deleted'));
+  }
 
-
-   void senRequest() async{
-
-      Map locationtopick ={
-        "latitude": pickuplocation.value.latitude.toString(),
-        "longitude": pickuplocation.value.longitude.toString(),
-      };
-
-      Map locationtodrop ={
-        "latitude": dropofflocation.value.latitude.toString(),
-        "longitude": dropofflocation.value.longitude.toString(),
-      };
-
-      print(userFromAuthcontroller.value.name);
-      print(userFromAuthcontroller.value.email);
-      print(userFromAuthcontroller.value.name);
-  
-
-
-      Map<String, dynamic> requestdata ={
-        
-        "driver_id": "null",
-        "phone": userFromAuthcontroller.value.phone,
-        "pickuplocation": locationtopick,
-        "dropoflocation": locationtodrop,
-        "status": "waiting",
-        "created_at":  DateTime.now().toString(),
-        "pickup_address":  pickuplocation.value.placeformattedaddress,
-        "drop_address": dropofflocation.value.placeName,
-      } ;
-
-
-      print(requestdata);
-        requestcollecctionrefference.doc(authinstance.currentUser!.uid).get().then((snapshot) {
-
-          if(snapshot.exists){
-              print(' you have 1 request pending. you can only send request 1 at a time. if you wish to creat new request cancel the pending request firest');
-          }else{
-
-             requestcollecctionrefference.doc(authinstance.currentUser!.uid).set(requestdata);  
-          }
-
-      });
-
-   }
-
-   void cancelRequest() async{
-
-      
-  
-           requestcollecctionrefference.doc(authinstance.currentUser!.uid).delete().then((value) => print('deleted'));
-
-   }
-
-  double createRandomeNumber(int num){
-  var random = Random();
-  int randomNumber = random.nextInt(num);
-  return randomNumber.toDouble();
-}
-
-
-
+  double createRandomeNumber(int num) {
+    var random = Random();
+    int randomNumber = random.nextInt(num);
+    return randomNumber.toDouble();
+  }
 }
