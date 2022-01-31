@@ -272,8 +272,12 @@ class Mapcontroller extends GetxController {
         dropofflocation.value.longitude as double);
 
     //String url = "https://maps.googleapis.com/maps/api/directions/json?origin=${picklocation.latitude},${picklocation.longitude}&destination=${droplocation.latitude},${droplocation.longitude}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
-    String url =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
+    //walking 
+    String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
+    //bicycling
+    //String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&mode=bicycling&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
+    // highway
+     //String url =  "https://maps.googleapis.com/maps/api/directions/json?avoid=highways&origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     var response = await Mapservices.mapRequest(url);
 
     if (response == "failed") {

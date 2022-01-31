@@ -11,8 +11,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart' as lotie;
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
+import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/helper/geofirehelper.dart';
 import 'package:tricycleapp/model/nearbydriver.dart';
+import 'package:tricycleapp/model/prediction_place.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 import 'package:tricycleapp/uiconstant/hex_color.dart';
 import 'package:tricycleapp/uiconstant/widget_function.dart';
@@ -54,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setMapIsReady(mapIsReady);
       showNearDriver();
     }
-    print(isMapReady);
+
 
     cameraposition = mapxcontroller.cameraposition;
   }
@@ -80,6 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
     cameraposition = await mapxcontroller.moveMapCameraToCurrentPosition();
     _newgooglemapcontroller!.animateCamera(
         CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
+   
+   
   }
 
   //_____________ for the page
@@ -122,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Geofire.queryAtLocation(mapxcontroller.currentPosition!.latitude,
             mapxcontroller.currentPosition!.longitude, 5)!
         .listen((map) {
-      print(map);
+     
       if (map != null) {
         var callBack = map['callBack'];
 
@@ -178,12 +182,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     for (Nearbydriver drivers in Geofirehelper.nearAvailableDriber) {
-      print('______  hey testing');
-      print(drivers.latitude);
-      print(drivers.longitude);
-      LatLng driverposition =
-          LatLng(drivers.latitude as double, drivers.longitude as double);
-      print(driverposition);
+     
+      LatLng driverposition =  LatLng(drivers.latitude as double, drivers.longitude as double);
+     
     }
 
     Set<Marker> tmarker = Set<Marker>();
@@ -228,17 +229,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
   void setDropOffMarker(LatLng position) {
-      
-
-     
-
     dropoffmarker = Marker(
-      markerId: MarkerId('dropmarker'),
-      position: position,
-      icon: selectedLocationIcon as BitmapDescriptor
-    );
+        markerId: MarkerId('dropmarker'),
+        position: position,
+        icon: selectedLocationIcon as BitmapDescriptor);
 
     setState(() {
       markersSet!.add(dropoffmarker as Marker);
@@ -264,6 +259,9 @@ class _HomeScreenState extends State<HomeScreen> {
         Polyline(
             polylineId: PolylineId(polylineIdVal),
             width: 5,
+            jointType: JointType.mitered,
+            endCap: Cap.roundCap,
+            startCap: Cap.roundCap,
             color: iconcolorsecondary,
             points: mapxcontroller
                 .routedirectiondetails.value.polylines_encoded!
@@ -275,17 +273,32 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _caneraBoundToRoute() {
-    var bound_sw = mapxcontroller.routedirectiondetails.value.bound_sw as LatLng;
-    var bound_ne = mapxcontroller.routedirectiondetails.value.bound_ne as LatLng;
-    
-    print("____sw");
-    print(bound_sw);
-     print("____sw");
-    print(bound_ne);
+    var bound_sw =
+        mapxcontroller.routedirectiondetails.value.bound_sw as LatLng;
+    var bound_ne =
+        mapxcontroller.routedirectiondetails.value.bound_ne as LatLng;
+
+  
     _newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
         LatLngBounds(southwest: bound_sw, northeast: bound_ne), 45));
   }
 
+  bool searchNearDriver(){
+      if(nearbydriverlist.length == 0){
+        handelrDialog("No available driver");
+
+              
+        return false;
+      }else{
+        var driver  = nearbydriverlist[0];
+        nearbydriverlist.removeAt(0);
+        return true;
+      }
+
+
+
+
+  }
   @override
   Widget build(BuildContext context) {
     createCustomMarker();
@@ -304,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 GoogleMap(
                   padding: EdgeInsets.only(top: 100, bottom: mpappading),
-                  mapType: MapType.normal,
+                  mapType: MapType.hybrid,
                   initialCameraPosition: cameraposition as CameraPosition,
                   zoomControlsEnabled: true,
                   zoomGesturesEnabled: true,
@@ -319,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _moveCameraToCurrentPostion();
                     }
                   },
-                  onTap: isPicking ? placeMarker : null,
+                  onTap: _currentStep >= 1 ? null : placeMarker,
 
                   //           },
                 ),
@@ -347,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                if (isPicking) buildFloatingSearchBar()
+                if (isPicking && _currentStep == 0) buildFloatingSearchBar()
               ],
             ))
     ]);
@@ -494,14 +507,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 onStepContinue: () {
                   final lastStep = _currentStep == _getSteps().length - 1;
 
+               
+
                   if (lastStep) {
-                    print('compledted');
-                    prepaireRequest();
+                    print('completed');
                   } else {
-                    setState(() {
-                      _currentStep += 1;
-                    });
+
+                    if (mapxcontroller.lastpickedlocation !=
+                        mapxcontroller.dropofflocation.value.placeid) {
+                      prepaireRequest();
+                    }
+                       setState(() {
+                    _currentStep += 1;
+                  });
                   }
+
                 },
                 onStepCancel: _currentStep == 0
                     ? null
@@ -609,27 +629,45 @@ class _HomeScreenState extends State<HomeScreen> {
     setCurrentRequestState(tricycleRequestState.requesting);
   }
 
-  void requestLogic() {
+  void requestLogic()  {
+
+     
+
+    
     if (currentrequestpagestate == tricycleRequestState.starting) {
-      setState(() {
+       nearbydriverlist = Geofirehelper.nearAvailableDriber;
+
+
+     
+         print('___________hey');
+         print(nearbydriverlist.length);
+         setState(() {
         isPicking = true;
         _containerHeight = 250;
         mpappading = 300;
         currentrequestpagestate = tricycleRequestState.requesting;
       });
+
+    
+
+
     } else {
-      mapxcontroller.clearRequest();
-      setState(() {
-        isPicking = false;
-        _containerHeight = 200;
-        mpappading = 200;
-        markersSet!.clear();
-        polylinesSet!.clear();
-        isPicking = false;
-        _currentStep = 0;
-        currentrequestpagestate = tricycleRequestState.starting;
-      });
+      clearRequest();
     }
+  }
+
+  void clearRequest() {
+     mapxcontroller.clearRequest();
+    setState(() {
+      isPicking = false;
+      _containerHeight = 200;
+      mpappading = 200;
+      markersSet!.clear();
+      polylinesSet!.clear();
+      isPicking = false;
+      _currentStep = 0;
+      currentrequestpagestate = tricycleRequestState.starting;
+    });
   }
 
   bool isSearchFocus = false;
@@ -673,10 +711,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // Call your model, bloc, controller here.
       },
-      onSubmitted: (query) {
-        print('onsbimitedds');
-        mapxcontroller.searchPlace(query);
-        searchcontroller.close();
+      onSubmitted: (query) async {
+
+        if(mapxcontroller.placeprediction.length != 0 ){
+            PredictionPlace firstresult = mapxcontroller.placeprediction[0];
+        var ismarkerSet = await mapxcontroller
+            .setDropOffLocationFromSearch(firstresult.placeId as String);
+        setDropOffMarker(mapxcontroller.markerPositon as LatLng);
+        if (ismarkerSet) {
+          setState(() {
+            searchcontroller.close();
+            mapxcontroller.placeprediction.clear();
+          });
+        }
+        }
+        
+
+        //mapxcontroller.searchPlace(query);
+        // searchcontroller.close();
       },
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
@@ -736,6 +788,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               var ismarkerSet = await mapxcontroller
                                   .setDropOffLocationFromSearch(mapxcontroller
                                       .placeprediction[index].placeId);
+
                               setDropOffMarker(
                                   mapxcontroller.markerPositon as LatLng);
                               if (ismarkerSet) {
