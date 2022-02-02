@@ -7,8 +7,14 @@ class Geofirehelper {
 static List<Nearbydriver> nearAvailableDriber = [];
 
 static void removeDriverFromList(String key ) {
+
+  
   int index = nearAvailableDriber.indexWhere((element) => element.key == key);
+  
+  if(nearAvailableDriber.length !=0){
+
   nearAvailableDriber.removeAt(index);
+  }
 
 }
 

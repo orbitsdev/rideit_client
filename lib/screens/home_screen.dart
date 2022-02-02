@@ -10,11 +10,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart'  as http;
+import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart' as lotie;
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
+import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
+import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/helper/geofirehelper.dart';
@@ -36,6 +38,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var mapxcontroller = Get.find<Mapcontroller>();
+  var requestxcontroller = Get.find<Requestcontroller>();
+  var authxcontroller = Get.find<Authcontroller>();
 
   //_____________ gor google map
   Completer<GoogleMapController> _googlmapcompleter = Completer();
@@ -57,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Marker? dropoffmarker;
   bool isPicking = false;
 
-
   List<Nearbydriver> listofavailabledriver = [];
 
   setCameraInitialValue() async {
@@ -65,18 +68,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (mapIsReady) {
       setMapIsReady(mapIsReady);
-      
+
       showNearDriver();
     }
-
-
 
     cameraposition = mapxcontroller.cameraposition;
   }
 
   void setMapIsReady(bool value) {
     setState(() {
-      
       isMapReady = value;
     });
   }
@@ -96,8 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
     cameraposition = await mapxcontroller.moveMapCameraToCurrentPosition();
     _newgooglemapcontroller!.animateCamera(
         CameraUpdate.newCameraPosition(cameraposition as CameraPosition));
-   
-   
   }
 
   //_____________ for the page
@@ -130,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     setCameraInitialValue();
-   
+    authxcontroller.getUserData();
 
     super.initState();
   }
@@ -141,7 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
     Geofire.queryAtLocation(mapxcontroller.currentPosition!.latitude,
             mapxcontroller.currentPosition!.longitude, 5)!
         .listen((map) {
-     
       if (map != null) {
         var callBack = map['callBack'];
 
@@ -197,9 +194,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     for (Nearbydriver drivers in Geofirehelper.nearAvailableDriber) {
-     
-      LatLng driverposition =  LatLng(drivers.latitude as double, drivers.longitude as double);
-     
+      LatLng driverposition =
+          LatLng(drivers.latitude as double, drivers.longitude as double);
     }
 
     Set<Marker> tmarker = Set<Marker>();
@@ -293,27 +289,22 @@ class _HomeScreenState extends State<HomeScreen> {
     var bound_ne =
         mapxcontroller.routedirectiondetails.value.bound_ne as LatLng;
 
-  
     _newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
         LatLngBounds(southwest: bound_sw, northeast: bound_ne), 45));
   }
 
-  bool searchNearDriver(){
-      if(nearbydriverlist.length == 0){
-        handelrDialog("No available driver");
+  bool searchNearDriver() {
+    if (nearbydriverlist.length == 0) {
+      handelrDialog("No available driver");
 
-              
-        return false;
-      }else{
-        var driver  = nearbydriverlist[0];
-        nearbydriverlist.removeAt(0);
-        return true;
-      }
-
-
-
-
+      return false;
+    } else {
+      var driver = nearbydriverlist[0];
+      nearbydriverlist.removeAt(0);
+      return true;
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     createCustomMarker();
@@ -347,7 +338,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       _moveCameraToCurrentPostion();
                     }
                   },
-                  onTap: _currentStep >= 1 ? null :  isPicking ? placeMarker: null,
+                  onTap: _currentStep >= 1
+                      ? null
+                      : isPicking
+                          ? placeMarker
+                          : null,
 
                   //           },
                 ),
@@ -394,154 +389,173 @@ class _HomeScreenState extends State<HomeScreen> {
             isActive: _currentStep >= 1,
             title: Text('Send Request'),
             content: Container(
-              child:
-              
-              Obx((){
+              child: Obx(() {
                 return Column(
-
-                children: [
- 
-
-                    GestureDetector(
-                      onTap: (){
-                           pickpostion =  LatLng(mapxcontroller.pickuplocation.value.latitude as double, mapxcontroller.pickuplocation.value.longitude as double);
-                         _moveCamera(pickpostion as LatLng);
-                      },
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Pickup Location', style: Theme.of(context).textTheme.headline4 ,),
-                          Text('${mapxcontroller.pickuplocation.value.placeformattedaddress }', style: Theme.of(context).textTheme.bodyText1 ,),
-                        ],
-                      ),
-                    ),
+                  children: [
+                    mapxcontroller.pickuplocation.value.placeid == null
+                        ? Container(
+                            width: 100,
+                            height: 100,
+                            child: Center(
+                                child: lotie.Lottie.asset(
+                              "assets/images/84272-loading-colour.json",
+                            )))
+                        : GestureDetector(
+                            onTap: () {
+                              pickpostion = LatLng(
+                                  mapxcontroller.pickuplocation.value.latitude
+                                      as double,
+                                  mapxcontroller.pickuplocation.value.longitude
+                                      as double);
+                              _moveCamera(pickpostion as LatLng);
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Pickup Location',
+                                  style: Theme.of(context).textTheme.headline4,
+                                ),
+                                Text(
+                                  '${mapxcontroller.pickuplocation.value.placeformattedaddress}',
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                ),
+                              ],
+                            ),
+                          ),
                     Divider(),
                     GestureDetector(
-                      onTap: (){
-                        pickpostion =  LatLng(mapxcontroller.dropofflocation.value.latitude as double, mapxcontroller.dropofflocation.value.longitude as double);
-                         _moveCamera(pickpostion as LatLng);
+                      onTap: () {
+                        pickpostion = LatLng(
+                            mapxcontroller.dropofflocation.value.latitude
+                                as double,
+                            mapxcontroller.dropofflocation.value.longitude
+                                as double);
+                        _moveCamera(pickpostion as LatLng);
                       },
                       child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Dropoff Location', style: Theme.of(context).textTheme.headline4 ,),
-                          Text('${mapxcontroller.dropofflocation.value.placeformattedaddress}', style: Theme.of(context).textTheme.bodyText1 ,),
+                          Text(
+                            'Dropoff Location',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                          Text(
+                            '${mapxcontroller.dropofflocation.value.placeformattedaddress}',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
                         ],
                       ),
                     ),
-                ],
-              );
+                  ],
+                );
               }),
-               
             )),
       ];
 
   Container pickaddressBuilder() {
     return Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Obx(() {
+            if (mapxcontroller.dropofflocation.value.placeformattedaddress ==
+                null) {
+              return Column(
+                children: [
+                  Text(
+                    'Choose Destination',
+                    style: Theme.of(context).textTheme.headline2,
+                  ),
+                  Text(
+                    ' Tap the map or use search bar to select location ',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  addVerticalSpace(8),
+                  Divider(
+                    height: 2,
+                  ),
+                  Container(
+                      height: 125,
+                      child: Center(
+                          child: lotie.Lottie.asset(
+                              "assets/images/86234-select-location.json"))),
+                ],
+              );
+            }
+            return Column(
               children: [
-                Obx(() {
-                  if (mapxcontroller
-                          .dropofflocation.value.placeformattedaddress ==
-                      null) {
-                    return Column(
-                      children: [
-                        Text(
-                          'Choose Destination',
-                          style: Theme.of(context).textTheme.headline2,
-                        ),
-                        Text(
-                          ' Tap the map or use search bar to select location ',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.subtitle1,
-                        ),
-                        addVerticalSpace(8),
-                        Divider(
-                          height: 2,
-                        ),
-                        Container(
-                            height: 125,
-                            child: Center(
-                                child: lotie.Lottie.asset(
-                                    "assets/images/86234-select-location.json"))),
-                      ],
-                    );
-                  }
-                  return Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                              width: 30,
-                              height: 30,
-                              child: Center(
-                                  child: FaIcon(
-                                FontAwesomeIcons.map,
-                                size: 30,
-                              ))),
-                          addHorizontalSpace(15),
-                          Expanded(
-                              child: Text(
-                            'Selected Location',
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ))
-                        ],
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            LatLng droposition = LatLng(
-                                mapxcontroller.dropofflocation.value.latitude
-                                    as double,
-                                (mapxcontroller.dropofflocation.value
-                                    .longitude as double));
-                            _moveCamera(droposition);
-                          },
-                          child: Row(
-                            children: [
-                              Container(
-                                  width: 30,
-                                  height: 30,
-                                  child: Center(
-                                      child: FaIcon(
-                                    FontAwesomeIcons.mapMarkerAlt,
-                                    size: 30,
-                                  ))),
-                              addHorizontalSpace(15),
-                              mapxcontroller.isaddresloading.value
-                                  ? Container(
-                                      width: 100,
-                                      height: 100,
-                                      child: Center(
-                                          child: lotie.Lottie.asset(
-                                        "assets/images/84272-loading-colour.json",
-                                      )))
-                                  : Expanded(
-                                      child: Text(
-                                      '${mapxcontroller.dropofflocation.value.placeformattedaddress}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText1,
-                                    ))
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  );
-                }),
-                addVerticalSpace(12),
-                Divider(
-                  height: 2,
+                Row(
+                  children: [
+                    Container(
+                        width: 30,
+                        height: 30,
+                        child: Center(
+                            child: FaIcon(
+                          FontAwesomeIcons.map,
+                          size: 30,
+                        ))),
+                    addHorizontalSpace(15),
+                    Expanded(
+                        child: Text(
+                      'Selected Location',
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ))
+                  ],
                 ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      LatLng droposition = LatLng(
+                          mapxcontroller.dropofflocation.value.latitude
+                              as double,
+                          (mapxcontroller.dropofflocation.value.longitude
+                              as double));
+                      _moveCamera(droposition);
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                            width: 30,
+                            height: 30,
+                            child: Center(
+                                child: FaIcon(
+                              FontAwesomeIcons.mapMarkerAlt,
+                              size: 30,
+                            ))),
+                        addHorizontalSpace(15),
+                        mapxcontroller.isaddresloading.value
+                            ? Container(
+                                width: 100,
+                                height: 100,
+                                child: Center(
+                                    child: lotie.Lottie.asset(
+                                  "assets/images/84272-loading-colour.json",
+                                )))
+                            : Expanded(
+                                child: Text(
+                                '${mapxcontroller.dropofflocation.value.placeformattedaddress}',
+                                style: Theme.of(context).textTheme.bodyText1,
+                              ))
+                      ],
+                    ),
+                  ),
+                )
               ],
-            ),
-          );
+            );
+          }),
+          addVerticalSpace(12),
+          Divider(
+            height: 2,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget requestForm(BuildContext context) {
@@ -567,25 +581,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 onStepContinue: () {
                   final lastStep = _currentStep == _getSteps().length - 1;
 
-               
-
                   if (lastStep) {
-                      
-                      print('complete');
+                    print('complete');
 
-                    sendNotification();
+                    requestxcontroller.createRequest();
+                    // sendNotification();
 
                   } else {
-
                     if (mapxcontroller.lastpickedlocation !=
                         mapxcontroller.dropofflocation.value.placeid) {
                       prepaireRequest();
                     }
-                       setState(() {
-                    _currentStep += 1;
-                  });
+                    setState(() {
+                      _currentStep += 1;
+                    });
                   }
-
                 },
                 onStepCancel: _currentStep == 0
                     ? null
@@ -693,11 +703,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setCurrentRequestState(tricycleRequestState.requesting);
   }
 
-  void requestLogic()  async{
-
-     
-
-    
+  void requestLogic() async {
     if (currentrequestpagestate == tricycleRequestState.starting) {
       // var hasavailabledriver =   await  checkAvailableDriver();
 
@@ -711,33 +717,27 @@ class _HomeScreenState extends State<HomeScreen> {
       //  }
 
       //  else{
-      //    handelrDialog('Sorry No Driver is Available'); 
+      //    handelrDialog('Sorry No Driver is Available');
       //  }
+      
 
-          setState(() {
+      setState(() {
         isPicking = true;
         _containerHeight = 250;
         mpappading = 300;
         currentrequestpagestate = tricycleRequestState.requesting;
       });
-       nearbydriverlist = Geofirehelper.nearAvailableDriber;
+      nearbydriverlist = Geofirehelper.nearAvailableDriber;
 
-
-     
-         print('___________hey');
-         print(nearbydriverlist.length);
-       
-
-    
-
-
+      print('___________hey');
+      print(nearbydriverlist.length);
     } else {
       clearRequest();
     }
   }
 
   void clearRequest() {
-     mapxcontroller.clearRequest();
+    mapxcontroller.clearRequest();
     setState(() {
       isPicking = false;
       _containerHeight = 200;
@@ -792,20 +792,18 @@ class _HomeScreenState extends State<HomeScreen> {
         // Call your model, bloc, controller here.
       },
       onSubmitted: (query) async {
-
-        if(mapxcontroller.placeprediction.length != 0 ){
-            PredictionPlace firstresult = mapxcontroller.placeprediction[0];
-        var ismarkerSet = await mapxcontroller
-            .setDropOffLocationFromSearch(firstresult.placeId as String);
-        setDropOffMarker(mapxcontroller.markerPositon as LatLng);
-        if (ismarkerSet) {
-          setState(() {
-            searchcontroller.close();
-            mapxcontroller.placeprediction.clear();
-          });
+        if (mapxcontroller.placeprediction.length != 0) {
+          PredictionPlace firstresult = mapxcontroller.placeprediction[0];
+          var ismarkerSet = await mapxcontroller
+              .setDropOffLocationFromSearch(firstresult.placeId as String);
+          setDropOffMarker(mapxcontroller.markerPositon as LatLng);
+          if (ismarkerSet) {
+            setState(() {
+              searchcontroller.close();
+              mapxcontroller.placeprediction.clear();
+            });
+          }
         }
-        }
-        
 
         //mapxcontroller.searchPlace(query);
         // searchcontroller.close();
@@ -889,129 +887,23 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
-  void sendNotification( )  async {
-
-    List<Neardriver> listd = [];
-
-
-    listd.clear();
-    await availabledriversrefference.limit(5).get().then((collection){
-
-      if(collection.docs.isNotEmpty){
-
-          collection.docs.forEach((element) { 
-          var data = element.data() as Map<String , dynamic>;
-
-            Neardriver ndriver = Neardriver();
-            ndriver.key = element.id;
-            ndriver.status = data['status'];
-            ndriver.devicetoken = data['token'];
-
-
-            listd.add(ndriver);
-
-          });
-
-        print('______________');
-        print(listd[0].key);
-
-
-      }else{
-
-      }
-
-    });
-
-    String tokens = listd[0].devicetoken as String;
-
-
-    Map<String, String>  headerData  ={
-      'Content-Type': 'application/json',
-      'Authorization' : Cloudmessagingconfig.CLOUDMESSAGING_SERVER_TOKEN, 
-    };
-
-    Map notificationData = {
-      'body': 'Drop Location',
-      'title': 'New Tricyle Request',
-    };
-
-    Map passData = {
-    
-      "id": 1,
-      "status":"done",
-
-
-    };
-
-    Map sendPushNotification = {
-      "notification" :  notificationData,
-      "data": passData,
-      "priority": "high",
-      "to": tokens,
-    };
-
-
-
-   var url  =Uri.parse("https://fcm.googleapis.com/fcm/send");
-   var serverKey = Cloudmessagingconfig.CLOUDMESSAGING_SERVER_TOKEN;
-
-
-try {
-    var response = await http.post( Uri.parse('https://fcm.googleapis.com/fcm/send'),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization': 'key=$serverKey',
-      },
-      body: jsonEncode(
-        <String, dynamic>{
-          'notification': <String, dynamic>{
-            'body': 'this is a body',
-            'title': 'this is a title'
-          },
-          'priority': 'high',
-          'data': <String, dynamic>{
-            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-            'id': '1',
-            'status': 'done'
-          },
-          'to': tokens,
-        },
-      ),
-    );
-} catch (e) {
-  print("error push notification");
-}
-   
-
-  }
 }
 
-Future<bool> checkAvailableDriver() async{
-
+Future<bool> checkAvailableDriver() async {
   List<Neardriver> listdd = [];
 
   bool hasDriverAvailable = false;
-   
-     var datacollection = await availabledriversrefference.limit(5).get().then((querySnapshot) {
-       
-       if(querySnapshot.docs.isNotEmpty){
 
-         hasDriverAvailable =  true;
+  var datacollection =
+      await availabledriversrefference.limit(5).get().then((querySnapshot) {
+    if (querySnapshot.docs.isNotEmpty) {
+      hasDriverAvailable = true;
+    } else {
+      hasDriverAvailable = false;
+    }
+  });
 
-       }else{
-         hasDriverAvailable = false;
-       }
-
-     
-
-
-     });
-
-
-    print('________________');
-    print(hasDriverAvailable);
-  return hasDriverAvailable ;
-     
-
+  print('________________');
+  print(hasDriverAvailable);
+  return hasDriverAvailable;
 }

@@ -80,10 +80,11 @@ class _TricycleAppState extends State<TricycleApp> {
       smartManagement: SmartManagement.keepFactory,
       initialBinding: Gextbinding(),
       theme: ThemeData(primaryColor: COLOR_PURPLE_BUTTON, accentColor: COLOR_DARK_BLUE, textTheme: screenWidth < 500 ? TEXT_THEME_SMALL : TEXT_THEME_DEFAULT  ),
-      home:HomeScreenManager(),
+      home:
+      //HomeScreenManager(),
       //Testcloudfunction(),
       //SigninScreen(),
-     //  authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
+     authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
       getPages: [
         GetPage(name: SigupScreen.screenName, page: () => SigupScreen()),
         GetPage(name: SigninScreen.screenName, page: () => SigninScreen()),

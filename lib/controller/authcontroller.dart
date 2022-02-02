@@ -33,8 +33,12 @@ class Authcontroller extends GetxController {
         accountSid: Twilioconfig.ACCOUNT_SID,
         serviceSid:  Twilioconfig.SERVICE_SID,
         authToken: Twilioconfig.AUTH_TOKEN);
+
+
+
   }
 
+  
   void createUser(String name, String phone, String email, String password,
       BuildContext context) async {
     gname = name.trim();
@@ -55,8 +59,15 @@ class Authcontroller extends GetxController {
           "phone": gphone as String,
         }).then((_) async {
           // Get.back();
-          verifyPhone(context);
+         // verifyPhone(context);
           // Get.offAllNamed(HomeScreenManager.screenName);
+
+          progressDialog('Authenticating...');
+        Future.delayed(Duration(seconds: 1), () {
+          Get.back();
+          clearFields();
+          Get.offAndToNamed(HomeScreenManager.screenName);
+        });
         });
       });
     } on FirebaseAuthException catch (e) {
@@ -116,6 +127,52 @@ class Authcontroller extends GetxController {
       //print(twilioResponse.errorMessage);
     }
   }
+
+  void getUserData() async{
+
+      if(user.value.id == null){
+         try{
+
+         await userrefference.doc(authinstance.currentUser!.uid).get().then((querySnapshot) {
+
+            var data = querySnapshot.data() as Map<String, dynamic>;
+            
+           if (querySnapshot. data() != null) {
+
+           Users userdata = Users();
+          userdata.id = authinstance.currentUser!.uid;
+          userdata.name = data['name'];
+          userdata.email = data['email'];
+          userdata.phone = data['phone'];
+          
+
+
+
+          print('___userdata _________');
+          print(userdata.id);
+          print(userdata.name);
+          print(userdata.phone);
+          print(userdata.email);
+
+          user = userdata.obs;
+          
+        }
+        
+
+         });
+
+      }catch(e){
+        
+        print(e.toString());
+      }
+      }else{
+        print('not null');
+      }
+
+     
+   
+  }
+
 
   void logInUser(String email, String password, BuildContext context) async {
     try {

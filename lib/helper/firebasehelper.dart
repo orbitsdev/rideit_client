@@ -5,6 +5,8 @@ User? firebaseuser;
 
 //cloudfirestore
 FirebaseFirestore firestore = FirebaseFirestore.instance;
-CollectionReference requestcollecctionrefference = firestore.collection('request');
+CollectionReference userrefference = firestore.collection('passengers');
 CollectionReference availabledriversrefference = firestore.collection('availabledrivers');
+CollectionReference requestrefference = firestore.collection('request');
+
 

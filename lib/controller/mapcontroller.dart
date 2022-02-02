@@ -359,54 +359,9 @@ class Mapcontroller extends GetxController {
     return totaLocalAmount.truncate();
   }
 
-  void senRequest() async {
-    Map locationtopick = {
-      "latitude": pickuplocation.value.latitude.toString(),
-      "longitude": pickuplocation.value.longitude.toString(),
-    };
+  
 
-    Map locationtodrop = {
-      "latitude": dropofflocation.value.latitude.toString(),
-      "longitude": dropofflocation.value.longitude.toString(),
-    };
-
-    print(userFromAuthcontroller.value.name);
-    print(userFromAuthcontroller.value.email);
-    print(userFromAuthcontroller.value.name);
-
-    Map<String, dynamic> requestdata = {
-      "driver_id": "null",
-      "phone": userFromAuthcontroller.value.phone,
-      "pickuplocation": locationtopick,
-      "dropoflocation": locationtodrop,
-      "status": "waiting",
-      "created_at": DateTime.now().toString(),
-      "pickup_address": pickuplocation.value.placeformattedaddress,
-      "drop_address": dropofflocation.value.placeName,
-    };
-
-    print(requestdata);
-    requestcollecctionrefference
-        .doc(authinstance.currentUser!.uid)
-        .get()
-        .then((snapshot) {
-      if (snapshot.exists) {
-        print(
-            ' you have 1 request pending. you can only send request 1 at a time. if you wish to creat new request cancel the pending request firest');
-      } else {
-        requestcollecctionrefference
-            .doc(authinstance.currentUser!.uid)
-            .set(requestdata);
-      }
-    });
-  }
-
-  void cancelRequest() async {
-    requestcollecctionrefference
-        .doc(authinstance.currentUser!.uid)
-        .delete()
-        .then((value) => print('deleted'));
-  }
+ 
 
   double createRandomeNumber(int num) {
     var random = Random();

@@ -37,6 +37,45 @@ void progressDialog(String message) async {
   );
 }
 
+
+void requestDialog(String message , Function cancelrequest) async {
+  Get.defaultDialog(
+    backgroundColor: Colors.black54,
+    title: '',
+    titlePadding: EdgeInsets.all(0),
+
+    cancelTextColor: Colors.white,
+    textCancel: "Cancel",
+      onCancel: (){
+       cancelrequest();
+       Get.back();
+      },
+    content: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            message,
+            style: TextStyle(
+                fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 18,
+          ),
+          Container(
+          child: LinearProgressIndicator(),
+          ),
+          SizedBox(
+            height: 12,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 void handelrDialog(String message){
   Get.defaultDialog(
     backgroundColor: Colors.black54,
