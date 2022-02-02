@@ -1,0 +1,4 @@
+class Cloudmessagingconfig {
+
+static const String CLOUDMESSAGING_SERVER_TOKEN ="AAAAJdoKA6c:APA91bGaGnzJj03VxQF7qnG717G-XE2BHFHGDg4yWwndr1xkOpzMxNe5HUj39WeUI48Bpsc0r80U22tcKbdkGewpQ1zBnsjOUTrLKOHY6sA6UXWbjPjAPWLKuMDrpUOEs4y0qYnnL9_f";
+}

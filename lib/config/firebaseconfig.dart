@@ -7,6 +7,8 @@ static const String FIREBASE_APP_ID ="1:162571879335:android:8b1e81380c3c34f417a
 static const String FIREBASE_MESSAGING_ID ="162571879335";
 static const String FIREBASE_PROJECT_ID ="tricyleapp-f8fff";
 
+
+
 static Future<FirebaseApp>  firebaseinitilizeapp() async{
   var firebaseapp =   await Firebase.initializeApp(
         options: FirebaseOptions(
