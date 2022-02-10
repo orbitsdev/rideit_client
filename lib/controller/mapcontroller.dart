@@ -28,12 +28,17 @@ class Mapcontroller extends GetxController {
 
   var dropofflocation = Placeaddress().obs;
   var pickuplocation = Placeaddress().obs;
+
+
+
   String? lastpickedlocation;
 
   var routedirectiondetails = DirectionDetails().obs;
   Position? currentPosition;
   CameraPosition? cameraposition;
   LatLng? markerPositon;
+  LatLng? actualdropmarkerposition;
+ 
 
   Future<bool> setMapCameraInitialValue() async {
     bool? isMapIsReady;
@@ -190,7 +195,15 @@ class Mapcontroller extends GetxController {
   }
 
   void placeMarkerAddressCoordinate(LatLng position) async {
+   
+
     isaddresloading(true);
+     actualdropmarkerposition = position;
+     
+    print('actual marker position');
+    print('_________________');
+    print(actualdropmarkerposition!.latitude);
+    print(actualdropmarkerposition!.longitude);
     String url =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     var response = await Mapservices.mapRequest(url);
@@ -330,6 +343,7 @@ class Mapcontroller extends GetxController {
   }
 
   void clearRequest() {
+    actualdropmarkerposition = null;
     dropofflocation = Placeaddress().obs;
     pickuplocation = Placeaddress().obs;
     routedirectiondetails = DirectionDetails().obs;

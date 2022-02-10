@@ -60,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Marker? pickupmarker;
   Marker? dropoffmarker;
   bool isPicking = false;
-
   List<Nearbydriver> listofavailabledriver = [];
 
   setCameraInitialValue() async {
@@ -329,7 +328,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   zoomGesturesEnabled: true,
                   myLocationButtonEnabled: true,
                   myLocationEnabled: true,
-                  markers: isPicking ? markersSet as Set<Marker> : {},
+                  markers: isPicking
+                      ? markersSet as Set<Marker>
+                      : _currentStep >= 1
+                          ? markersSet as Set<Marker>
+                          : {},
                   polylines: polylinesSet as Set<Polyline>,
                   onMapCreated: (GoogleMapController mapcontroller) {
                     if (!_googlmapcompleter.isCompleted) {
@@ -578,13 +581,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 currentStep: _currentStep,
                 type: StepperType.horizontal,
                 steps: _getSteps(),
-                onStepContinue: () {
+                onStepContinue: () async {
                   final lastStep = _currentStep == _getSteps().length - 1;
 
                   if (lastStep) {
                     print('complete');
 
-                    requestxcontroller.createRequest();
+                   requestxcontroller.createRequest();
+                    
+                    
+
                     // sendNotification();
 
                   } else {
@@ -683,9 +689,21 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                // switchContainer();
-                requestLogic();
+              onPressed: () async {
+                var hasOngoingtrip =    await requestxcontroller.checkIfHasOnGoingTrip();
+            if (!hasOngoingtrip) {
+              var hasAvailableDriver =    await requestxcontroller.checkIfHasAvailabDriver();
+
+                if (hasAvailableDriver) {
+                  requestLogic();
+                } else {
+                  handelrDialog("Sorry no availabler drivers found");
+                }
+            }else{
+               handelrDialog("You can make request again after finishing the trip");
+            }
+                 
+                
               },
               child: Text('FIND TRICYCLE'),
               style: ButtonStyle(
@@ -705,32 +723,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void requestLogic() async {
     if (currentrequestpagestate == tricycleRequestState.starting) {
-      // var hasavailabledriver =   await  checkAvailableDriver();
-
-      //  if(hasavailabledriver){
-      //       setState(() {
-      //   isPicking = true;
-      //   _containerHeight = 250;
-      //   mpappading = 300;
-      //   currentrequestpagestate = tricycleRequestState.requesting;
-      // });
-      //  }
-
-      //  else{
-      //    handelrDialog('Sorry No Driver is Available');
-      //  }
-      
-
+  
       setState(() {
         isPicking = true;
         _containerHeight = 250;
         mpappading = 300;
         currentrequestpagestate = tricycleRequestState.requesting;
       });
+
+
+     
       nearbydriverlist = Geofirehelper.nearAvailableDriber;
 
-      print('___________hey');
-      print(nearbydriverlist.length);
+    
     } else {
       clearRequest();
     }

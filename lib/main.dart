@@ -10,6 +10,7 @@ import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
+import 'package:tricycleapp/screens/ongoingtrip.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
 import 'package:tricycleapp/screens/trip_history_screen.dart';
 import 'package:tricycleapp/signin_screen.dart';
@@ -94,6 +95,7 @@ class _TricycleAppState extends State<TricycleApp> {
         GetPage( name: RequestTricycleSreen.screenName,page: () => RequestTricycleSreen()),
         GetPage( name: TripHistoryScreen.screenName, page: () => TripHistoryScreen()),
         GetPage(name: MeScreen.screenName, page: () => MeScreen()),
+        GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip()),
       
       ],
       debugShowCheckedModeBanner: false,

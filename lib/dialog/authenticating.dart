@@ -78,6 +78,7 @@ void requestDialog(String message , Function cancelrequest) async {
 
 void handelrDialog(String message){
   Get.defaultDialog(
+    barrierDismissible: false,
     backgroundColor: Colors.black54,
     title: '',
     titlePadding: EdgeInsets.all(0),
