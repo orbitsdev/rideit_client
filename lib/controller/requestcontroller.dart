@@ -18,12 +18,12 @@ class Requestcontroller extends GetxController {
    Stream? collectionStream;
   List<String> devicetokens = [];
   List<Neardriver> listofneardriver= [];
- 
+ var checking = false.obs;
 
   Future<bool> checkIfHasOnGoingTrip() async{
   bool hasOnGoingTrip = false;
-
-      progressDialog("Checking...");
+  checking(true);
+    //  progressDialog("Checking...");
    await requestrefference.doc(authinstance.currentUser!.uid).get().then((value) {
     if(value.data() != null){
       hasOnGoingTrip = true;
@@ -35,8 +35,8 @@ class Requestcontroller extends GetxController {
 
     print('_____________before returning');
     print(hasOnGoingTrip);
-Get.back();
 
+checking(false);
   return hasOnGoingTrip;
   }
 

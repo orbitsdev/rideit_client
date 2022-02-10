@@ -686,7 +686,16 @@ class _HomeScreenState extends State<HomeScreen> {
             style: Theme.of(context).textTheme.headline2,
           ),
           addVerticalSpace(15),
-          SizedBox(
+
+          Obx((){
+          if(requestxcontroller.checking.value ==true){
+                  return SizedBox(width: 15, height: 15,
+                  child: Center(
+                    child: CircularProgressIndicator(strokeWidth: 3,),
+                  ),
+                  );
+                }
+               return  SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () async {
@@ -705,13 +714,15 @@ class _HomeScreenState extends State<HomeScreen> {
                  
                 
               },
-              child: Text('FIND TRICYCLE'),
+              child:Text('FIND TRICYCLE') ,
               style: ButtonStyle(
                 backgroundColor:
                     MaterialStateProperty.all<Color>(iconcolorsecondary),
               ),
             ),
-          )
+          );
+              }),
+         
         ],
       ),
     );
