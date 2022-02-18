@@ -54,6 +54,8 @@ dependencies:
   flutter_svg: ^1.0.3
   lottie: ^1.2.1
   animated_text_kit: ^4.2.1
+  flutter_rating_bar: ^4.0.0
+  url_launcher: ^6.0.20
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -84,12 +86,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/car_android.png
-    - assets/images/Motorcycle_8.png
-    - assets/images/52141-balancing-loader.json
-    - assets/images/84272-loading-colour.json
-    - assets/images/86234-select-location.json
-    - assets/images/locationmarker.png
+    - assets/images/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

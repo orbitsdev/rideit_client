@@ -67,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (mapIsReady) {
       setMapIsReady(mapIsReady);
-
       showNearDriver();
     }
 
@@ -117,7 +116,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    if(_newgooglemapcontroller != null){
     _newgooglemapcontroller!.dispose();
+
+    }
     searchcontroller.dispose();
     // TODO: implement dispose
     super.dispose();

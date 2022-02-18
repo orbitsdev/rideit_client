@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-badge.widget.dart';
+import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
@@ -8,6 +10,9 @@ import 'package:tricycleapp/screens/trip_history_screen.dart';
 import 'package:tricycleapp/testwidgets/dashboard.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 import 'package:tricycleapp/uiconstant/hex_color.dart';
+import 'package:tricycleapp/helper/firebasehelper.dart';
+
+import 'screens/ongoingtrip.dart';
 
 
 
@@ -36,13 +41,52 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
 
   @override
   void initState() {
-    super.initState();
     _tabController = TabController(
       initialIndex: 1,
       length: 4,
       vsync: this,
     );
+
+    super.initState();
   }
+  @override
+  void setState(VoidCallback fn) {
+    
+    if(mounted){
+    super.setState(fn);
+
+    }
+    // TODO: implement setState
+  }
+
+void requestListiners() async{
+  //  var requeststatus =   requestrefference.doc(authinstance.currentUser!.uid).snapshots();
+          
+  //        requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
+  //         if(event.data() != null){
+  //              var data = event.data()  as Map<String, dynamic>;
+
+  //                 print('_______status');
+  //                 print(data['status']);
+  //               if(data['status'] =="accepted"){
+  //                 Get.back();
+  //                 Get.offNamed(Ongoingtrip.screenName);
+                  
+
+  //               }
+
+  //                if(data['tripstatus'] =="complete"){
+                  
+  //                 handelrDialog("completed");
+
+  //               }
+
+          
+  //         }      
+         
+  //       });
+}
+
 
   @override
   void dispose() {
@@ -58,8 +102,8 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
       bottomNavigationBar: MotionTabBar(
         initialSelectedTab: "Home",
         useSafeArea: true, // default: true, apply safe area wrapper
-        labels: const ["Dashboard", "Home", "Profile", "Settings"],
-        icons: const [Icons.dashboard, Icons.home, Icons.people_alt, Icons.settings],
+        labels: const ["Dashboard", "Home", "Trip", "Me"],
+        icons: const [Icons.dashboard, Icons.home, Icons.history, Icons.people_alt],
 
         // optional badges, length must be same with labels
         badges: [

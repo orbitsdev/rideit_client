@@ -1,29 +1,126 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:tricycleapp/home_screen_manager.dart';
 
-class Ongoingtrip extends StatelessWidget {
-  static const screenName="/ongoingtrip";
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:tricycleapp/controller/requestcontroller.dart';
+import 'package:tricycleapp/home_screen_manager.dart';
+import 'package:tricycleapp/screens/home_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class Ongoingtrip extends StatefulWidget {
+
+static const screenName = '/ongoingtrip';
+  @override
+  _OngoingtripState createState() => _OngoingtripState();
+}
+
+
+
+class _OngoingtripState extends State<Ongoingtrip> {
+  var requestxcontroller = Get.find<Requestcontroller>();
 
   @override
-  Widget build(BuildContext context){
+  void initState() {
+    super.initState();
+    
+
+    requestxcontroller.listenToOngoingTrip();
+
+    
+  
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Title'),
       ),
-      body: Column(
+      body: Container(
+      color: Colors.white,
+      width: double.infinity,
+      child: Column(
+
+        
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
 
-          ElevatedButton(onPressed: (){
-            Get.toNamed(HomeScreenManager.screenName);
-          }, child: Text('go to home')),
+
           Container(
-          child: Center(
-            child: Text("triscreen"),
+            height: 170,
+            width: 170,
+            child: Image.asset('assets/images/default-user-avatar.jpg'),
           ),
-    ),
+          Text('John Hernadez', style: Get.theme.textTheme.headline3,),
+          Text('Driver', style: Get.theme.textTheme.bodyText1,),
+
+        Obx((){
+
+          if(requestxcontroller.tripisnotcompleted.value){
+            return Container();
+          }
+          return  Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              children: [
+                 Text('Your Driver Is ${requestxcontroller.ongoingtripdetails.value.tripstatus }', style: Get.theme.textTheme.headline3,),
+                 SizedBox(
+                   height: 12,
+                 ),
+                GestureDetector(
+                  onTap: () async{
+                      await launch('tel:09366303145');
+                             },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FaIcon(FontAwesomeIcons.phoneAlt,),
+                
+                        SizedBox(
+                          width: 12,
+                        ),
+                    
+                    
+                      Text('093663123123 ', style: Get.theme.textTheme.headline3,),
+                     
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+         
+           Container(
+             height: 1,
+             color: Colors.red,
+                width: double.infinity,
+              ),
+          Container(
+              child: ElevatedButton(onPressed: (){
+
+                
+                print(Get.arguments["from"]);
+                goToScreen();
+
+              }, child: Text("back")),
+          ),
         ],
       ),
+    ),
     );
+  }
+
+
+  void goToScreen(){
+    if(Get.arguments["from"] =="request"){
+      Get.toNamed(HomeScreenManager.screenName);
+
+    } if(Get.arguments["from"] =="trip"){
+      Get.back();
+
+    }
   }
 }
