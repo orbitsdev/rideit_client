@@ -1,7 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Tripdetails {
- String? triprequestid;
+      String? triprequestid;
       String? picklocationid;
       String? droplocationid;
       LatLng? picklocation;

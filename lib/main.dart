@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/binding/gextbinding.dart';
 import 'package:tricycleapp/config/firebaseconfig.dart';
+import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
@@ -87,15 +88,15 @@ class _TricycleAppState extends State<TricycleApp> {
       //SigninScreen(),
      authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
       getPages: [
-        GetPage(name: SigupScreen.screenName, page: () => SigupScreen()),
-        GetPage(name: SigninScreen.screenName, page: () => SigninScreen()),
-        GetPage(name: Dashboard.screenName, page: () => Dashboard()),
-        GetPage(  name: HomeScreenManager.screenName,  page: () => HomeScreenManager()),
-        GetPage(name: HomeScreen.screenName, page: () => HomeScreen()),
-        GetPage( name: RequestTricycleSreen.screenName,page: () => RequestTricycleSreen()),
-        GetPage( name: TripHistoryScreen.screenName, page: () => TripHistoryScreen()),
-        GetPage(name: MeScreen.screenName, page: () => MeScreen()),
-        GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip()),
+        GetPage(name: SigupScreen.screenName, page: () => SigupScreen(), binding: Gextbinding()),
+        GetPage(name: SigninScreen.screenName, page: () => SigninScreen(), binding: Gextbinding()),
+        GetPage(name: Dashboard.screenName, page: () => Dashboard(), binding: Gextbinding()),
+        GetPage(  name: HomeScreenManager.screenName,  page: () => HomeScreenManager() , binding: Gextbinding()),
+        GetPage(name: HomeScreen.screenName, page: () => HomeScreen(), binding: Gextbinding()),
+        GetPage( name: RequestTricycleSreen.screenName,page: () => RequestTricycleSreen(), binding: Gextbinding()),
+        GetPage( name: TripHistoryScreen.screenName, page: () => TripHistoryScreen(), binding: Gextbinding()),
+        GetPage(name: MeScreen.screenName, page: () => MeScreen(), binding: Gextbinding()),
+        GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip(), binding: Gextbinding()),
       
       ],
       debugShowCheckedModeBanner: false,

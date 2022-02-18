@@ -16,6 +16,7 @@ import 'package:tricycleapp/model/neardriver.dart';
 import 'package:tricycleapp/model/tripdetails.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class Requestcontroller extends GetxController {
   var authxcontroller = Get.find<Authcontroller>();
@@ -95,6 +96,7 @@ class Requestcontroller extends GetxController {
         "passenger_phone": authxcontroller.user.value.phone,
         "actualmarker_position": actualdropmarker,
         "status": "pending",
+        'tripstatus':'notready',
         "created_at": DateTime.now().toString()
       };
 
@@ -115,16 +117,28 @@ class Requestcontroller extends GetxController {
               var data = event.data() as Map;
               print(event.data());
 
-              if (data['status'] == "accepted") {
+              if ((data['status'] == "accepted") && (data['tripstatus'] == 'notready') ){
                 Get.back();
-                Future.delayed(Duration(milliseconds: 300), () {
+                requestDialog("Accepted prepairing trip...", cancelRequest);
+
+                // Future.delayed(Duration(milliseconds: 300), () {
+                //   Get.offNamed(Ongoingtrip.screenName,
+                //       arguments: {"from": "request"});
+                // });
+
+                // }
+              }
+               if ((data['status'] == "accepted") && (data['tripstatus'] == 'ready')){
+                 Get.back();
+                  Future.delayed(Duration(milliseconds: 300), () {
                   Get.offNamed(Ongoingtrip.screenName,
                       arguments: {"from": "request"});
                 });
 
-                // }
+               }
+              
+          
 
-              }
             }
           });
         }).catchError((e) {
@@ -265,9 +279,8 @@ class Requestcontroller extends GetxController {
         if (ongoingtripstream != null) {
           ongoingtripstream!.listen((event) {
             if (event.data() != null) {
-              Tripdetails newtripdetails =
-                  Tripdetails.fromJson(event.data() as Map<String, dynamic>);
-
+              Tripdetails newtripdetails =Tripdetails.fromJson(event.data() as Map<String, dynamic>);
+                
               ongoingtripdetails(newtripdetails);
 
               print(
@@ -289,7 +302,7 @@ class Requestcontroller extends GetxController {
                   //show travelling
                   break;
                 case 'complete':
-                  //update to read
+                  //update read
                   if (data['read'] == false) {
                     ongoingtriprefference
                         .doc(authinstance.currentUser!.uid)
@@ -303,9 +316,7 @@ class Requestcontroller extends GetxController {
                       paymentshowed(true);
                     }
                   }
-
-                  //if na open ang app  and nakabayad
-
+                  //if naka bayad show ratings optional then exit
                   if (data['read'] == true && data['payed'] == true) {
                     if (ifnotread == false) {
                       Get.defaultDialog(
@@ -313,7 +324,28 @@ class Requestcontroller extends GetxController {
                         radius: 2,
                         barrierDismissible: false,
                         titlePadding: EdgeInsets.all(0),
-                        content: ElevatedButton(
+                        content: Column(
+                          children: [
+                              Text("Thank You !", style: Get.theme.textTheme.headline3,),
+                              
+
+                            RatingBar.builder(
+                              initialRating: 3,
+                              minRating: 1,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              itemCount: 5,
+                              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                              itemBuilder: (context, _) => Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              ),
+                              onRatingUpdate: (rating) {
+                                print(rating);
+                              },
+                            ),
+                              Text("Rated Our Driver ", style: Get.theme.textTheme.bodyText1,),
+                              ElevatedButton(
                             onPressed: () async {
                               ongoingtriprefference
                                   .doc(authinstance.currentUser!.uid)
@@ -332,6 +364,28 @@ class Requestcontroller extends GetxController {
                               });
                             },
                             child: Text('rate')),
+                          ],
+
+                        )
+                        // content: ElevatedButton(
+                        //     onPressed: () async {
+                        //       ongoingtriprefference
+                        //           .doc(authinstance.currentUser!.uid)
+                        //           .delete()
+                        //           .then((value) async {
+                        //         tripisnotcompleted(true);
+                        //         hasongoingtrip(false);
+                        //         payed(false);
+                        //         paymentshowed(false);
+                        //         ifnotread(false);
+                        //         tripisnotcompleted(false);
+                        //         requestdetails = Tripdetails().obs;
+                        //         ongoingtripdetails = Tripdetails().obs;1
+                        //         mapxcontroller.clearRequest();
+                        //         Get.offNamed(HomeScreenManager.screenName);
+                        //       });
+                        //     },
+                        //     child: Text('rate')),
                       );
                       ifnotread(true);
                     }

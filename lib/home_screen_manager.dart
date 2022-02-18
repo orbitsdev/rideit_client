@@ -60,31 +60,31 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
   }
 
 void requestListiners() async{
-  //  var requeststatus =   requestrefference.doc(authinstance.currentUser!.uid).snapshots();
+   var requeststatus =   requestrefference.doc(authinstance.currentUser!.uid).snapshots();
           
-  //        requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
-  //         if(event.data() != null){
-  //              var data = event.data()  as Map<String, dynamic>;
+         requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
+          if(event.data() != null){
+               var data = event.data()  as Map<String, dynamic>;
 
-  //                 print('_______status');
-  //                 print(data['status']);
-  //               if(data['status'] =="accepted"){
-  //                 Get.back();
-  //                 Get.offNamed(Ongoingtrip.screenName);
+                  print('_______status');
+                  print(data['status']);
+                if(data['status'] =="accepted"){
+                  Get.back();
+                  Get.offNamed(Ongoingtrip.screenName);
                   
 
-  //               }
+                }
 
-  //                if(data['tripstatus'] =="complete"){
+                 if(data['tripstatus'] =="complete"){
                   
-  //                 handelrDialog("completed");
+                  handelrDialog("completed");
 
-  //               }
+                }
 
           
-  //         }      
+          }      
          
-  //       });
+        });
 }
 
 
