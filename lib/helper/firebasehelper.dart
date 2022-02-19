@@ -11,6 +11,7 @@ CollectionReference requestrefference = firestore.collection('request');
 CollectionReference ongoingtriprefference = firestore.collection('ongointrip');
 Stream<DocumentSnapshot<Object?>>? requeststream =  requestrefference.doc(authinstance.currentUser!.uid).snapshots();
 Stream<DocumentSnapshot<Object?>>? ongoingtripstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
+Stream<DocumentSnapshot<Object?>>? driverlocationstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
 
 
  

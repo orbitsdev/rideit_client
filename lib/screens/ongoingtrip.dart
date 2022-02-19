@@ -1,9 +1,11 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
+import 'package:tricycleapp/screens/driver_location_screen.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -92,12 +94,19 @@ class _OngoingtripState extends State<Ongoingtrip> {
             ),
           );
         }),
-         
+         SizedBox(
+           height: 12,
+         ),
+         ElevatedButton(onPressed: (){
+           Get.to(DriverLocationScreen(), fullscreenDialog: true,  transition: Transition.downToUp, duration: Duration(milliseconds: 700), curve: Curves.decelerate  );
+         }, child: Text('View Driver Location')),
            Container(
              height: 1,
              color: Colors.red,
                 width: double.infinity,
               ),
+
+        if(Get.arguments["from"] !="trip")
           Container(
               child: ElevatedButton(onPressed: (){
 

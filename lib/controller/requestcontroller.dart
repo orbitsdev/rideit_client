@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
@@ -100,9 +101,7 @@ class Requestcontroller extends GetxController {
         "created_at": DateTime.now().toString()
       };
 
-      print('request data');
-      print(requestdata['actualmarker_position']);
-      print(requestdata);
+    
       try {
         requestrefference
             .doc(authinstance.currentUser!.uid)
@@ -115,11 +114,11 @@ class Requestcontroller extends GetxController {
           requeststream!.listen((event) {
             if (event.data() != null) {
               var data = event.data() as Map;
-              print(event.data());
+             
 
               if ((data['status'] == "accepted") && (data['tripstatus'] == 'notready') ){
                 Get.back();
-                requestDialog("Accepted prepairing trip...", cancelRequest);
+                progressDialog("Accepted prepairing trip...");
 
                 // Future.delayed(Duration(milliseconds: 300), () {
                 //   Get.offNamed(Ongoingtrip.screenName,
@@ -130,10 +129,13 @@ class Requestcontroller extends GetxController {
               }
                if ((data['status'] == "accepted") && (data['tripstatus'] == 'ready')){
                  Get.back();
+
+               // Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
                   Future.delayed(Duration(milliseconds: 300), () {
                   Get.offNamed(Ongoingtrip.screenName,
                       arguments: {"from": "request"});
                 });
+                
 
                }
               
@@ -171,9 +173,7 @@ class Requestcontroller extends GetxController {
       }
     });
 
-    print(devicetokens);
-    print('_____________________');
-    print(hasAvailableDriver);
+    
 
     return hasAvailableDriver;
   }
@@ -245,7 +245,7 @@ class Requestcontroller extends GetxController {
     var response =
         await requestrefference.doc(authinstance.currentUser!.uid).get();
     if (response.exists) {
-      print(response.data());
+  
       requestdetails =
           Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
 
@@ -262,8 +262,7 @@ class Requestcontroller extends GetxController {
     // }else{
     //   print('no data');
     // }
-    print('hhaas data');
-    print(hasdata(response.exists));
+   
     loader(false);
   }
 
@@ -283,11 +282,7 @@ class Requestcontroller extends GetxController {
                 
               ongoingtripdetails(newtripdetails);
 
-              print(
-                  'ongoingtiep_______________________________________________');
-              print(newtripdetails.tripstatus);
-
-              print(event.data());
+            
               var data = event.data() as Map;
 
               print(data['tripstatus']);
@@ -319,10 +314,13 @@ class Requestcontroller extends GetxController {
                   //if naka bayad show ratings optional then exit
                   if (data['read'] == true && data['payed'] == true) {
                     if (ifnotread == false) {
+
+
                       Get.defaultDialog(
                         title: '',
                         radius: 2,
                         barrierDismissible: false,
+                        backgroundColor: Colors.white,
                         titlePadding: EdgeInsets.all(0),
                         content: Column(
                           children: [
@@ -360,32 +358,15 @@ class Requestcontroller extends GetxController {
                                 requestdetails = Tripdetails().obs;
                                 ongoingtripdetails = Tripdetails().obs;
                                 mapxcontroller.clearRequest();
-                                Get.offNamed(HomeScreenManager.screenName);
+                                Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+                                //Get.offNamed(HomeScreenManager.screenName);
                               });
                             },
                             child: Text('rate')),
                           ],
 
                         )
-                        // content: ElevatedButton(
-                        //     onPressed: () async {
-                        //       ongoingtriprefference
-                        //           .doc(authinstance.currentUser!.uid)
-                        //           .delete()
-                        //           .then((value) async {
-                        //         tripisnotcompleted(true);
-                        //         hasongoingtrip(false);
-                        //         payed(false);
-                        //         paymentshowed(false);
-                        //         ifnotread(false);
-                        //         tripisnotcompleted(false);
-                        //         requestdetails = Tripdetails().obs;
-                        //         ongoingtripdetails = Tripdetails().obs;1
-                        //         mapxcontroller.clearRequest();
-                        //         Get.offNamed(HomeScreenManager.screenName);
-                        //       });
-                        //     },
-                        //     child: Text('rate')),
+                    
                       );
                       ifnotread(true);
                     }

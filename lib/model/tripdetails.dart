@@ -33,7 +33,7 @@ class Tripdetails {
 
 factory Tripdetails.fromJson(Map<String,dynamic> json){
 
-        Tripdetails newtripdetails = Tripdetails();
+      Tripdetails newtripdetails = Tripdetails();
        newtripdetails.picklocationid = json['pick_location_id'];
         newtripdetails.pickaddressname = json['pickaddress_name'];
         newtripdetails.actualmarkerposition = LatLng(

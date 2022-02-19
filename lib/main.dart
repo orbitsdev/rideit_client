@@ -9,6 +9,7 @@ import 'package:tricycleapp/config/firebaseconfig.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
+import 'package:tricycleapp/screens/driver_location_screen.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
@@ -97,6 +98,7 @@ class _TricycleAppState extends State<TricycleApp> {
         GetPage( name: TripHistoryScreen.screenName, page: () => TripHistoryScreen(), binding: Gextbinding()),
         GetPage(name: MeScreen.screenName, page: () => MeScreen(), binding: Gextbinding()),
         GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip(), binding: Gextbinding()),
+        GetPage(name: DriverLocationScreen.screenName, page: () => DriverLocationScreen(),  binding: Gextbinding(),),
       
       ],
       debugShowCheckedModeBanner: false,
