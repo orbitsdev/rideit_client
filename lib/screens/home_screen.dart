@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isPicking = false;
   List<Nearbydriver> listofavailabledriver = [];
 
-  setCameraInitialValue() async {
+ void setCameraInitialValue() async {
     var mapIsReady = await mapxcontroller.setMapCameraInitialValue();
 
     if (mapIsReady) {

@@ -242,14 +242,12 @@ class Requestcontroller extends GetxController {
 
   void checkIfHasDataRequest() async {
     loader(true);
-    var response =
-        await requestrefference.doc(authinstance.currentUser!.uid).get();
+    var response = await requestrefference.doc(authinstance.currentUser!.uid).get();
     if (response.exists) {
   
-      requestdetails =
-          Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
-
+      requestdetails =  Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
       print(requestdetails.value.passengerphone);
+      hasdata(true);
     } else {
       print('_nothing');
     }
