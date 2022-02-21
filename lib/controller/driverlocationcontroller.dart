@@ -22,7 +22,8 @@ Future<bool> setMapCameraInitialValue() async {
 
     if(value.data() != null){
        var data =  value.data() as Map<String, dynamic>;
-      driverpostion = LatLng(double.parse(data['pick_location']['latitude']) ,double.parse(data['pick_location']['longitude']) );
+       pickuplocation = LatLng(double.parse(data['pick_location']['latitude']) ,double.parse(data['pick_location']['longitude']) );
+      driverpostion =  LatLng(data['driver_location']['latitude'],data['driver_location']['longitude' ]);
        drivercameraposition = CameraPosition(
       target: driverpostion as LatLng,
       zoom: 16.999,

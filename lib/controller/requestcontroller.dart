@@ -10,6 +10,7 @@ import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
+import 'package:tricycleapp/dialog/ongointripdialog/ongoingtripdialog.dart';
 import 'package:tricycleapp/dialog/requestdialog/requestdialog.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
@@ -289,6 +290,7 @@ class Requestcontroller extends GetxController {
                 case 'coming':
                   break;
                 case 'arrived':
+                  showTripDialog("Thd driver has arrived");
                   //show notification when arrived
                   break;
                 case 'picked':

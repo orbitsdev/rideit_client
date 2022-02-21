@@ -19,9 +19,24 @@ class _DriverLocationScreenState extends State<DriverLocationScreen> {
     var driverxcontroller = Get.put(Driverlocationcontroller());
     CameraPosition? drivercameraposition;
     Marker? drivermarker;
-  
+    Marker? pickupmarker;
     Completer<GoogleMapController> _googlemapcontroller = Completer();
     GoogleMapController? _newgooglemapcontroller;
+    bool focusOnDriver =false;
+    double mapapdding = 0.0;
+
+
+
+  void focusCameraToDirverLocation(LatLng position ) async{
+
+    CameraPosition newcamerapostion = CameraPosition(target: position, zoom: 16.999,
+      tilt: 40,
+      bearing: -1000);
+
+    _newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(newcamerapostion),);
+
+  }
+
     Set<Marker> markerSet = {};
      static final CameraPosition _kLake = CameraPosition(
       bearing: 192.8334901395799,
@@ -31,6 +46,8 @@ class _DriverLocationScreenState extends State<DriverLocationScreen> {
   
         bool isMapReady = false;
         BitmapDescriptor? nearTricycleIcon;
+
+
 
 void getLiveDriverPosition(){
    bool isChanging =false;
@@ -44,6 +61,10 @@ void getLiveDriverPosition(){
         print(driverxcontroller.driverpostion);
         setDriverMarkerToNewPosition(driverxcontroller.driverpostion as LatLng);
         isChanging =true;
+        if(focusOnDriver){
+        focusCameraToDirverLocation(driverxcontroller.driverpostion as LatLng);
+
+        }
         
       }
     });
@@ -56,15 +77,26 @@ void getLiveDriverPosition(){
 
 @override
 void initState() {
+
   super.initState();
   setCameraInitialValue();
 
   
 }
 
+
+
 setCameraInitialValue() async {
     var mapIsReady = await driverxcontroller.setMapCameraInitialValue();
     drivercameraposition = driverxcontroller.drivercameraposition as CameraPosition;
+    pickupmarker = Marker(markerId: MarkerId('pickuplocation'),
+    position: driverxcontroller.pickuplocation as LatLng, 
+    );
+    
+    setState(() { 
+      markerSet.add(pickupmarker as Marker);
+    });
+
      getLiveDriverPosition();
 
     if (mapIsReady) {
@@ -90,6 +122,7 @@ void setDriverMarkerToNewPosition(LatLng newdriverpostion){
         
         setState(() {
           markerSet.add(drivermarker as Marker);
+        
         });
 
 
@@ -153,23 +186,30 @@ createCustomMarker();
         children: [
          
           GoogleMap(
+        padding: EdgeInsets.only(bottom: mapapdding),
         mapType: MapType.hybrid,
         initialCameraPosition: drivercameraposition as CameraPosition,
         markers: markerSet,
+        myLocationButtonEnabled: true,
+        myLocationEnabled: true,
         onMapCreated: (GoogleMapController mapcontroller) async {
 
           if(!_googlemapcontroller.isCompleted){     
             _googlemapcontroller.complete(mapcontroller);
             _newgooglemapcontroller = mapcontroller;
             _moveCameraToDriverPostion();
-            
              getLiveDriverPosition();
+
+            setState(() {
+              mapapdding =300;
+            });
+            
                 
           }
          
         },
       ),
- Positioned(
+    Positioned(
             top: 30,
             left: 0,
             right: 0,
@@ -188,7 +228,41 @@ createCustomMarker();
               ),
             ),
           ),
+        Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: AnimatedContainer(
 
+                    constraints: BoxConstraints(minHeight: 300),
+                    duration: Duration(milliseconds: 1500),
+                    curve: Curves.fastOutSlowIn,
+                    decoration: BoxDecoration(
+                      color: Colors.white
+                      
+                    ),
+                    child: AnimatedSwitcher(
+                      reverseDuration: Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeInOutBack,
+                      duration: Duration(milliseconds: 300),
+                    
+                      transitionBuilder: (child, animatin) => ScaleTransition(
+                        scale: animatin,
+                        child: child,
+                      ),
+                      child: Column(
+                        children: [
+                          ElevatedButton(onPressed: (){
+                            setState(() {
+                              focusOnDriver = !focusOnDriver;
+                            });
+                            print(focusOnDriver);
+                          }, child: Text(focusOnDriver  ? 'unLocked ' : 'Locked'))
+                        ],
+                      )
+                    ),
+                  ),
+                ),
         ],
       ),
     );
