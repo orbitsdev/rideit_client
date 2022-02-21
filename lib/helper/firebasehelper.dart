@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 FirebaseAuth authinstance = FirebaseAuth.instance;
@@ -12,6 +14,9 @@ CollectionReference ongoingtriprefference = firestore.collection('ongointrip');
 Stream<DocumentSnapshot<Object?>>? requeststream =  requestrefference.doc(authinstance.currentUser!.uid).snapshots();
 Stream<DocumentSnapshot<Object?>>? ongoingtripstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
 Stream<DocumentSnapshot<Object?>>? driverlocationstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
+  StreamSubscription<DocumentSnapshot<Object?>>?  driverstream;
+
+
 
 
  

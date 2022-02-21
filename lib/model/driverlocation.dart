@@ -20,9 +20,7 @@ Driverlocation.fromJson(Map<String, dynamic> json){
 
   Driverlocation newdriverlocation = Driverlocation();
 
-  newdriverlocation.picklocation = LatLng(
-            double.parse(json['pick_location']['latitude']),
-            double.parse(json['pick_location']['longitude']));
+
   newdriverlocation.driverposition =  LatLng(
             double.parse(json['driver_location']['latitude']),
             double.parse(json['driver_location']['longitude']));

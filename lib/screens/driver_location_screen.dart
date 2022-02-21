@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/controller/driverlocationcontroller.dart';
+import 'package:tricycleapp/helper/firebasehelper.dart';
 
 class DriverLocationScreen extends StatefulWidget {
 
@@ -30,7 +31,27 @@ class _DriverLocationScreenState extends State<DriverLocationScreen> {
   
         bool isMapReady = false;
         BitmapDescriptor? nearTricycleIcon;
-    
+
+void getLiveDriverPosition(){
+   bool isChanging =false;
+
+  if(driverxcontroller.driverpostion != null){
+      driverstream =  driverlocationstream!.listen((event) {
+      if (event.data() != null) {
+        var data = event.data() as Map<String, dynamic>;
+        driverxcontroller.driverpostion = LatLng(data['driver_location']['latitude'], data['driver_location']['longitude']);
+        print( '______newmarker');
+        print(driverxcontroller.driverpostion);
+        setDriverMarkerToNewPosition(driverxcontroller.driverpostion as LatLng);
+        isChanging =true;
+        
+      }
+    });
+
+   
+    }
+
+}
         
 
 @override
@@ -38,15 +59,17 @@ void initState() {
   super.initState();
   setCameraInitialValue();
 
-  //driverxcontroller.getLiveDriverPosition();
+  
 }
 
 setCameraInitialValue() async {
     var mapIsReady = await driverxcontroller.setMapCameraInitialValue();
     drivercameraposition = driverxcontroller.drivercameraposition as CameraPosition;
+     getLiveDriverPosition();
 
     if (mapIsReady) {
        setMapIsReady(mapIsReady);
+      
     }
   }
 
@@ -56,14 +79,12 @@ void setMapIsReady(bool value){
     isMapReady = value;
   });
 }
-void _moveCameraToDriverPostion() async {
-    drivercameraposition = await driverxcontroller.getDriverCamerapostion();
-    print(driverxcontroller.driverpostion);
 
-    
+void setDriverMarkerToNewPosition(LatLng newdriverpostion){
+        print("called");
         drivermarker = Marker(
         markerId: MarkerId('dropmarker'),
-        position: driverxcontroller.driverpostion as LatLng,
+        position: newdriverpostion,
         icon: nearTricycleIcon as BitmapDescriptor);
 
         
@@ -72,16 +93,19 @@ void _moveCameraToDriverPostion() async {
         });
 
 
+
+}
+void _moveCameraToDriverPostion() async {
+    drivercameraposition = await driverxcontroller.getDriverCamerapostion();
+    print(driverxcontroller.driverpostion);
+
+  setDriverMarkerToNewPosition(driverxcontroller.driverpostion as LatLng);
+
         _newgooglemapcontroller!.animateCamera(
         CameraUpdate.newCameraPosition(drivercameraposition as CameraPosition, ), );
 
         
 }
-
-
-
-
-
 
 @override
   void setState(VoidCallback fn) {
@@ -90,6 +114,16 @@ void _moveCameraToDriverPostion() async {
 
     }
     // TODO: implement setState
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    
+    if(driverstream != null){
+      driverstream!.cancel();
+    }
+    super.dispose();
   }
 
   void createCustomMarker() {
@@ -108,9 +142,7 @@ void _moveCameraToDriverPostion() async {
 createCustomMarker();
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Driver Location'),
-      ),
+
       body: isMapReady ==false ? Container(
         child: Center(
           child: CircularProgressIndicator(),
@@ -119,28 +151,43 @@ createCustomMarker();
        Stack(
         
         children: [
-          
+         
           GoogleMap(
         mapType: MapType.hybrid,
         initialCameraPosition: drivercameraposition as CameraPosition,
         markers: markerSet,
-        onMapCreated: (GoogleMapController mapcontroller) {
+        onMapCreated: (GoogleMapController mapcontroller) async {
 
           if(!_googlemapcontroller.isCompleted){     
             _googlemapcontroller.complete(mapcontroller);
             _newgooglemapcontroller = mapcontroller;
             _moveCameraToDriverPostion();
-
+            
+             getLiveDriverPosition();
+                
           }
-          // if (!_googlmapcompleter.isCompleted) {
-          //             _googlmapcompleter.complete(mapcontroller);
-          //             _newgooglemapcontroller = mapcontroller;
-          //             _moveCameraToCurrentPostion();
-          //           }
-          // _googlemapcontroller.complete(controller);
+         
         },
       ),
-
+ Positioned(
+            top: 30,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Get.theme.primaryColor,
+              height: 100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ElevatedButton(onPressed: (){
+                    
+                    Get.back();
+                  }, child: Text('x')),
+                ],
+              ),
+            ),
+          ),
 
         ],
       ),
