@@ -88,21 +88,26 @@ void initState() {
 
 setCameraInitialValue() async {
     var mapIsReady = await driverxcontroller.setMapCameraInitialValue();
-    drivercameraposition = driverxcontroller.drivercameraposition as CameraPosition;
+  if (mapIsReady) {
+       setMapIsReady(mapIsReady);
+        drivercameraposition = driverxcontroller.drivercameraposition as CameraPosition;
     pickupmarker = Marker(markerId: MarkerId('pickuplocation'),
     position: driverxcontroller.pickuplocation as LatLng, 
     );
-    
-    setState(() { 
+
+     setState(() { 
       markerSet.add(pickupmarker as Marker);
     });
 
      getLiveDriverPosition();
 
-    if (mapIsReady) {
-       setMapIsReady(mapIsReady);
       
     }
+
+   
+    
+   
+  
   }
 
 
@@ -257,7 +262,10 @@ createCustomMarker();
                               focusOnDriver = !focusOnDriver;
                             });
                             print(focusOnDriver);
-                          }, child: Text(focusOnDriver  ? 'unLocked ' : 'Locked'))
+                          }, child: Text(focusOnDriver  ? 'unLocked ' : 'Locked')),
+                          ElevatedButton(onPressed: (){
+                         
+                                                   }, child: Text('View Route'))
                         ],
                       )
                     ),
