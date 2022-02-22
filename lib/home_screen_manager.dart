@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-badge.widget.dart';
+import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
@@ -25,6 +26,7 @@ static const screenName = '/homescreenmanager';
 }
 
 class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProviderStateMixin {
+  var requesstxcontroller = Get.put(Requestcontroller());
 
     Color colorwhite = HexColor("#fbfefb");
     Color iconcolor = HexColor("#2F2191");
@@ -46,6 +48,8 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
       length: 4,
       vsync: this,
     );
+
+    requesstxcontroller.checkIdhasOngoinRequestNotRead();
 
     super.initState();
   }

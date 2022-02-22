@@ -424,4 +424,101 @@ class Requestcontroller extends GetxController {
       }
     });
   }
+
+
+  void checkIdhasOngoinRequestNotRead() async{
+    print('_______________________________________listen called');
+    ongoingtriprefference.doc(authinstance.currentUser!.uid).get().then((value) async {
+        if(value.exists){
+         var data = value.data() as Map<String, dynamic>;
+          
+          if(data != null){
+            
+              if(data['tripstatus'] == 'complete' && data['payed'] == true && data['read'] == false){
+
+            
+                   await ongoingtriprefference
+                        .doc(authinstance.currentUser!.uid)
+                        .update({'read': true}).then((_)  async{ 
+                             if (ifnotread == false) {
+
+
+                      Get.defaultDialog(
+                        title: '',
+                        radius: 2,
+                        barrierDismissible: false,
+                        backgroundColor: Colors.white,
+                        titlePadding: EdgeInsets.all(0),
+                        content: Column(
+                          children: [
+                              Text("Thank You !", style: Get.theme.textTheme.headline3,),
+                              
+
+                            RatingBar.builder(
+                              initialRating: 3,
+                              minRating: 1,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              itemCount: 5,
+                              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                              itemBuilder: (context, _) => Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              ),
+                              onRatingUpdate: (rating) {
+                                ratevalue = rating; 
+                                print('______________');
+                                print(rating);
+                              },
+                            ),
+                              Text("Rated Our Driver ", style: Get.theme.textTheme.bodyText1,),
+                              ElevatedButton(
+                            onPressed: () async {
+                             await ratingsrefference.doc(ongoingtripdetails.value.driverid).collection('ratings').add({
+                                'rate': ratevalue,
+                                'comment': null,
+                                'passenger_id': authinstance.currentUser!.uid,
+                                'created_at':  DateTime.now().toString(),
+                              }).then((_)  async {
+                                  await ongoingtriprefference
+                                  .doc(authinstance.currentUser!.uid)
+                                  .delete()
+                                  .then((value) async {
+                                tripisnotcompleted(true);
+                                hasongoingtrip(false);
+                                payed(false);
+                                paymentshowed(false);
+                                ifnotread(false);
+                                tripisnotcompleted(false);
+                                requestdetails = Tripdetails().obs;
+                                ongoingtripdetails = Tripdetails().obs;
+                                mapxcontroller.clearRequest();
+                                Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+                                //Get.offNamed(HomeScreenManager.screenName);
+                              });
+                              });
+                            
+                              
+                            },
+                            child: Text('rate')),
+                          ],
+
+                        )
+                    
+                      );
+                      ifnotread(true);
+                    }
+                        });
+                  
+
+              }
+
+            
+          }
+         
+          print('exist from home manage___________________');
+          print(data);
+        }
+    });
+  }
 }

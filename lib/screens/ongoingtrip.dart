@@ -36,6 +36,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
 
   @override
   Widget build(BuildContext context) {
+
+     print(Get.arguments["from"]);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Title'),
@@ -109,7 +111,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
           );
         }),
          
-
+        if(Get.arguments["from"] != null)
         if(Get.arguments["from"] !="trip")
           Container(
               child: ElevatedButton(onPressed: (){
