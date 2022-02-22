@@ -38,7 +38,7 @@ class Requestcontroller extends GetxController {
   var paymentshowed = false.obs;
   var ifnotread = false.obs;
   var tripisnotcompleted = false.obs;
-
+  double ratevalue =0.0;
   Future<bool> checkIfHasOnGoingTrip() async {
     bool hasOnGoingTrip = false;
     checking(true);
@@ -240,10 +240,33 @@ class Requestcontroller extends GetxController {
       print(e.toString());
     }
   }
+  void checkIfHasOnoingTripRequest() async {
+    loader(true);
+    var response = await ongoingtriprefference.doc(authinstance.currentUser!.uid).get();
+    if (response.exists) {
+  
+      requestdetails =  Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
+      print(requestdetails.value.passengerphone);
+      hasdata(true);
+    } else {
+      print('_nothing');
+    }
+
+    // if(response.exists){
+    //  //
+    //  //prin print(response.data() as DocumentSnapshot);
+    //   print('has data');
+    //   print(response.data() as Map<String, dynamic>);
+    // }else{
+    //   print('no data');
+    // }
+   
+    loader(false);
+  }
 
   void checkIfHasDataRequest() async {
     loader(true);
-    var response = await requestrefference.doc(authinstance.currentUser!.uid).get();
+    var response = await ongoingtriprefference.doc(authinstance.currentUser!.uid).get();
     if (response.exists) {
   
       requestdetails =  Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
@@ -290,7 +313,7 @@ class Requestcontroller extends GetxController {
                 case 'coming':
                   break;
                 case 'arrived':
-                  showTripDialog("Thd driver has arrived");
+                 // showTripDialog("Thd driver has arrived");
                   //show notification when arrived
                   break;
                 case 'picked':
@@ -339,13 +362,21 @@ class Requestcontroller extends GetxController {
                                 color: Colors.amber,
                               ),
                               onRatingUpdate: (rating) {
+                                ratevalue = rating; 
+                                print('______________');
                                 print(rating);
                               },
                             ),
                               Text("Rated Our Driver ", style: Get.theme.textTheme.bodyText1,),
                               ElevatedButton(
                             onPressed: () async {
-                              ongoingtriprefference
+                             await ratingsrefference.doc(ongoingtripdetails.value.driverid).collection('ratings').add({
+                                'rate': ratevalue,
+                                'comment': null,
+                                'passenger_id': authinstance.currentUser!.uid,
+                                'created_at':  DateTime.now().toString(),
+                              }).then((_)  async {
+                                  await ongoingtriprefference
                                   .doc(authinstance.currentUser!.uid)
                                   .delete()
                                   .then((value) async {
@@ -361,6 +392,9 @@ class Requestcontroller extends GetxController {
                                 Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
                                 //Get.offNamed(HomeScreenManager.screenName);
                               });
+                              });
+                            
+                              
                             },
                             child: Text('rate')),
                           ],

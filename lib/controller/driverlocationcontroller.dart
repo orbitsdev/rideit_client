@@ -22,11 +22,13 @@ Future<bool> setMapCameraInitialValue() async {
 
     if(value.data() != null){
         var data =  value.data() as Map<String, dynamic>;
+        double dlat =  checkDouble((data['pick_location']['latitude']));
+        double dlng =  checkDouble((data['pick_location']['latitude']));
         print(data);
         pickuplocation = LatLng(double.parse(data['pick_location']['latitude']) ,double.parse(data['pick_location']['longitude']) );
         print('picllocation_____________');
         print(pickuplocation);
-        driverpostion = LatLng(data['driver_location']['latitude'], data['driver_location']['longitude']);
+        driverpostion = LatLng(dlat,dlng);
         print('driverpostion________');
         print(driverpostion);
 
@@ -36,7 +38,7 @@ Future<bool> setMapCameraInitialValue() async {
       tilt: 40,
       bearing: -1000);
       isMapIsReady = true;
-    }else{
+    }else{  
       isMapIsReady =false;
     }      
         
@@ -92,6 +94,15 @@ Future<bool> setMapCameraInitialValue() async {
 
       
   }
+
+  static double checkDouble(dynamic value) {
+    if (value is String) {
+      return double.parse(value);
+    } else {
+      return value;
+    }
+  }
+
 
 
 }

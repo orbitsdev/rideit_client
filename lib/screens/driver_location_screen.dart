@@ -5,6 +5,10 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/controller/driverlocationcontroller.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
+import 'package:tricycleapp/helper/geofirehelper.dart';
+import 'package:tricycleapp/model/driverlocation.dart';
+
+
 
 class DriverLocationScreen extends StatefulWidget {
 
@@ -52,11 +56,19 @@ class _DriverLocationScreenState extends State<DriverLocationScreen> {
 void getLiveDriverPosition(){
    bool isChanging =false;
 
+  
+
   if(driverxcontroller.driverpostion != null){
       driverstream =  driverlocationstream!.listen((event) {
       if (event.data() != null) {
+          
+        
         var data = event.data() as Map<String, dynamic>;
-        driverxcontroller.driverpostion = LatLng(data['driver_location']['latitude'], data['driver_location']['longitude']);
+         double dl = checkDouble(data['driver_location']['latitude']);
+         double dlng = checkDouble(data['driver_location']['longitude']);
+        // var driverpostion =   Driverlocation.fromJson(data['driver_location']);
+
+        driverxcontroller.driverpostion = LatLng(dl , dlng);
         print( '______newmarker');
         print(driverxcontroller.driverpostion);
         setDriverMarkerToNewPosition(driverxcontroller.driverpostion as LatLng);
@@ -74,6 +86,13 @@ void getLiveDriverPosition(){
 
 }
         
+    double checkDouble(dynamic value) {
+    if (value is String) {
+      return double.parse(value);
+    } else {
+      return value.toDouble();
+    }
+  }
 
 @override
 void initState() {

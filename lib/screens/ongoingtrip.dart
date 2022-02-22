@@ -90,14 +90,13 @@ class _OngoingtripState extends State<Ongoingtrip> {
                     ],
                   ),
                 ),
-              ],
-            ),
-          );
-        }),
-         SizedBox(
+                SizedBox(
            height: 12,
          ),
-         ElevatedButton(onPressed: (){
+
+
+       //  if(requestxcontroller.ongoingtripdetails.value.tripstatus != "prepairing")
+          ElevatedButton(onPressed: (){
            Get.to(DriverLocationScreen(), fullscreenDialog: true,  transition: Transition.downToUp, duration: Duration(milliseconds: 700), curve: Curves.decelerate  );
          }, child: Text('View Driver Location')),
            Container(
@@ -105,6 +104,11 @@ class _OngoingtripState extends State<Ongoingtrip> {
              color: Colors.red,
                 width: double.infinity,
               ),
+              ],
+            ),
+          );
+        }),
+         
 
         if(Get.arguments["from"] !="trip")
           Container(

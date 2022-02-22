@@ -26,7 +26,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    requestxcontroller.checkIfHasDataRequest();
+    requestxcontroller.checkIfHasOnoingTripRequest();
   }
 
   @override
