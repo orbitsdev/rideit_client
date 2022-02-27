@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
+import 'package:tricycleapp/model/availabledriver.dart';
+import 'package:tricycleapp/model/neardriver.dart';
 
 class Driverlocationcontroller extends GetxController {
   LatLng? pickuplocation;
@@ -11,6 +13,7 @@ class Driverlocationcontroller extends GetxController {
   Marker? drivermarker;
   LatLng? driverpostion;
   CameraPosition? drivercameraposition;
+  List<Availabledriver> availabledriver = [];
 
   
 
@@ -103,6 +106,60 @@ Future<bool> setMapCameraInitialValue() async {
     }
   }
 
+
+  
+Future<bool> getAllOnlineDrivers() async{
+bool hasonlindrivers = false;
+  try{ 
+    availabledriver.clear();
+    
+    await availabledriversrefference.get().then((value)  async{
+
+            if(value.docs.isNotEmpty){
+
+              value.docs.forEach((element) { 
+              
+                var data =  element.data() as Map<String, dynamic>;
+                data['id'] = element.id;
+                
+              Availabledriver newavailabledriver = Availabledriver.fromJson(data);
+
+              availabledriver.add(newavailabledriver);
+            
+              print('__________________________________________________________');
+              print('__________________________________________________________');
+              print('__________________________________________________________');
+              print('___________________________token_____________________________');
+              print(newavailabledriver.location);
+              print('__________________________________________________________');
+
+            });
+
+            hasonlindrivers = true;
+
+            }else{
+               
+              print('__________________________________________________________');
+              print('__________________________________________________________');
+              print('__________________________________________________________');
+              print('__________________________________________________________');
+              print('empty');
+              print('__________________________________________________________');
+            }
+            
+    }); 
+
+  
+
+  }catch(e){
+    hasonlindrivers =false;
+    print(e);
+  }
+
+
+  return hasonlindrivers;
+  
+}
 
 
 }

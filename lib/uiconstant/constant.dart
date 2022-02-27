@@ -13,8 +13,8 @@ Color COLOR_SECONDARY_WHITE = HexColor("#FAFAFA");
 const COLOR_DARK_BLUE =Color.fromRGBO(20,25,45,1.0);
 
  Color colorwhite = HexColor("#fbfefb");
-    Color iconcolor = HexColor("#2F2191");
-    Color iconcolorsecondary = HexColor("#594DAF");
+  Color iconcolor = HexColor("#2F2191");
+  Color iconcolorsecondary = HexColor("#594DAF");
 
 const TextTheme TEXT_THEME_DEFAULT  =  TextTheme(
   headline1: TextStyle(color:COLOR_BLACK, fontWeight: FontWeight.w700, fontSize: 26 ,),

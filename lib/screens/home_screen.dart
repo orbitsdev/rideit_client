@@ -15,11 +15,13 @@ import 'package:lottie/lottie.dart' as lotie;
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
+import 'package:tricycleapp/controller/driverlocationcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/helper/geofirehelper.dart';
+import 'package:tricycleapp/model/availabledriver.dart';
 import 'package:tricycleapp/model/nearbydriver.dart';
 import 'package:tricycleapp/model/neardriver.dart';
 import 'package:tricycleapp/model/prediction_place.dart';
@@ -40,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var mapxcontroller = Get.find<Mapcontroller>();
   var requestxcontroller = Get.find<Requestcontroller>();
   var authxcontroller = Get.find<Authcontroller>();
+  var driverxcontroller = Get.find<Driverlocationcontroller>();
 
   //_____________ gor google map
   Completer<GoogleMapController> _googlmapcompleter = Completer();
@@ -60,14 +63,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Marker? pickupmarker;
   Marker? dropoffmarker;
   bool isPicking = false;
-  List<Nearbydriver> listofavailabledriver = [];
+  List<Availabledriver> listofavailabledriver = [];
 
- void setCameraInitialValue() async {
+  void setCameraInitialValue() async {
     var mapIsReady = await mapxcontroller.setMapCameraInitialValue();
 
     if (mapIsReady) {
       setMapIsReady(mapIsReady);
-      showNearDriver();
+     // showNearDriver();
     }
 
     cameraposition = mapxcontroller.cameraposition;
@@ -116,9 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    if(_newgooglemapcontroller != null){
-    _newgooglemapcontroller!.dispose();
-
+    if (_newgooglemapcontroller != null) {
+      _newgooglemapcontroller!.dispose();
     }
     searchcontroller.dispose();
     // TODO: implement dispose
@@ -135,69 +137,103 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void showNearDriver() async {
-    await Geofire.initialize("availableDrivers");
 
-    Geofire.queryAtLocation(mapxcontroller.currentPosition!.latitude,
-            mapxcontroller.currentPosition!.longitude, 5)!
-        .listen((map) {
-      if (map != null) {
-        var callBack = map['callBack'];
-
-        //latitude will be retrieved from map['latitude']
-        //longitude will be retrieved from map['longitude']
-
-        switch (callBack) {
-          case Geofire.onKeyEntered:
-            Nearbydriver driver = Nearbydriver();
-            driver.key = map["key"];
-            driver.latitude = map["latitude"];
-            driver.longitude = map["longitude"];
-            Geofirehelper.nearAvailableDriber.add(driver);
-            if (nearDriverIsLoad == true) {
-              updateAvailableDriverOnMap();
-            }
-            // keysRetrieved.add(map["key"]);
-            break;
-
-          case Geofire.onKeyExited:
-            Geofirehelper.removeDriverFromList(map["key"]);
-            updateAvailableDriverOnMap();
-
-            // keysRetrieved.remove(map["key"]);
-            break;
-
-          case Geofire.onKeyMoved:
-            Nearbydriver driver = Nearbydriver();
-            driver.key = map["key"];
-            driver.latitude = map["latitude"];
-            driver.longitude = map["longitude"];
-            Geofirehelper.updateDriverNearByLocation(driver);
-            updateAvailableDriverOnMap();
-            // Update your key's location
-            break;
-
-          case Geofire.onGeoQueryReady:
-            updateAvailableDriverOnMap();
-            // All Intial Data is loaded
-            // print(map['result'])
-
-            break;
-        }
-      }
-
-      setState(() {});
+      setState(() {
+      markersSet!.clear();
     });
+
+    Set<Marker> omarkersset={};
+
+
+    var hasonlindriver = await driverxcontroller.getAllOnlineDrivers();
+    listofavailabledriver = driverxcontroller.availabledriver;
+
+    if (hasonlindriver) {
+      
+      print(hasonlindriver);
+      for(Availabledriver driver in listofavailabledriver){
+      print('__________________________}}}}}}}}}}}}}');
+      print(driver.id);
+      print(driver.devicetoken);
+      print(driver.location);
+      
+      Marker newmarker = Marker(markerId: MarkerId(driver.id as String),
+        position: driver.location as LatLng,
+        icon:  nearTricycleIcon as BitmapDescriptor,
+      );
+
+        omarkersset.add(newmarker);   
+
+      }
+      setState(() { 
+        markersSet = omarkersset;
+      });
+    }
+
+    
+    
   }
+  // void showNearDriver() async {
+  //   await Geofire.initialize("availableDrivers");
+
+  //   Geofire.queryAtLocation(mapxcontroller.currentPosition!.latitude,
+  //           mapxcontroller.currentPosition!.longitude, 5)!
+  //       .listen((map) {
+  //     if (map != null) {
+  //       var callBack = map['callBack'];
+
+  //       //latitude will be retrieved from map['latitude']
+  //       //longitude will be retrieved from map['longitude']
+
+  //       switch (callBack) {
+  //         case Geofire.onKeyEntered:
+  //           Nearbydriver driver = Nearbydriver();
+  //           driver.key = map["key"];
+  //           driver.latitude = map["latitude"];
+  //           driver.longitude = map["longitude"];
+  //           Geofirehelper.nearAvailableDriber.add(driver);
+  //           if (nearDriverIsLoad == true) {
+  //             updateAvailableDriverOnMap();
+  //           }
+  //           // keysRetrieved.add(map["key"]);
+  //           break;
+
+  //         case Geofire.onKeyExited:
+  //           Geofirehelper.removeDriverFromList(map["key"]);
+  //           updateAvailableDriverOnMap();
+
+  //           // keysRetrieved.remove(map["key"]);
+  //           break;
+
+  //         case Geofire.onKeyMoved:
+  //           Nearbydriver driver = Nearbydriver();
+  //           driver.key = map["key"];
+  //           driver.latitude = map["latitude"];
+  //           driver.longitude = map["longitude"];
+  //           Geofirehelper.updateDriverNearByLocation(driver);
+  //           updateAvailableDriverOnMap();
+  //           // Update your key's location
+  //           break;
+
+  //         case Geofire.onGeoQueryReady:
+  //           updateAvailableDriverOnMap();
+  //           // All Intial Data is loaded
+  //           // print(map['result'])
+
+  //           break;
+  //       }
+  //     }
+
+  //     setState(() {});
+  //   });
+  // }
 
   void updateAvailableDriverOnMap() {
     setState(() {
       markersSet!.clear();
     });
 
-    for (Nearbydriver drivers in Geofirehelper.nearAvailableDriber) {
-      LatLng driverposition =
-          LatLng(drivers.latitude as double, drivers.longitude as double);
-    }
+   
 
     Set<Marker> tmarker = Set<Marker>();
 
@@ -330,7 +366,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   zoomGesturesEnabled: true,
                   myLocationButtonEnabled: true,
                   myLocationEnabled: true,
-                  markers: isPicking
+                  markers:
+                   isPicking
                       ? markersSet as Set<Marker>
                       : _currentStep >= 1
                           ? markersSet as Set<Marker>
@@ -589,9 +626,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (lastStep) {
                     print('complete');
 
-                   requestxcontroller.createRequest();
-                    
-                    
+                    requestxcontroller.createRequest();
 
                     // sendNotification();
 
@@ -688,43 +723,46 @@ class _HomeScreenState extends State<HomeScreen> {
             style: Theme.of(context).textTheme.headline2,
           ),
           addVerticalSpace(15),
-
-          Obx((){
-          if(requestxcontroller.checking.value ==true){
-                  return SizedBox(width: 15, height: 15,
-                  child: Center(
-                    child: CircularProgressIndicator(strokeWidth: 3,),
+          Obx(() {
+            if (requestxcontroller.checking.value == true) {
+              return SizedBox(
+                width: 15,
+                height: 15,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
                   ),
-                  );
-                }
-               return  SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () async {
-                var hasOngoingtrip =    await requestxcontroller.checkIfHasOnGoingTrip();
-            if (!hasOngoingtrip) {
-              var hasAvailableDriver =    await requestxcontroller.checkIfHasAvailabDriver();
-
-                if (hasAvailableDriver) {
-                  requestLogic();
-                } else {
-                  handelrDialog("Sorry no availabler drivers found");
-                }
-            }else{
-               handelrDialog("You can make request again after finishing the trip");
+                ),
+              );
             }
-                 
-                
-              },
-              child:Text('FIND TRICYCLE') ,
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(iconcolorsecondary),
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  var hasOngoingtrip =
+                      await requestxcontroller.checkIfHasOnGoingTrip();
+                  if (!hasOngoingtrip) {
+                    var hasAvailableDriver =
+                        await requestxcontroller.checkIfHasAvailabDriver();
+
+                    if (hasAvailableDriver) {
+                      requestLogic();
+                    } else {
+                      handelrDialog("Sorry no availabler drivers found");
+                    }
+                  } else {
+                    handelrDialog(
+                        "You can make request again after finishing the trip");
+                  }
+                },
+                child: Text('FIND TRICYCLE'),
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(iconcolorsecondary),
+                ),
               ),
-            ),
-          );
-              }),
-         
+            );
+          }),
         ],
       ),
     );
@@ -736,7 +774,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void requestLogic() async {
     if (currentrequestpagestate == tricycleRequestState.starting) {
-  
       setState(() {
         isPicking = true;
         _containerHeight = 250;
@@ -744,11 +781,7 @@ class _HomeScreenState extends State<HomeScreen> {
         currentrequestpagestate = tricycleRequestState.requesting;
       });
 
-
-     
       nearbydriverlist = Geofirehelper.nearAvailableDriber;
-
-    
     } else {
       clearRequest();
     }

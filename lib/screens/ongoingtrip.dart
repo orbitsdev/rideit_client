@@ -130,7 +130,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
 
 
   void goToScreen(){
-    print(Get.arguments["from"]);
+
+
     if(Get.arguments["from"] =="request"){
       
       Get.toNamed(HomeScreenManager.screenName);

@@ -15,7 +15,7 @@ CollectionReference ratingsrefference = firestore.collection('ratings');
 Stream<DocumentSnapshot<Object?>>? requeststream =  requestrefference.doc(authinstance.currentUser!.uid).snapshots();
 Stream<DocumentSnapshot<Object?>>? ongoingtripstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
 Stream<DocumentSnapshot<Object?>>? driverlocationstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
-  StreamSubscription<DocumentSnapshot<Object?>>?  driverstream;
+StreamSubscription<DocumentSnapshot<Object?>>?  driverstream;
 
 
 
