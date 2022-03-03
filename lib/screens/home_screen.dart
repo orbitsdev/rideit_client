@@ -380,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _moveCameraToCurrentPostion();
                     }
                   },
-                  onTap: _currentStep >= 1
+                  onLongPress: _currentStep >= 1
                       ? null
                       : isPicking
                           ? placeMarker

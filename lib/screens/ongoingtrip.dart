@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:tricycleapp/controller/requestcontroller.dart';
@@ -126,6 +127,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
             }, child: Text("Back") )
           
         ],
+
       ),
     ),
     );
@@ -134,11 +136,12 @@ class _OngoingtripState extends State<Ongoingtrip> {
 
   void goToScreen(){
 
-
+        print("called");
       if(widget.from != null){
-          Get.to(()=> HomeScreenManager() );
-      }else{
           Get.back();
+      }else{
+          Get.put(Pagecontroller()).updatePageIndex(2);
+          Get.to(()=> HomeScreenManager() );
       }
     
   }
