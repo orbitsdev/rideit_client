@@ -43,8 +43,13 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
     MeScreen(),
   ];
 
+
+
+  List<String?> _pagename = ["Dashboard", "Home", "Trip", "Me"];
+
   @override
   void initState() {
+    super.initState();
     _tabController = TabController(
       initialIndex: pagexcontroller.pageindex.value,
       length: _pages.length,
@@ -52,8 +57,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
     );
 
     requesstxcontroller.checkIdhasOngoinRequestNotRead();
-
-    super.initState();
+    
   }
   @override
   void setState(VoidCallback fn) {
@@ -76,6 +80,7 @@ void requestListiners() async{
                   print(data['status']);
                 if(data['status'] =="accepted"){
                   Get.back();
+                  pagexcontroller.updatePageIndex(2);
                   Get.offNamed(Ongoingtrip.screenName);
                   
 
@@ -106,9 +111,10 @@ void requestListiners() async{
     return Scaffold(
     
       bottomNavigationBar: MotionTabBar(
-        initialSelectedTab: "Home",
+        
+        initialSelectedTab: _pagename[pagexcontroller.pageindex.value] as String,
         useSafeArea: true, // default: true, apply safe area wrapper
-        labels: const ["Dashboard", "Home", "Trip", "Me"],
+        labels: _pagename,
         icons: const [Icons.dashboard, Icons.home, Icons.history, Icons.people_alt],
 
         // optional badges, length must be same with labels

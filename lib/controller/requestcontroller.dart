@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
+import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/dialog/ongointripdialog/ongoingtripdialog.dart';
 import 'package:tricycleapp/dialog/requestdialog/requestdialog.dart';
@@ -23,6 +24,8 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 class Requestcontroller extends GetxController {
   var authxcontroller = Get.find<Authcontroller>();
   var mapxcontroller = Get.find<Mapcontroller>();
+  var pagexcontroller = Get.find<Pagecontroller>();
+
 
   Stream? collectionStream;
   List<String> devicetokens = [];
@@ -240,6 +243,7 @@ class Requestcontroller extends GetxController {
       requestdetails =  Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
       print(requestdetails.value.passengerphone);
       hasdata(true);
+      hasongoingtrip(true);
     } else {
       print('_nothing');
     }
@@ -384,6 +388,10 @@ class Requestcontroller extends GetxController {
                                 ongoingtripdetails = Tripdetails().obs;
                                 mapxcontroller.clearRequest();
 
+                                if(pagexcontroller.pageindex == 2){
+
+                                  pagexcontroller.updatePageIndex(1);
+                                }
                                 //Get.offNamed(HomeScreenManager.screenName, (route) => false);
                                 Get.offNamed(HomeScreenManager.screenName);
                               });
@@ -488,7 +496,7 @@ class Requestcontroller extends GetxController {
                                 requestdetails = Tripdetails().obs;
                                 ongoingtripdetails = Tripdetails().obs;
                                 mapxcontroller.clearRequest();
-                                Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+                                
                                 //Get.offNamed(HomeScreenManager.screenName);
                               });
                               });

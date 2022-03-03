@@ -28,7 +28,7 @@ Future<bool> setMapCameraInitialValue() async {
         double dlat =  checkDouble((data['pick_location']['latitude']));
         double dlng =  checkDouble((data['pick_location']['latitude']));
         print(data);
-        pickuplocation = LatLng(double.parse(data['pick_location']['latitude']) ,double.parse(data['pick_location']['longitude']) );
+        
         print('picllocation_____________');
         print(pickuplocation);
         driverpostion = LatLng(dlat,dlat);

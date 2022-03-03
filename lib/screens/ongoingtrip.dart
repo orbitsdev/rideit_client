@@ -138,6 +138,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
 
         print("called");
       if(widget.from != null){
+          Get.put(Pagecontroller()).updatePageIndex(2);
           Get.back();
       }else{
           Get.put(Pagecontroller()).updatePageIndex(2);

@@ -27,7 +27,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
 try {
-    await Firebaseconfig.firebaseinitilizeapp();
+    await Firebaseconfig.firebaseinitilizeapp().then((value) {
+      
+
+    });
   } on FirebaseException catch (e) {
     if (e.code == 'duplicate-app') {
     } else {
@@ -54,7 +57,7 @@ class _TricycleAppState extends State<TricycleApp> {
   @override
   void initState() {
     super.initState();
-
+    Gextbinding().dependencies();
     user = FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user == null) {
         print('User is currently signed out!');
@@ -64,6 +67,8 @@ class _TricycleAppState extends State<TricycleApp> {
     });
     
   }
+
+  
 
   @override
   void dispose() {
