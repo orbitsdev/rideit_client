@@ -850,6 +850,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setDropOffMarker(mapxcontroller.markerPositon as LatLng);
           if (ismarkerSet) {
             setState(() {
+              
               searchcontroller.close();
               mapxcontroller.placeprediction.clear();
             });

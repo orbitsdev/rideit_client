@@ -3,15 +3,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Ongoingtrip extends StatefulWidget {
 
 static const screenName = '/ongoingtrip';
+
+String? from;
+   Ongoingtrip({
+    Key? key,
+    this.from,
+  }) : super(key: key);
+
+
   @override
   _OngoingtripState createState() => _OngoingtripState();
 }
@@ -37,7 +46,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
   @override
   Widget build(BuildContext context) {
 
-     print(Get.arguments["from"]);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Title'),
@@ -110,18 +119,12 @@ class _OngoingtripState extends State<Ongoingtrip> {
             ),
           );
         }),
-         
-        if(Get.arguments["from"] != null)
-        if(Get.arguments["from"] !="trip")
-          Container(
-              child: ElevatedButton(onPressed: (){
-
-                
-                print(Get.arguments["from"]);
-                goToScreen();
-
-              }, child: Text("back")),
-          ),
+          
+          
+            ElevatedButton(onPressed: (){
+              goToScreen();
+            }, child: Text("Back") )
+          
         ],
       ),
     ),
@@ -132,15 +135,11 @@ class _OngoingtripState extends State<Ongoingtrip> {
   void goToScreen(){
 
 
-    if(Get.arguments["from"] =="request"){
-      
-      Get.toNamed(HomeScreenManager.screenName);
-
-    } if(Get.arguments["from"] =="trip"){
-      Get.back();
-
-    }
-
+      if(widget.from != null){
+          Get.to(()=> HomeScreenManager() );
+      }else{
+          Get.back();
+      }
     
   }
 }

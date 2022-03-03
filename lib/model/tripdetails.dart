@@ -38,16 +38,15 @@ factory Tripdetails.fromJson(Map<String,dynamic> json){
        newtripdetails.picklocationid = json['pick_location_id'];
         newtripdetails.pickaddressname = json['pickaddress_name'];
         newtripdetails.actualmarkerposition = LatLng(
-            double.parse(json['actualmarker_position']['latitude']),
-            double.parse(json['actualmarker_position']['longitude']));
+          checkDouble(json['actualmarker_position']['latitude']),checkDouble(json['actualmarker_position']['longitude']));
         newtripdetails.picklocation = LatLng(
-            double.parse(json['pick_location']['latitude']),
-            double.parse(json['pick_location']['longitude']));
+            checkDouble(json['pick_location']['latitude']),
+            checkDouble(json['pick_location']['longitude']));
         newtripdetails.droplocationid = json['drop_location_id'];
         newtripdetails.dropddressname = json['dropddress_name'];
         newtripdetails.droplocation = LatLng(
-            double.parse(json['drop_location']['latitude']),
-            double.parse(json['drop_location']['longitude']));
+           checkDouble(json['drop_location']['latitude']),
+           checkDouble(json['drop_location']['longitude']));
         newtripdetails.passengername = json["passenger_name"];
         newtripdetails.passengerphone = json["passenger_phone"];
         newtripdetails.status = json["status"];
@@ -56,4 +55,14 @@ factory Tripdetails.fromJson(Map<String,dynamic> json){
 
         return newtripdetails;
 }
+
+
+static double checkDouble(dynamic value) {
+    if (value is String) {
+      return double.parse(value);
+    } else {
+      return value;
+    }
+  }
+
 }

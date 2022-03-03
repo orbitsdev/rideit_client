@@ -54,7 +54,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             Text(requestxcontroller.requestdetails.value.dropddressname as String),
             Center(
               child: ElevatedButton(onPressed: (){ 
-                Get.toNamed(Ongoingtrip.screenName, arguments: {"from": "trip"});
+                Get.to(Ongoingtrip(from: "trip"));
 
               }, child: Text('View')),
             )

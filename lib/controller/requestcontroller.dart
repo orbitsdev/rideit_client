@@ -40,6 +40,7 @@ class Requestcontroller extends GetxController {
   var tripisnotcompleted = false.obs;
   double ratevalue =0.0;
   Future<bool> checkIfHasOnGoingTrip() async {
+    
     bool hasOnGoingTrip = false;
     checking(true);
     //  progressDialog("Checking...");
@@ -69,20 +70,18 @@ class Requestcontroller extends GetxController {
       //  print(mapxcontroller.actualdropmarkerposition);
 
       Map<String, dynamic> picklocation = {
-        "latitude": mapxcontroller.pickuplocation.value.latitude.toString(),
-        "longitude": mapxcontroller.pickuplocation.value.longitude.toString(),
+        "latitude": mapxcontroller.pickuplocation.value.latitude,
+        "longitude": mapxcontroller.pickuplocation.value.longitude,
       };
 
       Map<String, dynamic> droplocation = {
-        "latitude": mapxcontroller.dropofflocation.value.latitude.toString(),
-        "longitude": mapxcontroller.dropofflocation.value.longitude.toString(),
+        "latitude": mapxcontroller.dropofflocation.value.latitude,
+        "longitude": mapxcontroller.dropofflocation.value.longitude,
       };
 
       Map<String, dynamic> actualdropmarker = {
-        "latitude":
-            mapxcontroller.actualdropmarkerposition!.latitude.toString(),
-        "longitude":
-            mapxcontroller.actualdropmarkerposition!.longitude.toString(),
+        "latitude": mapxcontroller.actualdropmarkerposition!.latitude,
+        "longitude":  mapxcontroller.actualdropmarkerposition!.longitude,
       };
 
       Map<String, dynamic> requestdata = {
@@ -90,10 +89,8 @@ class Requestcontroller extends GetxController {
         "drop_location_id": mapxcontroller.dropofflocation.value.placeid,
         "pick_location": picklocation,
         "drop_location": droplocation,
-        "pickaddress_name":
-            mapxcontroller.pickuplocation.value.placeformattedaddress,
-        "dropddress_name":
-            mapxcontroller.dropofflocation.value.placeformattedaddress,
+        "pickaddress_name": mapxcontroller.pickuplocation.value.placeformattedaddress,
+        "dropddress_name": mapxcontroller.dropofflocation.value.placeformattedaddress,
         "passenger_name": authxcontroller.user.value.name,
         "passenger_phone": authxcontroller.user.value.phone,
         "actualmarker_position": actualdropmarker,
@@ -121,20 +118,15 @@ class Requestcontroller extends GetxController {
                 Get.back();
                 progressDialog("Accepted prepairing trip...");
 
-                // Future.delayed(Duration(milliseconds: 300), () {
-                //   Get.offNamed(Ongoingtrip.screenName,
-                //       arguments: {"from": "request"});
-                // });
-
-                // }
+                
               }
                if ((data['status'] == "accepted") && (data['tripstatus'] == 'ready')){
                  Get.back();
 
                // Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
                   Future.delayed(Duration(milliseconds: 300), () {
-                  Get.offNamed(Ongoingtrip.screenName,
-                      arguments: {"from": "request"});
+                  Get.off(Ongoingtrip());
+                   
                 });
                 
 
@@ -293,7 +285,9 @@ class Requestcontroller extends GetxController {
         .doc(authinstance.currentUser!.uid)
         .get()
         .then((value) {
+
       if (value.exists) {
+        
         hasongoingtrip(true);
 
         print('exist');

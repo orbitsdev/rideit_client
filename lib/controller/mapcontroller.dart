@@ -198,7 +198,7 @@ class Mapcontroller extends GetxController {
    
 
     isaddresloading(true);
-     actualdropmarkerposition = position;
+   actualdropmarkerposition = position;
      
     print('actual marker position');
     print('_________________');
@@ -255,7 +255,7 @@ class Mapcontroller extends GetxController {
           selectedaddress.longitude as double);
 
       dropofflocation(selectedaddress);
-
+      actualdropmarkerposition = newmarkerpostion;
       setNewMarker(newmarkerpostion);
       isaddresloading(false);
 
@@ -286,7 +286,8 @@ class Mapcontroller extends GetxController {
 
     //String url = "https://maps.googleapis.com/maps/api/directions/json?origin=${picklocation.latitude},${picklocation.longitude}&destination=${droplocation.latitude},${droplocation.longitude}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     //walking 
-    String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
+    String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=${droplocation.latitude},${droplocation.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
+    //String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     //bicycling
     //String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocation.value.placeid}&destination=place_id:${dropofflocation.value.placeid}&mode=bicycling&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     // highway
