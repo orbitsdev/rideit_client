@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:tricycleapp/binding/gextbinding.dart';
 import 'package:tricycleapp/config/firebaseconfig.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
+import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
@@ -52,7 +53,7 @@ class TricycleApp extends StatefulWidget {
 
 class _TricycleAppState extends State<TricycleApp> {
 
-    late StreamSubscription<User?> user;
+  late StreamSubscription<User?> user;
 
   @override
   void initState() {
@@ -65,9 +66,36 @@ class _TricycleAppState extends State<TricycleApp> {
         print('User is signed in!');
       }
     });
+
+    
+
+    
+
+    
     
   }
 
+
+
+ pageAuth(){
+
+    if(authinstance.currentUser != null){
+
+          if(authinstance.currentUser!.emailVerified == true){
+            return HomeScreenManager();
+          }else{
+            return EmailverifyingScreen();
+          }
+          //check if email verified
+
+          
+    }
+
+    return SigninScreen();
+
+  
+  
+}
   
 
   @override
@@ -76,6 +104,10 @@ class _TricycleAppState extends State<TricycleApp> {
     user.cancel();
     super.dispose();
   }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,11 +120,11 @@ class _TricycleAppState extends State<TricycleApp> {
       smartManagement: SmartManagement.keepFactory,
       initialBinding: Gextbinding(),
       theme: ThemeData(primaryColor: COLOR_PURPLE_BUTTON, accentColor: COLOR_DARK_BLUE, textTheme: screenWidth < 500 ? TEXT_THEME_SMALL : TEXT_THEME_DEFAULT  ),
-      home:
+      home:pageAuth(),
       //HomeScreenManager(),
       //Testcloudfunction(),
       //SigninScreen(),
-     authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
+  //   authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
       getPages: [
         GetPage(name: SigupScreen.screenName, page: () => SigupScreen(), binding: Gextbinding()),
         GetPage(name: SigninScreen.screenName, page: () => SigninScreen(), binding: Gextbinding()),
@@ -104,6 +136,7 @@ class _TricycleAppState extends State<TricycleApp> {
         GetPage(name: MeScreen.screenName, page: () => MeScreen(), binding: Gextbinding()),
         GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip(), binding: Gextbinding()),
         GetPage(name: DriverLocationScreen.screenName, page: () => DriverLocationScreen(),  binding: Gextbinding(),),
+        GetPage(name: EmailverifyingScreen.screenName, page: () => EmailverifyingScreen(),  binding: Gextbinding(),),
       
       ],
       debugShowCheckedModeBanner: false,

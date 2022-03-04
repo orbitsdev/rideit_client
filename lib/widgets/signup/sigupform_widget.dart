@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 
 enum PageState { siningUpPagegSate, otpPageState }
@@ -30,12 +31,24 @@ class _SigupformWidgetState extends State<SigupformWidget> {
 
   GlobalKey<FormState> _otpFormKey = GlobalKey<FormState>();
 
+@override
+void initState() {
+  super.initState();
+
+  email.addListener(onListen);
+  
+}
+
+void onListen()=>  setState(() {});
+
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     name.dispose();
+    email.removeListener(onListen);
     email.dispose();
+
     phone.dispose();
     password.dispose();
     confirmpassword.dispose();
@@ -101,23 +114,45 @@ class _SigupformWidgetState extends State<SigupformWidget> {
                 autofocus: false,
                 keyboardType: TextInputType.emailAddress,
                 controller: email,
+                autofillHints: [AutofillHints.email],
+                
                 textInputAction: TextInputAction.next,
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Email enter a name';
-                  }
+                   
+                    
+                    
 
-                  if (!value.contains("@")) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
+
+                         
+                  return  EmailValidator.validate(value!) == true? null : "Enter A Valid Email";
+
+                    
+
+
+                    //return null;
+                    
+                  //   if(!value.contains("@")){
+                  //       return "Invalid Email"; 
+                  //   }
+                  // return EmailValidator.validate(value)  == true ?  "Enter A Valid Email" :  null;
+
+                  // if (value!.isEmpty) {
+                  //   return 'Email enter a email';
+                  // }
+
+                  // if (!value.contains("@")) {
+                  //   return 'Please enter a valid email';
+                  // }
+                  // return null;
                 },
                 decoration: InputDecoration(
+                  suffixIcon: email.text.isEmpty ? Container(width: 0,) :   IconButton(onPressed: ()=> email.clear() , icon: Icon(Icons.close)),
                   border: OutlineInputBorder(),
                   label: Text(
                     'Email',
                     style: TextStyle(fontSize: 14),
                   ),
+                  
                   hintStyle: TextStyle(fontSize: 10),
                 ),
                 style: TextStyle(fontSize: 14),

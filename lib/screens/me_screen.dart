@@ -71,9 +71,12 @@ Future pickedImage(ImageSource imagesource) async{
       Column(
         children: [ 
             Stack(
-              children:[  
+              children:[ 
+
+
+                authcontoller.user.value.image_url !=  null ? 
          
-             Image.network(
+              Image.network(
 
                     authcontoller.user.value.image_url as String, fit: BoxFit.cover,
                     loadingBuilder: (context, child, progress){
@@ -85,7 +88,11 @@ Future pickedImage(ImageSource imagesource) async{
                     },  
                     height: 170,
                     width: 170,
-                    ),
+                    ): Container(
+                      height: 100,
+                      width: 100,
+                      color: Colors.green,
+                    ), 
              
                   
 
@@ -147,9 +154,18 @@ Future pickedImage(ImageSource imagesource) async{
 
       ElevatedButton(onPressed: (){
         pickedImage(ImageSource.gallery);
-      }, child: Text("Galeery"))
+      }, child: Text("Galeery")),
+
+       ElevatedButton(
+              onPressed: () {
+                authinstance.signOut();
+                Get.offAllNamed(SigninScreen.screenName);
+              },
+              child: Text('Signout')),
               ]
         ,
+
+
       
       ),
     );

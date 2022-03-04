@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/config/twilioconfig.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
+import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/model/users.dart';
@@ -16,6 +17,7 @@ class Authcontroller extends GetxController {
   var isSignUpLoading = false.obs;
   var isCodeSent = false.obs;
   var isVerifying = false.obs;
+  bool mailverified = false;
 
 
   String? gname;
@@ -29,10 +31,10 @@ class Authcontroller extends GetxController {
 
     super.onInit();
 
-    _twilioPhoneVerify = TwilioPhoneVerify(
-        accountSid: Twilioconfig.ACCOUNT_SID,
-        serviceSid:  Twilioconfig.SERVICE_SID,
-        authToken: Twilioconfig.AUTH_TOKEN);
+    // _twilioPhoneVerify = TwilioPhoneVerify(
+    //     accountSid: Twilioconfig.ACCOUNT_SID,
+    //     serviceSid:  Twilioconfig.SERVICE_SID,
+    //     authToken: Twilioconfig.AUTH_TOKEN);
 
 
 
@@ -52,22 +54,46 @@ class Authcontroller extends GetxController {
           .createUserWithEmailAndPassword(
               email: gemail as String, password: gpassword as String)
           .then((credential) async {
-        // progressDialog('Authenticating..');
+         progressDialog('Checking..');
         await firestore.collection('passengers').doc(credential.user!.uid).set({
           "name": gname as String,
           "email": gemail as String,
           "phone": gphone as String,
+          "image_url":  null,
+          "image_file": null
+          
         }).then((_) async {
+            Get.back();
+            isSignUpLoading(false);
+         
           // Get.back();
          // verifyPhone(context);
           // Get.offAllNamed(HomeScreenManager.screenName);
+          
+            //check if verified
+            mailverified =  authinstance.currentUser!.emailVerified;
+            
+            if(mailverified == false){  
+              await sendVerification();
+              Get.back();
+              Future.delayed(Duration(milliseconds: 300 ),()=> Get.offNamed(EmailverifyingScreen.screenName));
+            }else{
 
-          progressDialog('Authenticating...');
-        Future.delayed(Duration(seconds: 1), () {
-          Get.back();
-          clearFields();
-          Get.offAndToNamed(HomeScreenManager.screenName);
+             progressDialog('Authenticating..');
+              Future.delayed(Duration(seconds: 1), () {
+              
+              clearFields();
+              Get.back();
+              Get.offAndToNamed(HomeScreenManager.screenName);
         });
+            }
+
+
+         // progressDialog('Authenticating...');
+
+
+
+       
         });
       });
     } on FirebaseAuthException catch (e) {
@@ -137,7 +163,7 @@ class Authcontroller extends GetxController {
           email: email.trim(), password: password.trim());
 
       Get.back();
-      progressDialog("Authenticating...");
+      progressDialog("Checking...");
       await firestore
           .collection('passengers')
           .doc(authuser.user!.uid)
@@ -154,9 +180,25 @@ class Authcontroller extends GetxController {
           //make global variable    
           firebaseuser = authuser.user;
         
-        
-          Get.back();
-          Get.offAllNamed(HomeScreenManager.screenName);
+             mailverified =  authinstance.currentUser!.emailVerified;
+             print('________is email vverified__________');
+             print(mailverified);
+            
+            if(mailverified == false){  
+               await sendVerification();
+              Get.back();
+              Future.delayed(Duration(milliseconds: 300 ),()=> Get.offNamed(EmailverifyingScreen.screenName));
+            }else{
+
+             progressDialog('Authenticating..');
+              Future.delayed(Duration(seconds: 1), () {
+              
+              clearFields();
+              Get.back();
+              Get.offAndToNamed(HomeScreenManager.screenName);
+        });
+            }
+         
         } else {
           Get.back();
           notificationDialog(context, 'User doesnt exist');
@@ -209,4 +251,20 @@ class Authcontroller extends GetxController {
     gphone = null;
     gpassword = null;
   }
+
+  Future<void> sendVerification() async{
+
+try{   
+
+  final user =  authinstance.currentUser;
+  await user!.sendEmailVerification();
+
+} catch(e){
+
+  print(e.toString());
+} 
+
 }
+}
+
+
