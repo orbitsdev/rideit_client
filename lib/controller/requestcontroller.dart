@@ -26,7 +26,6 @@ class Requestcontroller extends GetxController {
   var mapxcontroller = Get.find<Mapcontroller>();
   var pagexcontroller = Get.find<Pagecontroller>();
 
-
   Stream? collectionStream;
   List<String> devicetokens = [];
   List<Neardriver> listofneardriver = [];
@@ -41,9 +40,8 @@ class Requestcontroller extends GetxController {
   var paymentshowed = false.obs;
   var ifnotread = false.obs;
   var tripisnotcompleted = false.obs;
-  double ratevalue =0.0;
+  double ratevalue = 0.0;
   Future<bool> checkIfHasOnGoingTrip() async {
-    
     bool hasOnGoingTrip = false;
     checking(true);
     //  progressDialog("Checking...");
@@ -84,7 +82,7 @@ class Requestcontroller extends GetxController {
 
       Map<String, dynamic> actualdropmarker = {
         "latitude": mapxcontroller.actualdropmarkerposition!.latitude,
-        "longitude":  mapxcontroller.actualdropmarkerposition!.longitude,
+        "longitude": mapxcontroller.actualdropmarkerposition!.longitude,
       };
 
       Map<String, dynamic> requestdata = {
@@ -92,17 +90,18 @@ class Requestcontroller extends GetxController {
         "drop_location_id": mapxcontroller.dropofflocation.value.placeid,
         "pick_location": picklocation,
         "drop_location": droplocation,
-        "pickaddress_name": mapxcontroller.pickuplocation.value.placeformattedaddress,
-        "dropddress_name": mapxcontroller.dropofflocation.value.placeformattedaddress,
+        "pickaddress_name":
+            mapxcontroller.pickuplocation.value.placeformattedaddress,
+        "dropddress_name":
+            mapxcontroller.dropofflocation.value.placeformattedaddress,
         "passenger_name": authxcontroller.user.value.name,
         "passenger_phone": authxcontroller.user.value.phone,
         "actualmarker_position": actualdropmarker,
         "status": "pending",
-        'tripstatus':'notready',
+        'tripstatus': 'notready',
         "created_at": DateTime.now().toString()
       };
 
-    
       try {
         requestrefference
             .doc(authinstance.currentUser!.uid)
@@ -115,28 +114,21 @@ class Requestcontroller extends GetxController {
           requeststream!.listen((event) {
             if (event.data() != null) {
               var data = event.data() as Map;
-             
 
-              if ((data['status'] == "accepted") && (data['tripstatus'] == 'notready') ){
+              if ((data['status'] == "accepted") &&
+                  (data['tripstatus'] == 'notready')) {
                 Get.back();
                 progressDialog("Accepted prepairing trip...");
-
-                
               }
-               if ((data['status'] == "accepted") && (data['tripstatus'] == 'ready')){
-                 Get.back();
+              if ((data['status'] == "accepted") &&
+                  (data['tripstatus'] == 'ready')) {
+                Get.back();
 
-               // Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
-                  Future.delayed(Duration(milliseconds: 300), () {
+                // Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+                Future.delayed(Duration(milliseconds: 300), () {
                   Get.off(Ongoingtrip());
-                   
                 });
-                
-
-               }
-              
-          
-
+              }
             }
           });
         }).catchError((e) {
@@ -168,8 +160,6 @@ class Requestcontroller extends GetxController {
         hasAvailableDriver = false;
       }
     });
-
-    
 
     return hasAvailableDriver;
   }
@@ -235,17 +225,28 @@ class Requestcontroller extends GetxController {
       print(e.toString());
     }
   }
-  void checkIfHasOnoingTripRequest() async {
-    loader(true);
-    var response = await ongoingtriprefference.doc(authinstance.currentUser!.uid).get();
-    if (response.exists) {
-  
-      requestdetails =  Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
-      print(requestdetails.value.passengerphone);
-      hasdata(true);
-      hasongoingtrip(true);
-    } else {
-      print('_nothing');
+
+  Future<bool> checkIfHasOnoingTripRequest() async {
+  bool checking = false;
+
+    try {
+    
+      var response =   await ongoingtriprefference.doc(authinstance.currentUser!.uid).get();
+      if (response.exists) {
+        requestdetails = Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
+        print(requestdetails.value.passengerphone);
+        hasdata(true);
+        hasongoingtrip(true);
+        checking =true;
+      } else {
+     
+        print('_nothing');
+        checking = false;
+      }
+    } on FirebaseException catch (e) {
+       
+        checking =false;
+
     }
 
     // if(response.exists){
@@ -256,16 +257,17 @@ class Requestcontroller extends GetxController {
     // }else{
     //   print('no data');
     // }
-   
-    loader(false);
+    return checking;
+
   }
 
   void checkIfHasDataRequest() async {
     loader(true);
-    var response = await ongoingtriprefference.doc(authinstance.currentUser!.uid).get();
+    var response =
+        await ongoingtriprefference.doc(authinstance.currentUser!.uid).get();
     if (response.exists) {
-  
-      requestdetails =  Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
+      requestdetails =
+          Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
       print(requestdetails.value.passengerphone);
       hasdata(true);
     } else {
@@ -280,7 +282,7 @@ class Requestcontroller extends GetxController {
     // }else{
     //   print('no data');
     // }
-   
+
     loader(false);
   }
 
@@ -289,20 +291,18 @@ class Requestcontroller extends GetxController {
         .doc(authinstance.currentUser!.uid)
         .get()
         .then((value) {
-
       if (value.exists) {
-        
         hasongoingtrip(true);
 
         print('exist');
         if (ongoingtripstream != null) {
           ongoingtripstream!.listen((event) {
             if (event.data() != null) {
-              Tripdetails newtripdetails =Tripdetails.fromJson(event.data() as Map<String, dynamic>);
-                
+              Tripdetails newtripdetails =
+                  Tripdetails.fromJson(event.data() as Map<String, dynamic>);
+
               ongoingtripdetails(newtripdetails);
 
-            
               var data = event.data() as Map;
 
               print(data['tripstatus']);
@@ -311,7 +311,7 @@ class Requestcontroller extends GetxController {
                 case 'coming':
                   break;
                 case 'arrived':
-                 // showTripDialog("Thd driver has arrived");
+                  // showTripDialog("Thd driver has arrived");
                   //show notification when arrived
                   break;
                 case 'picked':
@@ -335,76 +335,78 @@ class Requestcontroller extends GetxController {
                   //if naka bayad show ratings optional then exit
                   if (data['read'] == true && data['payed'] == true) {
                     if (ifnotread == false) {
-
-
                       Get.defaultDialog(
-                        title: '',
-                        radius: 2,
-                        barrierDismissible: false,
-                        backgroundColor: Colors.white,
-                        titlePadding: EdgeInsets.all(0),
-                        content: Column(
-                          children: [
-                              Text("Thank You !", style: Get.theme.textTheme.headline3,),
-                              
-
-                            RatingBar.builder(
-                              initialRating: 3,
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                              itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: Colors.amber,
+                          title: '',
+                          radius: 2,
+                          barrierDismissible: false,
+                          backgroundColor: Colors.white,
+                          titlePadding: EdgeInsets.all(0),
+                          content: Column(
+                            children: [
+                              Text(
+                                "Thank You !",
+                                style: Get.theme.textTheme.headline3,
                               ),
-                              onRatingUpdate: (rating) {
-                                ratevalue = rating; 
-                                print('______________');
-                                print(rating);
-                              },
-                            ),
-                              Text("Rated Our Driver ", style: Get.theme.textTheme.bodyText1,),
+                              RatingBar.builder(
+                                initialRating: 3,
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemPadding:
+                                    EdgeInsets.symmetric(horizontal: 4.0),
+                                itemBuilder: (context, _) => Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                                onRatingUpdate: (rating) {
+                                  ratevalue = rating;
+                                  print('______________');
+                                  print(rating);
+                                },
+                              ),
+                              Text(
+                                "Rated Our Driver ",
+                                style: Get.theme.textTheme.bodyText1,
+                              ),
                               ElevatedButton(
-                            onPressed: () async {
-                             await ratingsrefference.doc(ongoingtripdetails.value.driverid).collection('ratings').add({
-                                'rate': ratevalue,
-                                'comment': null,
-                                'passenger_id': authinstance.currentUser!.uid,
-                                'created_at':  DateTime.now().toString(),
-                              }).then((_)  async {
-                                  await ongoingtriprefference
-                                  .doc(authinstance.currentUser!.uid)
-                                  .delete()
-                                  .then((value) async {
-                                tripisnotcompleted(true);
-                                hasongoingtrip(false);
-                                payed(false);
-                                paymentshowed(false);
-                                ifnotread(false);
-                                tripisnotcompleted(false);
-                                requestdetails = Tripdetails().obs;
-                                ongoingtripdetails = Tripdetails().obs;
-                                mapxcontroller.clearRequest();
+                                  onPressed: () async {
+                                    await ratingsrefference
+                                        .doc(ongoingtripdetails.value.driverid)
+                                        .collection('ratings')
+                                        .add({
+                                      'rate': ratevalue,
+                                      'comment': null,
+                                      'passenger_id':
+                                          authinstance.currentUser!.uid,
+                                      'created_at': DateTime.now().toString(),
+                                    }).then((_) async {
+                                      await ongoingtriprefference
+                                          .doc(authinstance.currentUser!.uid)
+                                          .delete()
+                                          .then((value) async {
+                                        tripisnotcompleted(true);
+                                        hasongoingtrip(false);
+                                        payed(false);
+                                        paymentshowed(false);
+                                        ifnotread(false);
+                                        tripisnotcompleted(false);
+                                        requestdetails = Tripdetails().obs;
+                                        ongoingtripdetails = Tripdetails().obs;
+                                        mapxcontroller.clearRequest();
 
-                                if(pagexcontroller.pageindex == 2){
-
-                                  pagexcontroller.updatePageIndex(1);
-                                }
-                                //Get.offNamed(HomeScreenManager.screenName, (route) => false);
-                                Get.offNamed(HomeScreenManager.screenName);
-                              });
-                              });
-                            
-                              
-                            },
-                            child: Text('rate')),
-                          ],
-
-                        )
-                    
-                      );
+                                        if (pagexcontroller.pageindex == 2) {
+                                          pagexcontroller.updatePageIndex(1);
+                                        }
+                                        //Get.offNamed(HomeScreenManager.screenName, (route) => false);
+                                        Get.offNamed(
+                                            HomeScreenManager.screenName);
+                                      });
+                                    });
+                                  },
+                                  child: Text('rate')),
+                            ],
+                          ));
                       ifnotread(true);
                     }
                   }
@@ -428,100 +430,107 @@ class Requestcontroller extends GetxController {
     });
   }
 
-
-  void checkIdhasOngoinRequestNotRead() async{
+  void checkIdhasOngoinRequestNotRead() async {
     print('_______________________________________listen called');
-    ongoingtriprefference.doc(authinstance.currentUser!.uid).get().then((value) async {
-        if(value.exists){
-         var data = value.data() as Map<String, dynamic>;
-          
-          if(data != null){
-            
-              if(data['tripstatus'] == 'complete' && data['payed'] == true && data['read'] == false){
+    await ongoingtriprefference
+        .doc(authinstance.currentUser!.uid)
+        .get()
+        .then((value) async {
+      if (value.exists) {
+        var data = value.data() as Map<String, dynamic>;
 
-            
-                   await ongoingtriprefference
-                        .doc(authinstance.currentUser!.uid)
-                        .update({'read': true}).then((_)  async{ 
-                             if (ifnotread == false) {
-
-
-                      Get.defaultDialog(
-                        title: '',
-                        radius: 2,
-                        barrierDismissible: false,
-                        backgroundColor: Colors.white,
-                        titlePadding: EdgeInsets.all(0),
-                        content: Column(
-                          children: [
-                              Text("Thank You !", style: Get.theme.textTheme.headline3,),
-                              
-
-                            RatingBar.builder(
-                              initialRating: 3,
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                              itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                              ),
-                              onRatingUpdate: (rating) {
-                                ratevalue = rating; 
-                                print('______________');
-                                print(rating);
-                              },
-                            ),
-                              Text("Rated Our Driver ", style: Get.theme.textTheme.bodyText1,),
-                              ElevatedButton(
+        if (data != null) {
+          if (data['tripstatus'] == 'complete' &&
+              data['payed'] == true &&
+              data['read'] == false) {
+            await ongoingtriprefference
+                .doc(authinstance.currentUser!.uid)
+                .update({'read': true}).then((_) async {
+              if (ifnotread == false) {
+                Get.defaultDialog(
+                    title: '',
+                    radius: 2,
+                    barrierDismissible: false,
+                    backgroundColor: Colors.white,
+                    titlePadding: EdgeInsets.all(0),
+                    content: Column(
+                      children: [
+                        Text(
+                          "Thank You !",
+                          style: Get.theme.textTheme.headline3,
+                        ),
+                        RatingBar.builder(
+                          initialRating: 3,
+                          minRating: 1,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: (rating) {
+                            ratevalue = rating;
+                            print('______________');
+                            print(rating);
+                          },
+                        ),
+                        Text(
+                          "Rated Our Driver ",
+                          style: Get.theme.textTheme.bodyText1,
+                        ),
+                        ElevatedButton(
                             onPressed: () async {
-                             await ratingsrefference.doc(ongoingtripdetails.value.driverid).collection('ratings').add({
+                              await ratingsrefference
+                                  .doc(ongoingtripdetails.value.driverid)
+                                  .collection('ratings')
+                                  .add({
                                 'rate': ratevalue,
                                 'comment': null,
                                 'passenger_id': authinstance.currentUser!.uid,
-                                'created_at':  DateTime.now().toString(),
-                              }).then((_)  async {
-                                  await ongoingtriprefference
-                                  .doc(authinstance.currentUser!.uid)
-                                  .delete()
-                                  .then((value) async {
-                                tripisnotcompleted(true);
-                                hasongoingtrip(false);
-                                payed(false);
-                                paymentshowed(false);
-                                ifnotread(false);
-                                tripisnotcompleted(false);
-                                requestdetails = Tripdetails().obs;
-                                ongoingtripdetails = Tripdetails().obs;
-                                mapxcontroller.clearRequest();
+                                'created_at': DateTime.now().toString(),
+                              }).then((_) async {
+                                await ongoingtriprefference
+                                    .doc(authinstance.currentUser!.uid)
+                                    .delete()
+                                    .then((value) async {
+                                  loader(false);
+                                  tripisnotcompleted(true);
+                                  hasongoingtrip(false);
+                                  payed(false);
+                                  paymentshowed(false);
+                                  ifnotread(false);
+                                  tripisnotcompleted(false);
+                                  requestdetails = Tripdetails().obs;
+                                  ongoingtripdetails = Tripdetails().obs;
+                                  mapxcontroller.clearRequest();
                                   Get.back();
-                                //Get.offNamed(HomeScreenManager.screenName);
+                                  //Get.offNamed(HomeScreenManager.screenName);
+                                });
                               });
-                              });
-                            
-                              
                             },
                             child: Text('rate')),
-                          ],
-
-                        )
-                    
-                      );
-                      ifnotread(true);
-                    }
-                        });
-                  
-
+                      ],
+                    ));
+                ifnotread(true);
               }
-
-            
+            });
           }
-         
-          print('exist from home manage___________________');
-          print(data);
+          //show when the app is open and not payed but complete
+          if (data['tripstatus'] == 'complete' &&
+              data['payed'] == false &&
+              data['read'] == false) {
+            if (paymentshowed == false) {
+              showPayments();
+              paymentshowed(true);
+            }
+          }
         }
+
+        print('exist from home manage___________________');
+        print(data);
+      }
     });
   }
 }

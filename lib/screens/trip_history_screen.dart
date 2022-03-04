@@ -15,6 +15,7 @@ class TripHistoryScreen extends StatefulWidget {
 class _TripHistoryScreenState extends State<TripHistoryScreen> with SingleTickerProviderStateMixin{
   var requestxcontroller = Get.put(Requestcontroller());
   late TabController controller;
+  bool hastrip = false;
 
   @override
   void setState(VoidCallback fn) {
@@ -33,13 +34,26 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> with SingleTicker
   @override
   void initState() {
     super.initState();
+    checkOngoingTrip();
     controller =  TabController(length: 2, vsync: this);
     controller.addListener(() { 
       setState(() { });
     });
-    requestxcontroller.checkIfHasOnoingTripRequest();
   }
 
+
+void checkOngoingTrip() async{
+   bool response = await requestxcontroller.checkIfHasOnoingTripRequest(); 
+  if(response){  
+
+    setState(() {
+      hastrip = response;
+    });
+
+    
+
+  }
+}
   @override
   Widget build(BuildContext context) {
     
@@ -65,16 +79,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> with SingleTicker
               controller: controller,
               children: 
               [
-                  Obx((){
-                    
-                   if(requestxcontroller.loader.value){
-        return Container(
-          child: Center(child: CircularProgressIndicator()),
-        );
-      }else{
-        
-      if(requestxcontroller.hasongoingtrip.value){
-        return Column(
+                hastrip == false ? Text('no data') :  Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -89,18 +94,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> with SingleTicker
               }, child: Text('View')),
             )
           ],
-        );
-        
-      }
-
-      return Container(child: Text('nodata'),);
-        
-         
-      }
-      
-     
-
-                  }),
+        ), 
 
                 tripHistoryBuilder(),
               ]
