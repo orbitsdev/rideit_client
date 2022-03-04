@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 FirebaseAuth authinstance = FirebaseAuth.instance;
 User? firebaseuser;
 
@@ -18,6 +19,9 @@ Stream<DocumentSnapshot<Object?>>? ongoingtripstream =  ongoingtriprefference.do
 Stream<DocumentSnapshot<Object?>>? driverlocationstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
 StreamSubscription<DocumentSnapshot<Object?>>?  driverstream;
 
+
+//cloud storage
+FirebaseStorage storage = FirebaseStorage.instance;  
 
 
 

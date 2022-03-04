@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     setCameraInitialValue();
-    authxcontroller.getUserData();
+
 
     super.initState();
   }

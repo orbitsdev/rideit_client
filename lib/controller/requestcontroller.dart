@@ -496,7 +496,7 @@ class Requestcontroller extends GetxController {
                                 requestdetails = Tripdetails().obs;
                                 ongoingtripdetails = Tripdetails().obs;
                                 mapxcontroller.clearRequest();
-                                
+                                  Get.back();
                                 //Get.offNamed(HomeScreenManager.screenName);
                               });
                               });

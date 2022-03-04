@@ -128,50 +128,6 @@ class Authcontroller extends GetxController {
     }
   }
 
-  void getUserData() async{
-
-      if(user.value.id == null){
-         try{
-
-         await userrefference.doc(authinstance.currentUser!.uid).get().then((querySnapshot) {
-
-            var data = querySnapshot.data() as Map<String, dynamic>;
-            
-           if (querySnapshot. data() != null) {
-
-           Users userdata = Users();
-          userdata.id = authinstance.currentUser!.uid;
-          userdata.name = data['name'];
-          userdata.email = data['email'];
-          userdata.phone = data['phone'];
-          
-
-
-
-          print('___userdata _________');
-          print(userdata.id);
-          print(userdata.name);
-          print(userdata.phone);
-          print(userdata.email);
-
-          user = userdata.obs;
-          
-        }
-        
-
-         });
-
-      }catch(e){
-        
-        print(e.toString());
-      }
-      }else{
-        print('not null');
-      }
-
-     
-   
-  }
 
 
   void logInUser(String email, String password, BuildContext context) async {
@@ -186,22 +142,19 @@ class Authcontroller extends GetxController {
           .collection('passengers')
           .doc(authuser.user!.uid)
           .get()
-          .then((querySnapshot) {
+          .then((querySnapshot)  async {
         if (querySnapshot.data() != null) {
+          var data =  
           print(querySnapshot.data());
 
-          Users userdata = Users();
+          Users userdata = Users.fromJson(querySnapshot.data() as Map<String, dynamic>);
           userdata.id = authuser.user!.uid;
-          userdata.name = querySnapshot.data()!['name'];
-          userdata.email = querySnapshot.data()!['email'];
-          userdata.phone = querySnapshot.data()!['phone'];
+          user(userdata);
           
-
-
           //make global variable    
           firebaseuser = authuser.user;
-          user = userdata.obs;
-          
+        
+        
           Get.back();
           Get.offAllNamed(HomeScreenManager.screenName);
         } else {
@@ -216,6 +169,38 @@ class Authcontroller extends GetxController {
     } catch (e) {
       rethrow;
     }
+  }
+
+  
+  void checkIfAcountDetailsIsNull() async {
+  
+    
+    if (user.value.id == null) {
+      await firestore
+        .collection('passengers')
+        .doc(authinstance.currentUser!.uid)
+        .get()
+        .then((querySnapshot) {
+      if (querySnapshot.data() != null) {
+        var data = querySnapshot.data() as Map<String, dynamic>;
+        var useracount = Users.fromJson(data);
+        useracount.id = authinstance.currentUser!.uid;
+        user(useracount);
+       
+         print(user.value.id);
+        print(user.value.name);
+        print(user.value.phone);
+        print('________________________________________');
+        print('__________________________________________');
+        print('____________________________________________');
+        print('______________________________________________');
+        print(user.value.image_file);
+        print(user.value.image_url);
+      }
+    });
+      
+    }
+    
   }
 
   void clearFields() {
