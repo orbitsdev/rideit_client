@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/binding/gextbinding.dart';
@@ -10,6 +12,7 @@ import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
+import 'package:tricycleapp/localnotification/local_notification_services.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
@@ -24,12 +27,21 @@ import 'package:tricycleapp/testsign_screen.dart';
 import 'package:tricycleapp/testwidgets/dashboard.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 
+
+Future<void> backgroundhandler(RemoteMessage message) async{
+
+        print('notification from backgournd');
+        print(message.notification!.title);
+        print(message.notification!.body);
+
+}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  LocalNotificationServices.initialize();
 
 try {
     await Firebaseconfig.firebaseinitilizeapp().then((value) {
-      
+        
 
     });
   } on FirebaseException catch (e) {
@@ -40,6 +52,9 @@ try {
   } catch (e) {
     rethrow;
   }
+
+  //backoufn handler  
+  FirebaseMessaging.onBackgroundMessage(backgroundhandler);
 
   runApp(const TricycleApp());
 }
@@ -58,6 +73,7 @@ class _TricycleAppState extends State<TricycleApp> {
   @override
   void initState() {
     super.initState();
+ 
     Gextbinding().dependencies();
     user = FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user == null) {
@@ -67,8 +83,46 @@ class _TricycleAppState extends State<TricycleApp> {
       }
     });
 
+    //it will open the app close tor terminated iot will open the ap
+    FirebaseMessaging.instance.getInitialMessage().then((message) async  {
+        
+
+        if(message != null){
+
+        print('forgound');
+        print(message.notification!.title);
+        print(message.notification!.body);
+
+         Get.toNamed(message.data["screenname"]);
+        }
+    
     
 
+    });
+    
+    //forground
+    FirebaseMessaging.onMessage.listen((message) {
+      if(message.notification !=  null){
+        print('forgound');
+        print(message.notification!.title);
+        print(message.notification!.body);
+
+        LocalNotificationServices.display(message);
+      }  
+    });
+
+    //when click the notficale on background state
+    FirebaseMessaging.onMessageOpenedApp.listen((message) { 
+        print(message.notification!.title);
+        print('click notification from backgournd');
+        print(message.notification!.title);
+        print(message.notification!.body);
+
+        Get.toNamed(message.data["screenname"]);
+    });
+
+    
+  
     
 
     

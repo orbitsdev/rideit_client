@@ -8,6 +8,7 @@ class Users {
   String? phone;
   String? image_url;
   String? image_file;
+  String? devicetoken;
  
  
   Users({
@@ -17,6 +18,8 @@ class Users {
     this.phone,
     this.image_url,
     this.image_file,
+    this.devicetoken,
+
   });
 
 
@@ -31,6 +34,7 @@ class Users {
     user.phone = json['phone'];
     user.image_url = json['image_url'];
     user.image_file = json['image_file'];
+    user.devicetoken = json["device_token"];
 
     return user;
   }

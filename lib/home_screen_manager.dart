@@ -58,10 +58,27 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
       vsync: this,
     );
 
-    requesstxcontroller.checkIdhasOngoinRequestNotRead(); 
+//    requesstxcontroller.checkIdhasOngoinRequestNotRead(); 
     authxcontroller.checkIfAcountDetailsIsNull();
     
   }
+
+  bool isdiddepencicalled = false;
+
+  @override
+  void didChangeDependencies() {
+
+    if(isdiddepencicalled == false){
+      requesstxcontroller.checkIdhasOngoinRequestNotRead(context); 
+
+      setState(() {
+        isdiddepencicalled = true;
+      });
+
+    }
+    super.didChangeDependencies();
+  }
+
   @override
   void setState(VoidCallback fn) {
     

@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
 import 'package:tricycleapp/config/twilioconfig.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/emailverifying_screen.dart';
@@ -35,6 +36,15 @@ class Authcontroller extends GetxController {
     //     authToken: Twilioconfig.AUTH_TOKEN);
   }
 
+  String? devicetoken;
+  Future<void> getDeviceToken() async {
+    devicetoken = await messaginginstance.getToken();
+
+    if (devicetoken != null) {
+      print('device  token is here__________________');
+    }
+  }
+
   void createUser(String name, String phone, String email, String password,
       BuildContext context) async {
     gname = name.trim();
@@ -49,16 +59,23 @@ class Authcontroller extends GetxController {
               email: gemail as String, password: gpassword as String)
           .then((credential) async {
         progressDialog('Checking..');
-        await firestore.collection('passengers').doc(credential.user!.uid).set({
+
+        await getDeviceToken();
+        Map<String, dynamic> userdetailstostore = {
           "name": gname as String,
           "email": gemail as String,
           "phone": gphone as String,
           "image_url": null,
-          "image_file": null
-        }).then((_) async {
+          "image_file": null,
+          'device_token': devicetoken,
+        };
+        await firestore
+            .collection('passengers')
+            .doc(credential.user!.uid)
+            .set(userdetailstostore)
+            .then((_) async {
+          user(Users.fromJson(userdetailstostore));
           Get.back();
-          
-          
 
           // Get.back();
           // verifyPhone(context);
@@ -156,28 +173,35 @@ class Authcontroller extends GetxController {
           .get()
           .then((querySnapshot) async {
         if (querySnapshot.data() != null) {
-          var data = print(querySnapshot.data());
 
-          Users userdata =
-              Users.fromJson(querySnapshot.data() as Map<String, dynamic>);
+          Users userdata =   Users.fromJson(querySnapshot.data() as Map<String, dynamic>);
           userdata.id = authuser.user!.uid;
           user(userdata);
+          
 
+          //check if device token expired or change
+          await getDeviceToken();
+          if(devicetoken !=  null){
+            if(user.value.devicetoken != devicetoken){
+              await updateDeviceToken(devicetoken);
+              user.value.devicetoken = devicetoken;
+            }
+          }
           //make global variable
           firebaseuser = authuser.user;
 
-           mailverified = authinstance.currentUser!.emailVerified;
-          
+
+          mailverified = authinstance.currentUser!.emailVerified;
 
           if (mailverified == false) {
             await sendVerification();
             Get.back();
-            Future.delayed(Duration(milliseconds: 300), () => Get.offNamed(EmailverifyingScreen.screenName));
+            Future.delayed(Duration(milliseconds: 300),
+                () => Get.offNamed(EmailverifyingScreen.screenName));
           } else {
             Get.back();
             progressDialog('Authenticating..');
             Future.delayed(Duration(seconds: 1), () {
-             
               Get.back();
               Get.offAndToNamed(HomeScreenManager.screenName);
             });
@@ -198,16 +222,27 @@ class Authcontroller extends GetxController {
 
   void checkIfAcountDetailsIsNull() async {
     if (user.value.id == null) {
+
       await firestore
           .collection('passengers')
           .doc(authinstance.currentUser!.uid)
           .get()
-          .then((querySnapshot) {
+          .then((querySnapshot) async {
         if (querySnapshot.data() != null) {
-          var data = querySnapshot.data() as Map<String, dynamic>;
-          var useracount = Users.fromJson(data);
+          
+          var useracount = Users.fromJson(querySnapshot.data() as Map<String, dynamic>);
           useracount.id = authinstance.currentUser!.uid;
           user(useracount);
+          
+          await getDeviceToken();
+       
+          if(devicetoken !=  null){
+            if(user.value.devicetoken !=  devicetoken){
+              await updateDeviceToken(devicetoken);
+              user.value.devicetoken = devicetoken;
+            }
+          }
+        
 
           print(user.value.id);
           print(user.value.name);
@@ -218,8 +253,12 @@ class Authcontroller extends GetxController {
           print('______________________________________________');
           print(user.value.image_file);
           print(user.value.image_url);
+          print(user.value.devicetoken);
         }
       });
+
+
+
     }
   }
 
@@ -237,5 +276,13 @@ class Authcontroller extends GetxController {
     } catch (e) {
       print(e.toString());
     }
+  }
+
+ Future<void> updateDeviceToken(String? devicetoken) async{
+
+    await userrefference.doc(authinstance.currentUser!.uid).update({
+      "device_token": devicetoken
+    });
+    print('device token updated');
   }
 }

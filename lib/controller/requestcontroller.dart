@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,6 +28,7 @@ class Requestcontroller extends GetxController {
   var authxcontroller = Get.find<Authcontroller>();
   var mapxcontroller = Get.put(Mapcontroller());
   var pagexcontroller = Get.find<Pagecontroller>();
+  
 
   Stream? collectionStream;
   List<String> devicetokens = [];
@@ -43,6 +45,10 @@ class Requestcontroller extends GetxController {
   var ifnotread = false.obs;
   var tripisnotcompleted = false.obs;
   double ratevalue = 0.0;
+
+
+
+
   Future<bool> checkIfHasOnGoingTrip() async {
     bool hasOnGoingTrip = false;
     checking(true);
@@ -101,6 +107,7 @@ class Requestcontroller extends GetxController {
         "actualmarker_position": actualdropmarker,
         "status": "pending",
         'tripstatus': 'notready',
+        'device_token':  authxcontroller.user.value.devicetoken,
         "created_at": DateTime.now().toString()
       };
 
@@ -166,7 +173,7 @@ class Requestcontroller extends GetxController {
     return hasAvailableDriver;
   }
 
-  void sendNotification(String requestid) async {
+  void  sendNotification(String requestid) async {
     print('__________sending notfification');
     print(devicetokens);
     if (devicetokens.isNotEmpty) {
@@ -434,7 +441,7 @@ class Requestcontroller extends GetxController {
     });
   }
 
-  void checkIdhasOngoinRequestNotRead() async {
+  void checkIdhasOngoinRequestNotRead(BuildContext context) async {
     print('_______________________________________listen called');
     await ongoingtriprefference
         .doc(authinstance.currentUser!.uid)
@@ -444,6 +451,13 @@ class Requestcontroller extends GetxController {
         var data = value.data() as Map<String, dynamic>;
 
         if (data != null) {
+
+
+          if(data['tripstatus'] == 'arrived'){
+
+            Tripdialog.showInfoDialog(context, 'Driver Has Arrived');
+
+          }
           if (data['tripstatus'] == 'complete' &&
               data['payed'] == true &&
               data['read'] == false) {
