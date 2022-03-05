@@ -36,10 +36,31 @@ class _OngoingtripState extends State<Ongoingtrip> {
     super.initState();
     
 
-    requestxcontroller.listenToOngoingTrip();
+    //requestxcontroller.listenToOngoingTrip();
 
     
   
+  }
+
+  bool isdependciescalled  = false;
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+  
+
+
+    if(isdependciescalled == false){
+      print('caled from didpdencies ___________');
+      print('caled from didpdencies ______________');
+      print('caled from didpdencies _____________');
+      requestxcontroller.listenToOngoingTrip(context);
+      setState(() {
+        isdependciescalled = true;
+      });
+    }
+    super.didChangeDependencies();
+
+
   }
 
 

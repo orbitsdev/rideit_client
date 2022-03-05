@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/dialog/ongointripdialog/ongoingtripdialog.dart';
+import 'package:tricycleapp/dialog/ongointripdialog/tripdialog.dart';
 import 'package:tricycleapp/dialog/requestdialog/requestdialog.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
@@ -23,7 +25,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class Requestcontroller extends GetxController {
   var authxcontroller = Get.find<Authcontroller>();
-  var mapxcontroller = Get.find<Mapcontroller>();
+  var mapxcontroller = Get.put(Mapcontroller());
   var pagexcontroller = Get.find<Pagecontroller>();
 
   Stream? collectionStream;
@@ -286,7 +288,7 @@ class Requestcontroller extends GetxController {
     loader(false);
   }
 
-  void listenToOngoingTrip() async {
+  void listenToOngoingTrip(BuildContext context) async {
     await ongoingtriprefference
         .doc(authinstance.currentUser!.uid)
         .get()
@@ -311,6 +313,8 @@ class Requestcontroller extends GetxController {
                 case 'coming':
                   break;
                 case 'arrived':
+
+               Tripdialog.showInfoDialog(context, 'Driver has arrived ');
                   // showTripDialog("Thd driver has arrived");
                   //show notification when arrived
                   break;

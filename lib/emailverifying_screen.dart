@@ -30,7 +30,7 @@ var autxcontroller =  Get.find<Authcontroller>();
 
   WidgetsBinding.instance!.addObserver(this);
 
-checkIfEmailIsNotVerified();
+  checkIfEmailIsNotVerified();
     super.initState();
     
     

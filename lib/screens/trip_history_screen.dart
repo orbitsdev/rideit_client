@@ -89,7 +89,7 @@ void checkOngoingTrip() async{
             Center(
               child: ElevatedButton(onPressed: (){
                  
-                Get.to(Ongoingtrip(from: "trip"));
+                Get.to(()=> Ongoingtrip(from: "trip"));
 
               }, child: Text('View')),
             )
