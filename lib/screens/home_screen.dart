@@ -19,6 +19,7 @@ import 'package:tricycleapp/controller/driverlocationcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
+import 'package:tricycleapp/dialog/dialog_collection.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/helper/geofirehelper.dart';
 import 'package:tricycleapp/model/availabledriver.dart';
@@ -136,6 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
+
+
   void showNearDriver() async {
 
       setState(() {
@@ -145,30 +148,30 @@ class _HomeScreenState extends State<HomeScreen> {
     Set<Marker> omarkersset={};
 
 
-    var hasonlindriver = await driverxcontroller.getAllOnlineDrivers();
-    listofavailabledriver = driverxcontroller.availabledriver;
+    // var hasonlindriver = await driverxcontroller.getAllOnlineDrivers();
+    // listofavailabledriver = driverxcontroller.availabledriver;
 
-    if (hasonlindriver) {
+    // if (hasonlindriver) {
       
-      print(hasonlindriver);
-      for(Availabledriver driver in listofavailabledriver){
-      print('__________________________}}}}}}}}}}}}}');
-      print(driver.id);
-      print(driver.devicetoken);
-      print(driver.location);
+    //   print(hasonlindriver);
+    //   for(Availabledriver driver in listofavailabledriver){
+    //   print('__________________________}}}}}}}}}}}}}');
+    //   print(driver.id);
+    //   print(driver.devicetoken);
+    //   print(driver.location);
       
-      Marker newmarker = Marker(markerId: MarkerId(driver.id as String),
-        position: driver.location as LatLng,
-        icon:  nearTricycleIcon as BitmapDescriptor,
-      );
+    //   Marker newmarker = Marker(markerId: MarkerId(driver.id as String),
+    //     position: driver.location as LatLng,
+    //     icon:  nearTricycleIcon as BitmapDescriptor,
+    //   );
 
-        omarkersset.add(newmarker);   
+    //     omarkersset.add(newmarker);   
 
-      }
-      setState(() { 
-        markersSet = omarkersset;
-      });
-    }
+    //   }
+    //   setState(() { 
+    //     markersSet = omarkersset;
+    //   });
+    // }
 
     
     
@@ -427,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text('Select Destination'),
             content: pickaddressBuilder()),
         Step(
-            state: _currentStep > 1 ? StepState.complete : StepState.indexed,
+            state: _currentStep > 1 && mapxcontroller.dropofflocation.value.placeformattedaddress != null ? StepState.complete : StepState.indexed,
             isActive: _currentStep >= 1,
             title: Text('Send Request'),
             content: Container(
@@ -610,7 +613,7 @@ class _HomeScreenState extends State<HomeScreen> {
         alignment: Alignment.center,
         fit: StackFit.expand,
         children: [
-          Padding(
+         Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Theme(
               data: Theme.of(context).copyWith(
@@ -624,16 +627,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   final lastStep = _currentStep == _getSteps().length - 1;
 
                   if (lastStep) {
-                    print('complete');
+                    print('complete');  
 
-                    requestxcontroller.createRequest();
+                      if(requestxcontroller.listofavailabledriver.length > 0){
+                          
+                           requestxcontroller.createRequest(context);
+
+                      }else{
+                       handelrDialog("Sorry no availabler drivers found");
+                      }
 
                     // sendNotification();
 
                   } else {
                     if (mapxcontroller.lastpickedlocation !=
                         mapxcontroller.dropofflocation.value.placeid) {
-                      prepaireRequest();
+                        prepaireRequest();
                     }
                     setState(() {
                       _currentStep += 1;
@@ -676,6 +685,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+
+         
+
+         
           Positioned(
             top: -25,
             child: ClipRRect(
@@ -739,21 +752,27 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  var hasOngoingtrip =
-                      await requestxcontroller.checkIfHasOnGoingTrip();
-                  if (!hasOngoingtrip) {
-                    var hasAvailableDriver =
-                        await requestxcontroller.checkIfHasAvailabDriver();
+                  
+                  if(requestxcontroller.listofavailabledriver.length > 0){
 
-                    if (hasAvailableDriver) {
-                      requestLogic();
-                    } else {
-                      handelrDialog("Sorry no availabler drivers found");
+                    if(requestxcontroller.currentrequest.value.dropddress_name ==  null){
+                      
+
+                        requestLogic();
+                    }else{
+
+                      //SHOW  BUTTON TO DIRECT IN PENDING Request
+                        DialogCollection.showRequestInfo(context);
                     }
-                  } else {
-                    handelrDialog(
-                        "You can make request again after finishing the trip");
+                    
+
+                  }else{
+
+                      handelrDialog("Sorry no availabler drivers found");
                   }
+
+                  
+                  
                 },
                 child: Text('FIND TRICYCLE'),
                 style: ButtonStyle(

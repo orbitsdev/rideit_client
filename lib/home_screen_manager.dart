@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
@@ -6,6 +7,8 @@ import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
+import 'package:tricycleapp/model/availabledriver.dart';
+import 'package:tricycleapp/model/request_details.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
@@ -58,9 +61,61 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
       vsync: this,
     );
 
+    // ever(pagexcontroller.pageindex , (_)=> refreshPage() );
+    
+    listentoavailabledriver();
+    listenIfHasRequest();
+
 //    requesstxcontroller.checkIdhasOngoinRequestNotRead(); 
     authxcontroller.checkIfAcountDetailsIsNull();
     
+  }
+
+
+
+  void listentoavailabledriver() async{
+
+        List<String> testlist = [];
+       availabledriversrefference.where('status',isEqualTo: 'online').snapshots().listen((qeurySnapShot) {
+        
+        print("_____________listetning to availbale driver");
+
+       requesstxcontroller.listofavailabledriver( qeurySnapShot.docs.map((e) {
+          var data = e.data() as Map<String, dynamic>;
+          data['driver_id'] = e.id;
+          Availabledriver availabledriver= Availabledriver.fromJson(data);
+          return availabledriver;
+        }).toList());
+
+            
+
+        
+        requesstxcontroller.devicetokens(requesstxcontroller.listofavailabledriver.map((e)=> e.device_token as String  ).toList());
+        print('available_______________driver lenth');
+        print(testlist);
+        print(requesstxcontroller.listofavailabledriver.length);
+
+     });
+  }
+
+  void listenIfHasRequest() async{
+
+      
+      requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) { 
+        
+          if(event.data() !=  null){
+           requesstxcontroller.currentrequest(RequestDetails.fromJson(event.data() as Map<String, dynamic>));
+           
+          }else{
+            print('_____________________listening to current request');
+            print('_____________________libut nolllt');
+            print('_____________________lio current request');
+
+          }
+     
+
+      });
+
   }
 
   bool isdiddepencicalled = false;
@@ -124,6 +179,8 @@ void requestListiners() async{
     super.dispose();
     _tabController!.dispose();
   }
+
+  
 
   @override
   Widget build(BuildContext context) {

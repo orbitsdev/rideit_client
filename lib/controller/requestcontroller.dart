@@ -13,12 +13,15 @@ import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
+import 'package:tricycleapp/dialog/dialog_collection.dart';
 import 'package:tricycleapp/dialog/ongointripdialog/ongoingtripdialog.dart';
 import 'package:tricycleapp/dialog/ongointripdialog/tripdialog.dart';
 import 'package:tricycleapp/dialog/requestdialog/requestdialog.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
+import 'package:tricycleapp/model/availabledriver.dart';
 import 'package:tricycleapp/model/neardriver.dart';
+import 'package:tricycleapp/model/request_details.dart';
 import 'package:tricycleapp/model/tripdetails.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
@@ -31,12 +34,13 @@ class Requestcontroller extends GetxController {
   
 
   Stream? collectionStream;
-  List<String> devicetokens = [];
+
   List<Neardriver> listofneardriver = [];
   var checking = false.obs;
   var requeststatus = false.obs;
   var loader = false.obs;
   var hasdata = false.obs;
+  var collecting = false.obs;
   var requestdetails = Tripdetails().obs;
   var ongoingtripdetails = Tripdetails().obs;
   var hasongoingtrip = false.obs;
@@ -44,7 +48,13 @@ class Requestcontroller extends GetxController {
   var paymentshowed = false.obs;
   var ifnotread = false.obs;
   var tripisnotcompleted = false.obs;
+  var canceling = false.obs;
   double ratevalue = 0.0;
+  var listofavailabledriver = <Availabledriver>[].obs;
+  var devicetokens = <String?>[].obs;
+  var currentrequest = RequestDetails().obs;
+  
+
 
 
 
@@ -71,10 +81,10 @@ class Requestcontroller extends GetxController {
     return hasOnGoingTrip;
   }
 
-  void createRequest() async {
-    var ifhasavailabler = await checkIfHasAvailabDriver();
+  void createRequest(BuildContext context) async {
 
-    if (ifhasavailabler) {
+
+    
       print('from requast actual merker postion');
       //  print(mapxcontroller.actualdropmarkerposition);
 
@@ -116,8 +126,9 @@ class Requestcontroller extends GetxController {
             .doc(authinstance.currentUser!.uid)
             .set(requestdata)
             .then((value) {
-          requestDialog("Waiting driver to accept...", cancelRequest);
 
+              DialogCollection.requestDialog(context, 'Waiting driver to accept...');
+     // requestDialog(message, cancelrequest)
           sendNotification(authinstance.currentUser!.uid);
 
           requeststream!.listen((event) {
@@ -146,9 +157,7 @@ class Requestcontroller extends GetxController {
       } catch (e) {
         print(e.toString());
       }
-    } else {
-      handelrDialog("Sorry no availabler drivers found");
-    }
+   
   }
 
   Future<bool> checkIfHasAvailabDriver() async {
@@ -179,7 +188,31 @@ class Requestcontroller extends GetxController {
     if (devicetokens.isNotEmpty) {
       var serverKey = Cloudmessagingconfig.CLOUDMESSAGING_SERVER_TOKEN;
 
-      Map<String, String> headerData = {
+     
+      //prepair data
+
+      Map<String, dynamic> picklocation = {
+        "latitude": mapxcontroller.pickuplocation.value.latitude,
+        "longitude": mapxcontroller.pickuplocation.value.longitude,
+      };
+
+      Map<String, dynamic> droplocation = {
+        "latitude": mapxcontroller.dropofflocation.value.latitude,
+        "longitude": mapxcontroller.dropofflocation.value.longitude,
+      };
+
+      Map<String, dynamic> unacceptedrequest = {
+       "request_id": requestid,
+       "picklocation_name": mapxcontroller.pickuplocation.value.placeformattedaddress,
+       "droplocation_name": mapxcontroller.dropofflocation.value.placeformattedaddress,
+        "pick_location":picklocation ,
+        "drop_location":droplocation ,
+      };
+
+      
+      //prepaire pushnotification
+
+       Map<String, String> headerData = {
         'Content-Type': 'application/json',
         'Authorization': 'key=$serverKey',
       };
@@ -194,7 +227,8 @@ class Requestcontroller extends GetxController {
         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
         "id": 1,
         "status": "done",
-        "request_id": requestid,
+        "recieve_request":unacceptedrequest,
+
       };
 
       Map<String, dynamic> sendPushNotification = {
@@ -204,6 +238,7 @@ class Requestcontroller extends GetxController {
         "registration_ids": devicetokens,
         //"to": token,
       };
+
 
       var url = Uri.parse("https://fcm.googleapis.com/fcm/send");
 
@@ -224,16 +259,21 @@ class Requestcontroller extends GetxController {
   void cancelRequest() async {
     //  print('cancel hehe');
     try {
+    canceling(true);
       requestrefference
           .doc(authinstance.currentUser!.uid)
           .delete()
           .then((value) {
+            canceling(false);
+            currentrequest(RequestDetails());
         print('request canceld');
       });
     } catch (e) {
+      canceling(false);
       print(e.toString());
     }
   }
+
 
   Future<bool> checkIfHasOnoingTripRequest() async {
   bool checking = false;

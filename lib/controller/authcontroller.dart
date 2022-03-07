@@ -169,7 +169,7 @@ class Authcontroller extends GetxController {
       progressDialog("Checking...");
       await firestore
           .collection('passengers')
-          .doc(authuser.user!.uid)
+          .doc(authuser.user!.uid)  
           .get()
           .then((querySnapshot) async {
         if (querySnapshot.data() != null) {

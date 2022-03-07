@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,7 +17,7 @@ import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
-import 'package:tricycleapp/screens/trip_history_screen.dart';
+import 'package:tricycleapp/screens/trip_history_screen.dart'; 
 import 'package:tricycleapp/signin_screen.dart';
 import 'package:tricycleapp/sigup_screen.dart';
 import 'package:tricycleapp/testcloudfunction.dart';
@@ -107,7 +106,7 @@ class _TricycleAppState extends State<TricycleApp> {
         print(message.notification!.title);
         print(message.notification!.body);
 
-        LocalNotificationServices.display(message);
+        LocalNotificationServices.display(message); 
       }  
     });
 
