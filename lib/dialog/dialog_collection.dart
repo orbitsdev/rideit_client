@@ -123,35 +123,38 @@ class DialogCollection {
         context: context,
         builder: (context) {
           return Dialog(child: Obx(() {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  message,
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                Container(
-                  child: LinearProgressIndicator(),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-              requestxcontrooler.canceling.value ? 
-              Center(child: CircularProgressIndicator())
-              :
-              ElevatedButton(onPressed: (){
-                  requestxcontrooler.cancelRequest();
-                  Get.back();
-              }, child: Text('Cancel')) 
-              
-              ],
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    message,
+                    style: TextStyle(
+                        fontSize: 16,
+
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 18,
+                  ),
+                  Container(
+                    child: LinearProgressIndicator(),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                requestxcontrooler.canceling.value ? 
+                Center(child: CircularProgressIndicator())
+                :
+                ElevatedButton(onPressed: (){
+                    requestxcontrooler.cancelRequest();
+                    Get.back();
+                }, child: Text('Cancel')) 
+                
+                ],
+              ),
             );
           }));
         });

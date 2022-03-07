@@ -143,7 +143,7 @@ class Requestcontroller extends GetxController {
               if ((data['status'] == "accepted") &&
                   (data['tripstatus'] == 'ready')) {
                 Get.back();
-
+                
                 // Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
                 Future.delayed(Duration(milliseconds: 300), () {
                   Get.off(Ongoingtrip());
@@ -445,6 +445,7 @@ class Requestcontroller extends GetxController {
                                         requestdetails = Tripdetails().obs;
                                         ongoingtripdetails = Tripdetails().obs;
                                         mapxcontroller.clearRequest();
+                                        currentrequest(RequestDetails());
 
                                         if (pagexcontroller.pageindex == 2) {
                                           pagexcontroller.updatePageIndex(1);
