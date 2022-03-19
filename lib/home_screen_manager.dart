@@ -78,21 +78,29 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
         List<String> testlist = [];
        availabledriversrefference.where('status',isEqualTo: 'online').snapshots().listen((qeurySnapShot) {
         
+
         print("_____________listetning to availbale driver");
 
-       requesstxcontroller.listofavailabledriver( qeurySnapShot.docs.map((e) {
+       requesstxcontroller.listofavailabledriver(qeurySnapShot.docs.map((e) {
           var data = e.data() as Map<String, dynamic>;
           data['driver_id'] = e.id;
           Availabledriver availabledriver= Availabledriver.fromJson(data);
           return availabledriver;
         }).toList());
 
-            
+            requesstxcontroller.devicetokens.clear();
+        if(requesstxcontroller.listofavailabledriver.length >0){
 
-        
-        requesstxcontroller.devicetokens(requesstxcontroller.listofavailabledriver.map((e)=> e.device_token as String  ).toList());
+              requesstxcontroller.listofavailabledriver.forEach((element) {
+                print(element.device_token);
+                requesstxcontroller.devicetokens.add(element.device_token);    
+               });
+        }
+
+
+        print('available_______________driver device');
+        print(requesstxcontroller.devicetokens.length);
         print('available_______________driver lenth');
-        print(testlist);
         print(requesstxcontroller.listofavailabledriver.length);
 
      });

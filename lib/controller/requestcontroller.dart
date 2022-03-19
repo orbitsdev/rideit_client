@@ -383,6 +383,10 @@ class Requestcontroller extends GetxController {
                       paymentshowed(true);
                     }
                   }
+
+                    if(data['tripstatus' == 'canceled']){
+                          Tripdialog.canceledDialog(context,'Trip has been canceld');
+                      }
                   //if naka bayad show ratings optional then exit
                   if (data['read'] == true && data['payed'] == true) {
                     if (ifnotread == false) {
@@ -427,9 +431,9 @@ class Requestcontroller extends GetxController {
                                         .collection('ratings')
                                         .add({
                                       'rate': ratevalue,
-                                      'comment': null,
-                                      'passenger_id':
-                                          authinstance.currentUser!.uid,
+                                      'comment': 'Excellent Worl',
+                                      'passenger_id':authinstance.currentUser!.uid,
+                                      'passenger_name': authxcontroller.user.value.name,
                                       'created_at': DateTime.now().toString(),
                                     }).then((_) async {
                                       await ongoingtriprefference
@@ -499,6 +503,13 @@ class Requestcontroller extends GetxController {
             Tripdialog.showInfoDialog(context, 'Driver Has Arrived');
 
           }
+          
+         if(data['tripstatus'] == 'canceled'){
+            print('HEYYYYYYYYYYYY');
+              Tripdialog.canceledDialog(context,'Trip has been canceld');
+          }
+
+
           if (data['tripstatus'] == 'complete' &&
               data['payed'] == true &&
               data['read'] == false) {
@@ -530,6 +541,9 @@ class Requestcontroller extends GetxController {
                             color: Colors.amber,
                           ),
                           onRatingUpdate: (rating) {
+
+                          
+                          
                             ratevalue = rating;
                             print('______________');
                             print(rating);
@@ -546,8 +560,9 @@ class Requestcontroller extends GetxController {
                                   .collection('ratings')
                                   .add({
                                 'rate': ratevalue,
-                                'comment': null,
+                                'comment': 'Nice And Good Services',
                                 'passenger_id': authinstance.currentUser!.uid,
+                                'passenger_name': authxcontroller.user.value.name,
                                 'created_at': DateTime.now().toString(),
                               }).then((_) async {
                                 await ongoingtriprefference
@@ -591,5 +606,25 @@ class Requestcontroller extends GetxController {
         print(data);
       }
     });
+  }
+
+  void deleteOngoingTrip() async{
+    await ongoingtriprefference
+                                    .doc(authinstance.currentUser!.uid)
+                                    .delete()
+                                    .then((value) async {
+                                  loader(false);
+                                  tripisnotcompleted(true);
+                                  hasongoingtrip(false);
+                                  payed(false);
+                                  paymentshowed(false);
+                                  ifnotread(false);
+                                  tripisnotcompleted(false);
+                                  requestdetails = Tripdetails().obs;
+                                  ongoingtripdetails = Tripdetails().obs;
+                                  mapxcontroller.clearRequest();
+                                  Get.back();
+                                });
+                              
   }
 }
