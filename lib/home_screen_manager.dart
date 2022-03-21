@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-badge.widget.dart';
+import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
@@ -239,13 +240,13 @@ void requestListiners() async{
         ],
         tabSize: 50,
         tabBarHeight: 55,
-        textStyle:theme.textTheme.subtitle1,
-        tabIconColor: iconcolor,
+        textStyle:TextStyle(fontSize: 12, color: TEXT_WHITE, fontWeight: FontWeight.w300),
+        tabIconColor: ICON_GREY,
         tabIconSize: 28.0,
         tabIconSelectedSize: 26.0,
-        tabSelectedColor: iconcolorsecondary,
-        tabIconSelectedColor: COLOR_WHITE,
-        tabBarColor: colorwhite,
+        tabSelectedColor:  Colors.transparent,
+        tabIconSelectedColor: GREEN_LIGHT,
+        tabBarColor: BACKGROUND_BLACK,
         onTabItemSelected: (int value) {
             pagexcontroller.updatePageIndex(value);
              setState(() {

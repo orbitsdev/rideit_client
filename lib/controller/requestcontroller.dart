@@ -117,7 +117,7 @@ class Requestcontroller extends GetxController {
         "actualmarker_position": actualdropmarker,
         "status": "pending",
         'tripstatus': 'notready',
-        'device_token':  authxcontroller.user.value.devicetoken,
+        'device_token':  authxcontroller.user.value.device_token,
         "created_at": DateTime.now().toString()
       };
 

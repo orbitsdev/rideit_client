@@ -4,16 +4,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
 import 'package:tricycleapp/config/twilioconfig.dart';
+import 'package:tricycleapp/dialog/authdialog/authdialog.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
+import 'package:tricycleapp/dialog/failuredialog/failuredialog.dart';
 import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/model/users.dart';
+import 'package:tricycleapp/verifyingemail_screen.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 
 class Authcontroller extends GetxController {
+  var hasinternet = false.obs;
   var user = Users().obs;
   late TwilioPhoneVerify _twilioPhoneVerify;
+  
   var isSignUpLoading = false.obs;
   var isCodeSent = false.obs;
   var isVerifying = false.obs;
@@ -74,6 +79,7 @@ class Authcontroller extends GetxController {
             .doc(credential.user!.uid)
             .set(userdetailstostore)
             .then((_) async {
+          isSignUpLoading(false);
           user(Users.fromJson(userdetailstostore));
           Get.back();
 
@@ -85,7 +91,7 @@ class Authcontroller extends GetxController {
           mailverified = authinstance.currentUser!.emailVerified;
 
           if (mailverified == false) {
-            await sendVerification();
+           // await sendVerification();
             Get.back();
             Future.delayed(Duration(milliseconds: 300),
                 () => Get.offNamed(EmailverifyingScreen.screenName));
@@ -103,15 +109,8 @@ class Authcontroller extends GetxController {
       });
     } on FirebaseAuthException catch (e) {
       isSignUpLoading(false);
-
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.ERROR,
-        animType: AnimType.BOTTOMSLIDE,
-        title: e.message.toString(),
-        desc: e.message.toString(),
-        btnOkOnPress: () {},
-      )..show();
+    Failuredialog.showErrorDialog(context, 'OPS', e.message.toString());
+    
     } catch (e) {
       rethrow;
     }
@@ -161,60 +160,59 @@ class Authcontroller extends GetxController {
 
   void logInUser(String email, String password, BuildContext context) async {
     try {
-      progressDialog("Loading...");
+      Authdialog.showAuthProGress(context, 'Please wait...');
       var authuser = await authinstance.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
 
-      Get.back();
-      progressDialog("Checking...");
+     
+      
       await firestore
           .collection('passengers')
-          .doc(authuser.user!.uid)  
+          .doc(authuser.user!.uid)
           .get()
           .then((querySnapshot) async {
         if (querySnapshot.data() != null) {
+          var data = querySnapshot.data() as Map<String, dynamic>;
+          var useracount = Users.fromJson(data);
+          useracount.id = authuser.user!.uid;
+          user(useracount);
 
-          Users userdata =   Users.fromJson(querySnapshot.data() as Map<String, dynamic>);
-          userdata.id = authuser.user!.uid;
-          user(userdata);
-          
 
-          //check if device token expired or change
-          await getDeviceToken();
+           await getDeviceToken();
           if(devicetoken !=  null){
-            if(user.value.devicetoken != devicetoken){
+            if(user.value.device_token != devicetoken){
               await updateDeviceToken(devicetoken);
-              user.value.devicetoken = devicetoken;
+              user.value.device_token = devicetoken;
             }
           }
-          //make global variable
-          firebaseuser = authuser.user;
-
-
+          //check mail
           mailverified = authinstance.currentUser!.emailVerified;
 
           if (mailverified == false) {
             await sendVerification();
-            Get.back();
+           Get.back();
             Future.delayed(Duration(milliseconds: 300),
-                () => Get.offNamed(EmailverifyingScreen.screenName));
+                () => Get.offNamed(VerifyingemailScreen.screenName));
           } else {
-            Get.back();
-            progressDialog('Authenticating..');
+              
             Future.delayed(Duration(seconds: 1), () {
-              Get.back();
+           
+            Get.back();
               Get.offAndToNamed(HomeScreenManager.screenName);
             });
           }
+
         } else {
           Get.back();
-          notificationDialog(context, 'User doesnt exist');
+          Failuredialog.noDataDialog(context,'Ops', 'User doesnt exist');
+  //        notificationDialog(context, 'User doesnt exist');
           authinstance.signOut();
         }
       });
     } on FirebaseAuthException catch (e) {
       Get.back();
-      notificationDialog(context, e.message.toString());
+       // notificationDialog(context, e.message.toString());
+          Failuredialog.noDataDialog(context,'Ops' ,e.message.toString());
     } catch (e) {
       rethrow;
     }
@@ -237,9 +235,9 @@ class Authcontroller extends GetxController {
           await getDeviceToken();
        
           if(devicetoken !=  null){
-            if(user.value.devicetoken !=  devicetoken){
+            if(user.value.device_token !=  devicetoken){
               await updateDeviceToken(devicetoken);
-              user.value.devicetoken = devicetoken;
+              user.value.device_token = devicetoken;
             }
           }
         
@@ -253,7 +251,7 @@ class Authcontroller extends GetxController {
           print('______________________________________________');
           print(user.value.image_file);
           print(user.value.image_url);
-          print(user.value.devicetoken);
+          print(user.value.device_token);
         }
       });
 

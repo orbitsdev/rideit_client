@@ -1,18 +1,24 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:tricycleapp/UI/constant.dart';
+import 'package:tricycleapp/UI/palette.dart';
 import 'package:tricycleapp/binding/gextbinding.dart';
 import 'package:tricycleapp/config/firebaseconfig.dart';
+import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/localnotification/local_notification_services.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
+import 'package:tricycleapp/screens/editprofile_screen.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
@@ -25,6 +31,7 @@ import 'package:tricycleapp/testotp.dart';
 import 'package:tricycleapp/testsign_screen.dart';
 import 'package:tricycleapp/testwidgets/dashboard.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
+import 'package:tricycleapp/verifyingemail_screen.dart';
 
 
 Future<void> backgroundhandler(RemoteMessage message) async{
@@ -66,8 +73,53 @@ class TricycleApp extends StatefulWidget {
 }
 
 class _TricycleAppState extends State<TricycleApp> {
+late StreamSubscription<ConnectivityResult> sunscription;
 
   late StreamSubscription<User?> user;
+
+void listenToInternetConnection(BuildContext context) async{
+     sunscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      if (result == ConnectivityResult.mobile) {
+          
+          Fluttertoast.showToast(
+              msg: "Connected ",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: ELSA_TEXT_GREY,
+              fontSize: 16.0); 
+                    Get.find<Authcontroller>().hasinternet(true);
+        // I am connected to a mobile network.
+      } else if (result == ConnectivityResult.wifi) {
+        // I am connected to a wifi network.
+           Fluttertoast.showToast(
+              msg: "Connected ",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: ELSA_GREEN,
+              fontSize: 16.0);
+             Get.find<Authcontroller>().hasinternet(true);
+      }else{
+       
+          Get.find<Authcontroller>().hasinternet(false);
+
+        Fluttertoast.showToast(
+              msg: "No Enternet Connection",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: Colors.grey[400],
+              fontSize: 16.0);
+      }
+      // Got a new connectivity status!
+    });
+  }
 
   @override
   void initState() {
@@ -127,28 +179,21 @@ class _TricycleAppState extends State<TricycleApp> {
     
     
   }
+ bool isdidchangecalled = false;
 
+@override
+  void didChangeDependencies() {
 
-
- pageAuth(){
-
-    if(authinstance.currentUser != null){
-
-          if(authinstance.currentUser!.emailVerified == true){
-            return HomeScreenManager();
-          }else{
-            return EmailverifyingScreen();
-          }
-          //check if email verified
-
-          
+     if(isdidchangecalled == false){
+      listenToInternetConnection(context);
+      setState(() {
+        isdidchangecalled = true;
+      });
     }
 
-    return SigninScreen();
-
-  
-  
-}
+    super.didChangeDependencies();
+  }
+ 
   
 
   @override
@@ -172,14 +217,24 @@ class _TricycleAppState extends State<TricycleApp> {
     return GetMaterialApp(
       smartManagement: SmartManagement.keepFactory,
       initialBinding: Gextbinding(),
-      theme: ThemeData(primaryColor: COLOR_PURPLE_BUTTON, accentColor: COLOR_DARK_BLUE, textTheme: screenWidth < 500 ? TEXT_THEME_SMALL : TEXT_THEME_DEFAULT  ),
-      home:pageAuth(),
+      
+      theme: ThemeData(
+        scaffoldBackgroundColor: BOTTOMNAVIGATOR_COLOR,
+        textTheme: TEXT_THEME_DEFAULT_DARK,
+        primarySwatch: Palette.generateMaterialColor(0xFF151147),
+      ),
+      home: 
+          FirebaseAuth.instance.currentUser == null
+              ? SigninScreen()
+              : FirebaseAuth.instance.currentUser!.emailVerified == false
+                  ? VerifyingemailScreen()
+                  : HomeScreenManager(),
       //HomeScreenManager(),
       //Testcloudfunction(),
       //SigninScreen(),
   //   authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
       getPages: [
-        GetPage(name: SigupScreen.screenName, page: () => SigupScreen(), binding: Gextbinding()),
+        GetPage(name: SignupScreen.screenName, page: () => SignupScreen(), binding: Gextbinding()),
         GetPage(name: SigninScreen.screenName, page: () => SigninScreen(), binding: Gextbinding()),
         GetPage(name: Dashboard.screenName, page: () => Dashboard(), binding: Gextbinding()),
         GetPage(  name: HomeScreenManager.screenName,  page: () => HomeScreenManager() , binding: Gextbinding()),
@@ -189,8 +244,11 @@ class _TricycleAppState extends State<TricycleApp> {
         GetPage(name: MeScreen.screenName, page: () => MeScreen(), binding: Gextbinding()),
         GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip(), binding: Gextbinding()),
         GetPage(name: DriverLocationScreen.screenName, page: () => DriverLocationScreen(),  binding: Gextbinding(),),
-        GetPage(name: EmailverifyingScreen.screenName, page: () => EmailverifyingScreen(),  binding: Gextbinding(),),
-      
+        GetPage(name: EditprofileScreen.screenName, page: () => EditprofileScreen(),  binding: Gextbinding(),),
+       GetPage(
+            name: VerifyingemailScreen.screenName,
+            page: () => VerifyingemailScreen(),
+            binding: Gextbinding()),
       ],
       debugShowCheckedModeBanner: false,
     );

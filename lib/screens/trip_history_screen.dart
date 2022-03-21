@@ -1,145 +1,163 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
+import 'package:tricycleapp/UI/constant.dart';
+import 'package:tricycleapp/controller/passenger_controller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
-import 'package:tricycleapp/helper/firebasehelper.dart';
-import 'package:tricycleapp/screens/ongoingtrip.dart';
+
+import 'package:twilio_phone_verify/twilio_phone_verify.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class TripHistoryScreen extends StatefulWidget {
-  static const screenName = '/triphistory';
+  const TripHistoryScreen({Key? key}) : super(key: key);
+  static const screenName = '/tripscreen';
 
   @override
   _TripHistoryScreenState createState() => _TripHistoryScreenState();
 }
 
-class _TripHistoryScreenState extends State<TripHistoryScreen>
-    with SingleTickerProviderStateMixin {
-  var requestxcontroller = Get.put(Requestcontroller());
-  late TabController controller;
-  bool hastrip = false;
-
-  @override
-  void setState(VoidCallback fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
-    // TODO: implement setState
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    controller.dispose();
-    super.dispose();
-  }
+class _TripHistoryScreenState extends State<TripHistoryScreen> with SingleTickerProviderStateMixin {
+  late TabController tabController;
+  var requestxcontroller = Get.find<Requestcontroller>();
+  var passengerxcontroller = Get.find<PassengerController>();
+  bool hasongointrip = false;
+  bool loadingrequest = true;
 
   @override
   void initState() {
     super.initState();
-    checkOngoingTrip();
-    controller = TabController(length: 3, vsync: this);
-    controller.addListener(() {
-      setState(() {});
+    tabController = TabController(length: 3, vsync: this);
+    this.tabController.addListener(() => setState(() {}));
+  }
+
+  bool isdepencycalled = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+  }
+
+
+  
+ 
+
+@override
+  void setState(VoidCallback fn) {
+    if(mounted){
+    super.setState(fn);
+
+    }
+  }
+
+  void tripSetter(bool value) {
+    setState(() {
+      hasongointrip = value;
     });
   }
 
-  void checkOngoingTrip() async {
-    bool response = await requestxcontroller.checkIfHasOnoingTripRequest();
-    if (response) {
-      setState(() {
-        hastrip = response;
-      });
-    }
+  void loaderSetter(bool value) {
+    setState(() {
+      loadingrequest = value;
+    });
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        child:
+         Column(children: [
           Container(
-            width: double.infinity,
-            color: Colors.blueAccent,
-            child: TabBar(
-              controller: controller,
-              indicatorColor: Colors.pinkAccent,
-              tabs: [
-                Tab(text: 'Pending', icon: Icon(Icons.pending)),
-                Tab(text: 'Ongoing', icon: Icon(Icons.document_scanner)),
-                Tab(text: 'History', icon: Icon(Icons.time_to_leave)),
-              ],
+            padding: EdgeInsets.only(top: 40),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  BACKGROUND_TOP,
+                  BACKGROUND_CEENTER,
+                ],
+              ),
+              // color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
             ),
+            height: 80,
+            child: TabBar(
+                controller: tabController,
+                labelColor: TEXT_COLOR_WHITE,
+                unselectedLabelColor: Colors.white,
+                indicatorSize: TabBarIndicatorSize.label,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10)),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      ELSA_BLUE_2_,
+                      ELSA_BLUE_1_,
+                    ],
+                  ),
+                ),
+                tabs: [
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Pending".toUpperCase()),
+                    ),
+                  ),
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Ongoing".toUpperCase()),
+                    ),
+                  ),
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Records".toUpperCase()),
+                    ),
+                  ),
+                ]),
           ),
           Expanded(
-            child: TabBarView(controller: controller, children: [
-             
-              requestxcontroller.currentrequest.value.dropddress_name ==  null 
-              ?Text('no data') 
-              : Column(
-                children: [
-                  Text(requestxcontroller.currentrequest.value.pickaddress_name as String),
-                  Text(requestxcontroller.currentrequest.value.dropddress_name as String),
-                  
-                  if(requestxcontroller.currentrequest.value.tripstatus == "pending")
-                  ElevatedButton(onPressed: (){
-                    requestxcontroller.cancelRequest();
-                  }, child: Text('Cancel'))
-                ],  
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    BACKGROUND_TOP,
+                    BACKGROUND_BOTTOM,
+                  ],
+                ),
+                borderRadius:
+                    BorderRadius.all(Radius.circular(containerRadius)),
               ),
-              
-
-              hastrip == false
-                  ? Text('no data')
-                  : ongoingTripBuilder(),
-              tripHistoryBuilder(),
-            ]),
+              child: TabBarView(
+                controller: tabController,
+                children: [
+                  Container(child: Center(child: Text('pending request'),),),
+                  Container(child: Center(child: Text('Ongoingtirp'),),),
+                  Container(child: Center(child: Text('Records'),),),
+                ],
+              ),
+            ),
           ),
-        ],
+        ]),
+       
       ),
     );
   }
 
-  Column ongoingTripBuilder() {
-    return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("drop location"),
-                      Text(requestxcontroller
-                          .requestdetails.value.dropddressname as String),
-                      Center(
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Get.to(() => Ongoingtrip(from: "trip"));
-                            },
-                            child: Text('View')),
-                      )
-                    ],
-                  );
-  }
+  
+  
 
-  StreamBuilder<QuerySnapshot<Map<String, dynamic>>> tripHistoryBuilder() {
-    return StreamBuilder(
-        stream: firestore
-            .collection('passengertriphistory')
-            .doc(authinstance.currentUser!.uid)
-            .collection('trips')
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return ListView.builder(
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title:
-                      Text("${snapshot.data!.docs[index]['dropddress_name']}"),
-                  subtitle: Text("${snapshot.data!.docs[index]['created_at']}"),
-                );
-              });
-        });
-  }
+  
+
 }

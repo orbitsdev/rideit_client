@@ -3,7 +3,7 @@ import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/driverlocationcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
-import 'package:tricycleapp/controller/profile_controller.dart';
+import 'package:tricycleapp/controller/passenger_controller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
 
 class Gextbinding implements Bindings{
@@ -17,7 +17,7 @@ class Gextbinding implements Bindings{
     Get.lazyPut(() =>Requestcontroller());
     Get.lazyPut(() =>Driverlocationcontroller());
     Get.lazyPut(() =>Pagecontroller());
-    Get.lazyPut(() =>ProfileController());
+    Get.lazyPut(() =>PassengerController());
   }
 
 
