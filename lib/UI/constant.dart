@@ -225,6 +225,7 @@ const lINE_RIGHT =  Color(0xFF161A9E);
 const lINE_LIGHT =  Color(0xFF5E617A); 
 //container Light box
 const LIGHT_CONTAINER =  Color(0xFF322F65); 
+const LIGHT_CONTAINER2 =  Color.fromARGB(255, 34, 31, 73); 
 //elsa text
 const ELSA_TEXT_WHITE =  Color(0xFFF6F6F8); 
 const ELSA_TEXT_LIGHT =  Color(0xFF5E617A); 
