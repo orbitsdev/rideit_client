@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       else if (states
                                           .contains(MaterialState.disabled))
                                         return LIGHT_CONTAINER2;
-                                      return ELSA_BLUE_1_; // Use the component's default.
+                                      return currenStep == 2 ?GREEN_ONLINE : ELSA_BLUE_1_; // Use the component's default.
                                     },
                                   ),
                                 ),
@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Center(
                                             child: FaIcon(
                                       currenStep == 2
-                                          ? FontAwesomeIcons.check
+                                          ? FontAwesomeIcons.motorcycle
                                           : FontAwesomeIcons.angleRight,
                                       size: 24,
                                     )))
