@@ -13,7 +13,7 @@ import 'package:tricycleapp/model/request_details.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
-import 'package:tricycleapp/screens/trip_history_screen.dart';
+import 'package:tricycleapp/screens/trip_screen.dart';
 import 'package:tricycleapp/testwidgets/dashboard.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 import 'package:tricycleapp/uiconstant/hex_color.dart';
@@ -45,7 +45,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
   List<Widget> _pages =[
     Dashboard(),
     HomeScreen(),
-    TripHistoryScreen(),
+    TripScreen(),
     MeScreen(),
   ];
 

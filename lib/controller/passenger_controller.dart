@@ -102,4 +102,6 @@ class PassengerController extends GetxController {
       authxcontroller.user(Users.fromJson(data));
     });
   }
+
+  
 }

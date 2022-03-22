@@ -63,7 +63,7 @@ class DialogCollection {
                             :
                             ElevatedButton(
                                 onPressed: () {
-                                  requestxcontroller.cancelRequest();
+                                  requestxcontroller.cancelRequest(context);
                                   Get.back();
                                 },
                                 child: Text('Yes')),
@@ -149,7 +149,7 @@ class DialogCollection {
                 Center(child: CircularProgressIndicator())
                 :
                 ElevatedButton(onPressed: (){
-                    requestxcontrooler.cancelRequest();
+                    requestxcontrooler.cancelRequest(context);
                     Get.back();
                 }, child: Text('Cancel')) 
                 

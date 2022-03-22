@@ -14,6 +14,7 @@ import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/dialog/dialog_collection.dart';
+import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/dialog/ongointripdialog/ongoingtripdialog.dart';
 import 'package:tricycleapp/dialog/ongointripdialog/tripdialog.dart';
 import 'package:tricycleapp/dialog/requestdialog/requestdialog.dart';
@@ -31,7 +32,6 @@ class Requestcontroller extends GetxController {
   var authxcontroller = Get.find<Authcontroller>();
   var mapxcontroller = Get.put(Mapcontroller());
   var pagexcontroller = Get.find<Pagecontroller>();
-  
 
   Stream? collectionStream;
 
@@ -53,11 +53,8 @@ class Requestcontroller extends GetxController {
   var listofavailabledriver = <Availabledriver>[].obs;
   var devicetokens = <String?>[].obs;
   var currentrequest = RequestDetails().obs;
-  
 
-
-
-
+  var pendingrequest = RequestDetails().obs;
 
   Future<bool> checkIfHasOnGoingTrip() async {
     bool hasOnGoingTrip = false;
@@ -82,82 +79,80 @@ class Requestcontroller extends GetxController {
   }
 
   void createRequest(BuildContext context) async {
+    print('from requast actual merker postion');
+    //  print(mapxcontroller.actualdropmarkerposition);
 
+    Map<String, dynamic> picklocation = {
+      "latitude": mapxcontroller.pickuplocation.value.latitude,
+      "longitude": mapxcontroller.pickuplocation.value.longitude,
+    };
 
-    
-      print('from requast actual merker postion');
-      //  print(mapxcontroller.actualdropmarkerposition);
+    Map<String, dynamic> droplocation = {
+      "latitude": mapxcontroller.dropofflocation.value.latitude,
+      "longitude": mapxcontroller.dropofflocation.value.longitude,
+    };
 
-      Map<String, dynamic> picklocation = {
-        "latitude": mapxcontroller.pickuplocation.value.latitude,
-        "longitude": mapxcontroller.pickuplocation.value.longitude,
-      };
+    Map<String, dynamic> actualdropmarker = {
+      "latitude": mapxcontroller.actualdropmarkerposition!.latitude,
+      "longitude": mapxcontroller.actualdropmarkerposition!.longitude,
+    };
 
-      Map<String, dynamic> droplocation = {
-        "latitude": mapxcontroller.dropofflocation.value.latitude,
-        "longitude": mapxcontroller.dropofflocation.value.longitude,
-      };
+    Map<String, dynamic> requestdata = {
+      "pick_location_id": mapxcontroller.pickuplocation.value.placeid,
+      "drop_location_id": mapxcontroller.dropofflocation.value.placeid,
+      "pick_location": picklocation,
+      "drop_location": droplocation,
+      "pickaddress_name":
+          mapxcontroller.pickuplocation.value.placeformattedaddress,
+      "dropddress_name":
+          mapxcontroller.dropofflocation.value.placeformattedaddress,
+      "passenger_name": authxcontroller.user.value.name,
+      "passenger_phone": authxcontroller.user.value.phone,
+      "actualmarker_position": actualdropmarker,
+      "status": "pending",
+      'tripstatus': 'notready',
+      'device_token': authxcontroller.user.value.device_token,
+      "created_at": DateTime.now().toString()
+    };
 
-      Map<String, dynamic> actualdropmarker = {
-        "latitude": mapxcontroller.actualdropmarkerposition!.latitude,
-        "longitude": mapxcontroller.actualdropmarkerposition!.longitude,
-      };
+    try {
+      requestrefference
+          .doc(authinstance.currentUser!.uid)
+          .set(requestdata)
+          .then((value) {
+        DialogCollection.requestDialog(context, 'Waiting driver to accept...');
 
-      Map<String, dynamic> requestdata = {
-        "pick_location_id": mapxcontroller.pickuplocation.value.placeid,
-        "drop_location_id": mapxcontroller.dropofflocation.value.placeid,
-        "pick_location": picklocation,
-        "drop_location": droplocation,
-        "pickaddress_name":
-            mapxcontroller.pickuplocation.value.placeformattedaddress,
-        "dropddress_name":
-            mapxcontroller.dropofflocation.value.placeformattedaddress,
-        "passenger_name": authxcontroller.user.value.name,
-        "passenger_phone": authxcontroller.user.value.phone,
-        "actualmarker_position": actualdropmarker,
-        "status": "pending",
-        'tripstatus': 'notready',
-        'device_token':  authxcontroller.user.value.device_token,
-        "created_at": DateTime.now().toString()
-      };
+        sendNotification(authinstance.currentUser!.uid);
 
-      try {
-        requestrefference
-            .doc(authinstance.currentUser!.uid)
-            .set(requestdata)
-            .then((value) {
+        requeststream!.listen((event) {
+          //store it locally
+          pendingrequest(  RequestDetails.fromJson(event.data() as Map<String, dynamic>));
 
-              DialogCollection.requestDialog(context, 'Waiting driver to accept...');
-     // requestDialog(message, cancelrequest)
-          sendNotification(authinstance.currentUser!.uid);
+          if (event.data() != null) {
+            var data = event.data() as Map;
 
-          requeststream!.listen((event) {
-            if (event.data() != null) {
-              var data = event.data() as Map;
-
-              if ((data['status'] == "accepted") &&
-                  (data['tripstatus'] == 'notready')) {
-                Get.back();
-                progressDialog("Accepted prepairing trip...");
-              }
-              if ((data['status'] == "accepted") &&
-                  (data['tripstatus'] == 'ready')) {
-                Get.back();
-                
-                // Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
-                Future.delayed(Duration(milliseconds: 300), () {
-                  Get.off(Ongoingtrip());
-                });
-              }
+            if ((data['status'] == "accepted") &&
+                (data['tripstatus'] == 'notready')) {
+              Get.back();
+              progressDialog("Accepted prepairing trip...");
             }
-          });
-        }).catchError((e) {
-          print(e.toString());
+            if ((data['status'] == "accepted") &&
+                (data['tripstatus'] == 'ready')) {
+              Get.back();
+
+              // Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+              Future.delayed(Duration(milliseconds: 300), () {
+                Get.off(Ongoingtrip());
+              });
+            }
+          }
         });
-      } catch (e) {
+      }).catchError((e) {
         print(e.toString());
-      }
-   
+      });
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future<bool> checkIfHasAvailabDriver() async {
@@ -182,13 +177,12 @@ class Requestcontroller extends GetxController {
     return hasAvailableDriver;
   }
 
-  void  sendNotification(String requestid) async {
+  void sendNotification(String requestid) async {
     print('__________sending notfification');
     print(devicetokens);
     if (devicetokens.isNotEmpty) {
       var serverKey = Cloudmessagingconfig.CLOUDMESSAGING_SERVER_TOKEN;
 
-     
       //prepair data
 
       Map<String, dynamic> picklocation = {
@@ -202,17 +196,18 @@ class Requestcontroller extends GetxController {
       };
 
       Map<String, dynamic> unacceptedrequest = {
-       "request_id": requestid,
-       "picklocation_name": mapxcontroller.pickuplocation.value.placeformattedaddress,
-       "droplocation_name": mapxcontroller.dropofflocation.value.placeformattedaddress,
-        "pick_location":picklocation ,
-        "drop_location":droplocation ,
+        "request_id": requestid,
+        "picklocation_name":
+            mapxcontroller.pickuplocation.value.placeformattedaddress,
+        "droplocation_name":
+            mapxcontroller.dropofflocation.value.placeformattedaddress,
+        "pick_location": picklocation,
+        "drop_location": droplocation,
       };
 
-      
       //prepaire pushnotification
 
-       Map<String, String> headerData = {
+      Map<String, String> headerData = {
         'Content-Type': 'application/json',
         'Authorization': 'key=$serverKey',
       };
@@ -227,8 +222,7 @@ class Requestcontroller extends GetxController {
         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
         "id": 1,
         "status": "done",
-        "recieve_request":unacceptedrequest,
-
+        "recieve_request": unacceptedrequest,
       };
 
       Map<String, dynamic> sendPushNotification = {
@@ -238,7 +232,6 @@ class Requestcontroller extends GetxController {
         "registration_ids": devicetokens,
         //"to": token,
       };
-
 
       var url = Uri.parse("https://fcm.googleapis.com/fcm/send");
 
@@ -256,46 +249,50 @@ class Requestcontroller extends GetxController {
     }
   }
 
-  void cancelRequest() async {
-    //  print('cancel hehe');
-    try {
-    canceling(true);
-      requestrefference
-          .doc(authinstance.currentUser!.uid)
-          .delete()
-          .then((value) {
-            canceling(false);
-            currentrequest(RequestDetails());
-        print('request canceld');
-      });
-    } catch (e) {
-      canceling(false);
-      print(e.toString());
+  void cancelRequest(BuildContext context) async {
+
+    //check before cancel
+        canceling(true);
+    if (pendingrequest.value.status != "accepted") {
+      try {
+        requestrefference
+            .doc(authinstance.currentUser!.uid)
+            .delete()
+            .then((value) {
+          canceling(false);
+          pendingrequest(RequestDetails());
+        });
+      } catch (e) {
+        canceling(false);
+
+      }
+    }else{
+
+        canceling(false);
+      Infodialog.info(context, 'You request is already accept by the driver  if you wan to cance the trip call the driver');
+
     }
   }
 
-
   Future<bool> checkIfHasOnoingTripRequest() async {
-  bool checking = false;
+    bool checking = false;
 
     try {
-    
-      var response =   await ongoingtriprefference.doc(authinstance.currentUser!.uid).get();
+      var response =
+          await ongoingtriprefference.doc(authinstance.currentUser!.uid).get();
       if (response.exists) {
-        requestdetails = Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
+        requestdetails =
+            Tripdetails.fromJson(response.data() as Map<String, dynamic>).obs;
         print(requestdetails.value.passengerphone);
         hasdata(true);
         hasongoingtrip(true);
-        checking =true;
+        checking = true;
       } else {
-     
         print('_nothing');
         checking = false;
       }
     } on FirebaseException catch (e) {
-       
-        checking =false;
-
+      checking = false;
     }
 
     // if(response.exists){
@@ -307,7 +304,6 @@ class Requestcontroller extends GetxController {
     //   print('no data');
     // }
     return checking;
-
   }
 
   void checkIfHasDataRequest() async {
@@ -360,8 +356,7 @@ class Requestcontroller extends GetxController {
                 case 'coming':
                   break;
                 case 'arrived':
-
-               Tripdialog.showInfoDialog(context, 'Driver has arrived ');
+                  Tripdialog.showInfoDialog(context, 'Driver has arrived ');
                   // showTripDialog("Thd driver has arrived");
                   //show notification when arrived
                   break;
@@ -384,9 +379,9 @@ class Requestcontroller extends GetxController {
                     }
                   }
 
-                    if(data['tripstatus' == 'canceled']){
-                          Tripdialog.canceledDialog(context,'Trip has been canceld');
-                      }
+                  if (data['tripstatus' == 'canceled']) {
+                    Tripdialog.canceledDialog(context, 'Trip has been canceld');
+                  }
                   //if naka bayad show ratings optional then exit
                   if (data['read'] == true && data['payed'] == true) {
                     if (ifnotread == false) {
@@ -432,8 +427,10 @@ class Requestcontroller extends GetxController {
                                         .add({
                                       'rate': ratevalue,
                                       'comment': 'Excellent Worl',
-                                      'passenger_id':authinstance.currentUser!.uid,
-                                      'passenger_name': authxcontroller.user.value.name,
+                                      'passenger_id':
+                                          authinstance.currentUser!.uid,
+                                      'passenger_name':
+                                          authxcontroller.user.value.name,
                                       'created_at': DateTime.now().toString(),
                                     }).then((_) async {
                                       await ongoingtriprefference
@@ -496,19 +493,14 @@ class Requestcontroller extends GetxController {
         var data = value.data() as Map<String, dynamic>;
 
         if (data != null) {
-
-
-          if(data['tripstatus'] == 'arrived'){
-
+          if (data['tripstatus'] == 'arrived') {
             Tripdialog.showInfoDialog(context, 'Driver Has Arrived');
-
           }
-          
-         if(data['tripstatus'] == 'canceled'){
+
+          if (data['tripstatus'] == 'canceled') {
             print('HEYYYYYYYYYYYY');
-              Tripdialog.canceledDialog(context,'Trip has been canceld');
+            Tripdialog.canceledDialog(context, 'Trip has been canceld');
           }
-
 
           if (data['tripstatus'] == 'complete' &&
               data['payed'] == true &&
@@ -541,9 +533,6 @@ class Requestcontroller extends GetxController {
                             color: Colors.amber,
                           ),
                           onRatingUpdate: (rating) {
-
-                          
-                          
                             ratevalue = rating;
                             print('______________');
                             print(rating);
@@ -562,7 +551,8 @@ class Requestcontroller extends GetxController {
                                 'rate': ratevalue,
                                 'comment': 'Nice And Good Services',
                                 'passenger_id': authinstance.currentUser!.uid,
-                                'passenger_name': authxcontroller.user.value.name,
+                                'passenger_name':
+                                    authxcontroller.user.value.name,
                                 'created_at': DateTime.now().toString(),
                               }).then((_) async {
                                 await ongoingtriprefference
@@ -608,23 +598,22 @@ class Requestcontroller extends GetxController {
     });
   }
 
-  void deleteOngoingTrip() async{
+  void deleteOngoingTrip() async {
     await ongoingtriprefference
-                                    .doc(authinstance.currentUser!.uid)
-                                    .delete()
-                                    .then((value) async {
-                                  loader(false);
-                                  tripisnotcompleted(true);
-                                  hasongoingtrip(false);
-                                  payed(false);
-                                  paymentshowed(false);
-                                  ifnotread(false);
-                                  tripisnotcompleted(false);
-                                  requestdetails = Tripdetails().obs;
-                                  ongoingtripdetails = Tripdetails().obs;
-                                  mapxcontroller.clearRequest();
-                                  Get.back();
-                                });
-                              
+        .doc(authinstance.currentUser!.uid)
+        .delete()
+        .then((value) async {
+      loader(false);
+      tripisnotcompleted(true);
+      hasongoingtrip(false);
+      payed(false);
+      paymentshowed(false);
+      ifnotread(false);
+      tripisnotcompleted(false);
+      requestdetails = Tripdetails().obs;
+      ongoingtripdetails = Tripdetails().obs;
+      mapxcontroller.clearRequest();
+      Get.back();
+    });
   }
 }

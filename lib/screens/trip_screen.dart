@@ -10,15 +10,15 @@ import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
-class TripHistoryScreen extends StatefulWidget {
-  const TripHistoryScreen({Key? key}) : super(key: key);
+class TripScreen extends StatefulWidget {
+  const TripScreen({Key? key}) : super(key: key);
   static const screenName = '/tripscreen';
 
   @override
-  _TripHistoryScreenState createState() => _TripHistoryScreenState();
+  _TripScreenState createState() => _TripScreenState();
 }
 
-class _TripHistoryScreenState extends State<TripHistoryScreen> with SingleTickerProviderStateMixin {
+class _TripScreenState extends State<TripScreen> with SingleTickerProviderStateMixin {
   late TabController tabController;
   var requestxcontroller = Get.find<Requestcontroller>();
   var passengerxcontroller = Get.find<PassengerController>();
