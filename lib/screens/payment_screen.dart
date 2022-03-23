@@ -18,22 +18,25 @@ import 'package:tricycleapp/widgets/homewidgets/paymensummarybox.dart';
 import 'package:tricycleapp/widgets/horizontalspace.dart';
 import 'package:tricycleapp/widgets/verticalspace.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class PaymentScreen extends StatefulWidget {
+  const PaymentScreen({Key? key}) : super(key: key);
 
-  static const screenName = "/request_screen";
+  static const screenName = "/paymentscreen";
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _PaymentScreenState createState() => _PaymentScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _PaymentScreenState extends State<PaymentScreen> {
   int currenStep = 0;
   late String paymentmethod;
+  var mapadatacontroller = Get.find<Mapdatacontroller>();
 
   void setPaymentMethod(String value) {
     setState(() {
       paymentmethod = value;
+      mapadatacontroller.paymentmethod = value;
+
     });
     print(paymentmethod);
   }
@@ -340,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Paymensummarybox(
                               title: 'From',
                               value:
-                                  'Isulan Sultan Kudarat Salem St dIsulan Sultan '),
+                                  '${mapadatacontroller.pickuplocationDetails.value.placeformattedaddress}'),
                           Divider(
                             thickness: 1,
                             color: ELSA_TEXT_LIGHT,
@@ -348,12 +351,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           Paymensummarybox(
                               title: 'To',
                               value:
-                                  'Isulan Sultan Kudarat Salem St dIsulan Sultan '),
+                                  '${mapadatacontroller.droplocationDetails.value.placeformattedaddress}'),
                           Divider(
                             thickness: 1,
                             color: ELSA_TEXT_LIGHT,
                           ),
-                          Paymensummarybox(title: 'Distance', value: '1 km'),
+                          
+                          Paymensummarybox(title: 'Distance', value: '${mapadatacontroller.directionDetails.value.distanceText}'),
                           Divider(
                             thickness: 1,
                             color: ELSA_TEXT_LIGHT,
@@ -375,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Horizontalspace(16),
                                 Flexible(
                                   child: Text(
-                                    '₱ 10.00',
+                                    mapadatacontroller.calculateFee(),
                                     style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.w900),

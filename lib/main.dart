@@ -20,7 +20,7 @@ import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/localnotification/local_notification_services.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
 import 'package:tricycleapp/screens/editprofile_screen.dart';
-import 'package:tricycleapp/screens/home_screen.dart';
+import 'package:tricycleapp/screens/payment_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
 import 'package:tricycleapp/screens/request_screen.dart';
@@ -204,8 +204,8 @@ class _TricycleAppState extends State<TricycleApp> {
             page: () => HomeScreenManager(),
             binding: Gextbinding()),
         GetPage(
-            name: HomeScreen.screenName,
-            page: () => HomeScreen(),
+            name: PaymentScreen.screenName,
+            page: () => PaymentScreen(),
             binding: Gextbinding()),
         GetPage(
             name: RequestTricycleSreen.screenName,

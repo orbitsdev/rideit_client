@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
-import 'package:tricycleapp/screens/home_screen.dart';
+import 'package:tricycleapp/screens/payment_screen.dart';
 
 class Ongoingtrip extends StatefulWidget {
 

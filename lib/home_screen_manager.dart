@@ -10,7 +10,7 @@ import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/model/availabledriver.dart';
 import 'package:tricycleapp/model/request_details.dart';
-import 'package:tricycleapp/screens/home_screen.dart';
+import 'package:tricycleapp/screens/payment_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/request_screen.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';

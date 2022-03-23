@@ -24,7 +24,7 @@ import 'package:tricycleapp/model/availabledriver.dart';
 import 'package:tricycleapp/model/neardriver.dart';
 import 'package:tricycleapp/model/request_details.dart';
 import 'package:tricycleapp/model/tripdetails.dart';
-import 'package:tricycleapp/screens/home_screen.dart';
+import 'package:tricycleapp/screens/payment_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
