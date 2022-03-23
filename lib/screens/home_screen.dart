@@ -1,11 +1,18 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:lottie/lottie.dart';
 import 'package:path/path.dart';
 import 'package:tricycleapp/UI/constant.dart';
+import 'package:tricycleapp/controller/mapdatacontroller.dart';
+import 'package:tricycleapp/controller/permissioncontrooler.dart';
+import 'package:tricycleapp/uiconstant/widget_function.dart';
 import 'package:tricycleapp/widgets/homewidgets/detailsbuilder.dart';
 import 'package:tricycleapp/widgets/homewidgets/paymensummarybox.dart';
 import 'package:tricycleapp/widgets/horizontalspace.dart';
@@ -31,232 +38,227 @@ class _HomeScreenState extends State<HomeScreen> {
     print(paymentmethod);
   }
 
-  Completer<GoogleMapController> _macontroller = Completer();
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+//map variales
+
+  
 
   @override
   void initState() {
     super.initState();
+ 
     paymentmethod = "null";
+  }
+
+  
+
+  
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Theme(
-          data:
-              ThemeData(colorScheme: ColorScheme.light(primary: ELSA_BLUE_1_)),
-          child: Stepper(
-              margin: EdgeInsets.all(0),
-              controlsBuilder:
-                  (BuildContext context, ControlsDetails functions) {
-                return Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    
-                      borderRadius: BorderRadius.all(Radius.circular(6))),
-                  margin: EdgeInsets.symmetric(
-                    vertical: 20,
-                  ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Divider(
-                          thickness: 1,
-                          color: ELSA_TEXT_LIGHT,
-                        ),
-                        if (currenStep != 0)
-                          Expanded(
-                            child: Container(
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(4)),
-                              ),
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      primary: Colors.transparent,
-                                      elevation: 0),
-                                  onPressed: functions.onStepCancel,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                          child: Center(
-                                              child: FaIcon(
-                                        FontAwesomeIcons.angleLeft,
-                                        size: 24,
-                                      ))),
-                                      Horizontalspace(5),
-                                      Text(
-                                        'Back',
-                                      ),
-                                    ],
-                                  )),
-                            ),
-                          ),
-
-                        //                       ElevatedButton(
-                        //   onPressed: null,
-                        //   child: Text('Submit disable'),
-                        //   style: ButtonStyle(
-                        //     backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                        //       (Set<MaterialState> states) {
-                        //         if (states.contains(MaterialState.pressed))
-                        //           return Theme.of(context)
-                        //               .colorScheme
-                        //               .primary
-                        //               .withOpacity(0.5);
-                        //         else if (states.contains(MaterialState.disabled))
-                        //           return Colors.green;
-                        //         return Colors.black; // Use the component's default.
-                        //       },
-                        //     ),
-                        //   ),
-                        // ),
-                        if (currenStep != 0) Horizontalspace(50),
-                        Expanded(
-                          child: Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(4)),
-                            ),
-                            child: ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                                      if (states
-                                          .contains(MaterialState.pressed))
-                                        return Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.5);
-                                      else if (states
-                                          .contains(MaterialState.disabled))
-                                        return LIGHT_CONTAINER2;
-                                      return currenStep == 2 ?GREEN_ONLINE : ELSA_BLUE_1_; // Use the component's default.
-                                    },
-                                  ),
-                                ),
-                                // style: ElevatedButton.styleFrom(
-                                //   primary: currenStep == 2
-                                //       ? GREEN_ONLINE
-                                //       : ELSA_BLUE_1_,
-                                // ),
-
-                                onPressed:
-                                    paymentmethod == 'null' && currenStep > 0
-                                        ? null
-                                        : functions.onStepContinue,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(currenStep == 2 ? 'Request' : 'Next'),
-                                    Horizontalspace(5),
-                                    Container(
-                                        child: Center(
-                                            child: FaIcon(
-                                      currenStep == 2
-                                          ? FontAwesomeIcons.motorcycle
-                                          : FontAwesomeIcons.angleRight,
-                                      size: 24,
-                                    )))
-                                  ],
-                                )),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              type: StepperType.horizontal,
-              // onStepTapped: (step){
-              //     if(paymentmethod != 'null'){
-
-              //     setState((){
-              //       currenStep = step;
-              //     });
-              //     }
-              // },
-              steps: getStep(context),
-              currentStep: currenStep,
-              onStepContinue: () {
-                final isLastStep = currenStep == getStep(context).length - 1;
-                if (isLastStep) {
-                  print('comoplerte');
-                } else {
-                  setState(() {
-                    currenStep += 1;
-                    print(currenStep);
-                  });
-                }
-              },
-              onStepCancel: () {
-                if (currenStep != 0) {
-                  setState(() {
-                    currenStep -= 1;
-                  });
-                }
-              }),
+        appBar: AppBar(
+          leading: IconButton(onPressed: currenStep == 0?  (){
+              Get.back();
+          }:  null, icon:FaIcon(FontAwesomeIcons.arrowLeft)),
         ),
+        body: SingleChildScrollView(
+            child: Column(
+                    children: [
+                      
+                      Container(
+                        height: MediaQuery.of(context).size.height,
+                        child: Theme(
+                          data: ThemeData(
+                              colorScheme:
+                                  ColorScheme.light(primary: ELSA_BLUE_1_)),
+                          child: Stepper(
+                              physics: ClampingScrollPhysics(),
+                              margin: EdgeInsets.all(0),
+                              controlsBuilder: (BuildContext context,
+                                  ControlsDetails functions) {
+                                return Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(6))),
+                                  margin: EdgeInsets.symmetric(
+                                    vertical: 20,
+                                  ),
+                                  child: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Divider(
+                                          thickness: 1,
+                                          color: ELSA_TEXT_LIGHT,
+                                        ),
+                                        if (currenStep != 0)
+                                          Expanded(
+                                            child: Container(
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(4)),
+                                              ),
+                                              child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          primary: Colors
+                                                              .transparent,
+                                                          elevation: 0),
+                                                  onPressed:
+                                                      functions.onStepCancel,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Container(
+                                                          child: Center(
+                                                              child: FaIcon(
+                                                        FontAwesomeIcons
+                                                            .angleLeft,
+                                                        size: 24,
+                                                      ))),
+                                                      Horizontalspace(5),
+                                                      Text(
+                                                        'Back',
+                                                      ),
+                                                    ],
+                                                  )),
+                                            ),
+                                          ),
+                                        if (currenStep != 0)
+                                          Horizontalspace(50),
+                                        Expanded(
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(4)),
+                                            ),
+                                            child: ElevatedButton(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty
+                                                          .resolveWith<Color>(
+                                                    (Set<MaterialState>
+                                                        states) {
+                                                      if (states.contains(
+                                                          MaterialState
+                                                              .pressed))
+                                                        return Theme.of(context)
+                                                            .colorScheme
+                                                            .primary
+                                                            .withOpacity(0.5);
+                                                      else if (states.contains(
+                                                          MaterialState
+                                                              .disabled))
+                                                        return LIGHT_CONTAINER2;
+                                                      return currenStep == getStep(context).length -1
+                                                          ? GREEN_ONLINE
+                                                          : ELSA_BLUE_1_; // Use the component's default.
+                                                    },
+                                                  ),
+                                                ),
+                                                // style: ElevatedButton.styleFrom(
+                                                //   primary: currenStep == 2
+                                                //       ? GREEN_ONLINE
+                                                //       : ELSA_BLUE_1_,
+                                                // ),
+
+                                                onPressed: paymentmethod ==
+                                                            'null' &&
+                                                        currenStep == 0
+                                                    ? null
+                                                    : functions.onStepContinue,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(currenStep == getStep(context).length -1 
+                                                          ? 'Request'.toUpperCase()
+                                                          : 'Continue'.toUpperCase()),
+                                                    ),
+                                                    if( currenStep == getStep(context).length -1)
+                                                    Container(
+                                                        child: Center(
+                                                            child: FaIcon(
+                                                     
+                                                           FontAwesomeIcons
+                                                              .motorcycle,
+                                                         
+                                                      size: 24,
+                                                    )))
+                                                  ],
+                                                )),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                              type: StepperType.horizontal,
+                              // onStepTapped: (step){
+                              //     if(paymentmethod != 'null'){
+
+                              //     setState((){
+                              //       currenStep = step;
+                              //     });
+                              //     }
+                              // },
+                              steps: getStep(context),
+                              currentStep: currenStep,
+                              onStepContinue: () {
+                                final isLastStep =
+                                    currenStep == getStep(context).length - 1;
+                                if (isLastStep) {
+                                  print('comoplerte');
+                                } else {
+                                  setState(() {
+                                    currenStep += 1;
+                                    print(currenStep);
+                                  });
+                                }
+                              },
+                              onStepCancel: () {
+                                if (currenStep != 0) {
+                                  setState(() {
+                                    currenStep -= 1;
+                                  });
+                                }
+                              }),
+                        ),
+                      ),
+                    ],
+                  )),
       ),
     );
   }
 
   List<Step> getStep(BuildContext context) => [
+        
         Step(
-          state: currenStep > 0 ? StepState.complete : StepState.indexed,
-          isActive: currenStep >= 0,
-          title: Text('Location'),
-          content: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                      color: LIGHT_CONTAINER,
-                      borderRadius: BorderRadius.all(Radius.circular(6))),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Drop off location',
-                          style: Get.textTheme.headline1!.copyWith(
-                            color: ELSA_TEXT_WHITE,
-                            fontSize: 16,
-                          )),
-                      Divider(
-                        thickness: 1,
-                        color: ELSA_TEXT_LIGHT,
-                      ),
-                      Verticalspace(5),
-                      Text(
-                        'Isulan Sultan Kudarat Isulan Sultan Kudarat Isulan Sultan Kudarat Isulan Sultan Kudarat',
-                        style: Theme.of(context).textTheme.bodyText1,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Step(
-            state: currenStep > 1 ? StepState.complete : StepState.indexed,
-            isActive: currenStep >= 1,
+            state: currenStep > 0? StepState.complete : StepState.indexed,
+            isActive: currenStep >= 0,
             title: Text('Payment'),
             content: Container(
               child: Center(
@@ -390,8 +392,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )),
         Step(
-            state: currenStep >= 2 ? StepState.complete : StepState.indexed,
-            isActive: currenStep >= 2,
+            state: currenStep >= 1 ? StepState.complete : StepState.indexed,
+            isActive: currenStep >= 1,
             title: Text('Review'),
             content: Container(
               child: Column(

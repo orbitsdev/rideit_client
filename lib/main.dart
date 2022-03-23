@@ -23,6 +23,7 @@ import 'package:tricycleapp/screens/editprofile_screen.dart';
 import 'package:tricycleapp/screens/home_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
+import 'package:tricycleapp/screens/request_screen.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
 import 'package:tricycleapp/screens/trip_screen.dart';
 import 'package:tricycleapp/signin_screen.dart';
@@ -235,6 +236,10 @@ class _TricycleAppState extends State<TricycleApp> {
         GetPage(
             name: VerifyingemailScreen.screenName,
             page: () => VerifyingemailScreen(),
+            binding: Gextbinding()),
+        GetPage(
+            name: RequestScreen.screenName,
+            page: () => RequestScreen(),
             binding: Gextbinding()),
       ],
       debugShowCheckedModeBanner: false,
