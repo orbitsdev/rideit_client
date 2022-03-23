@@ -240,8 +240,18 @@ class Mapdatacontroller extends GetxController {
     int distance = directionDetails.value.distanceValue as int;
     var km = distance / 1000;
     var fee_by_km = rate * km ;
+  
+    
+     
+      if(km.round() <=2){
 
-    return fee_by_km.toStringAsFixed(0);
+        return rate.toString();
+      }else{
+        return fee_by_km.toStringAsFixed(0);
+
+      }
+
+
 
   }
 }

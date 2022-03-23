@@ -84,9 +84,11 @@ class _RequestScreenState extends State<RequestScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-    
+    if (newgooglemapcontroller != null) {
+      newgooglemapcontroller!.dispose();
+    }
   searchcontroller.dispose();
+    super.dispose();
   }
 
   void setCameraPostionToMyCurrentLocation() async {
@@ -150,7 +152,7 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
         zIndex: 1,
         fillColor: Colors.purpleAccent.withOpacity(0.5),
         strokeWidth: 1,
-        radius: 5,
+        radius: 12,
         center: piclatlng,
         strokeColor: Colors.purpleAccent,
         circleId: CircleId("pickcicrcle"));
@@ -211,9 +213,10 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
         appBar: AppBar(
           leading: IconButton(
               onPressed: () {
-
+                setCurrentStep(0);
                 mapdatacontroller.clearRequestForm();
                   startingCamera();
+                  Get.back();
               }, icon: FaIcon(FontAwesomeIcons.times)),
         ),
         body: isMapReady == false
@@ -228,6 +231,7 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
                 children: [
                   Expanded(
                     child: Stack(
+                       fit: StackFit.expand,
                       children: [
                         GoogleMap(
                           gestureRecognizers: {
@@ -264,7 +268,8 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
                             // });
                           },
                         ),
-                        // buildFloatingSearchBar(),
+
+                        buildFloatingSearchBar(),
                       ],
                     ),
                   ),
@@ -296,23 +301,63 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
                               Column(
                                 children: [
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        width: 34,
-                                        child: Center(
-                                            child: FaIcon(
-                                          FontAwesomeIcons.mapMarkerAlt,
-                                          color: ELSA_PINK,
-                                        )),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 34,
+                                            child: Center(
+                                                child: FaIcon(
+                                              FontAwesomeIcons.mapMarkerAlt,
+                                              color: ELSA_PINK,
+                                            )),
+                                          ),
+                                          Text('Your Destination'.toUpperCase(),
+                                              style: Get.textTheme.headline1!.copyWith(
+                                                color: ELSA_TEXT_WHITE,
+                                                fontSize: 16,
+                                              )),
+                                        ],
+
                                       ),
-                                      Text('Your Destination'.toUpperCase(),
-                                          style: Get.textTheme.headline1!.copyWith(
-                                            color: ELSA_TEXT_WHITE,
-                                            fontSize: 16,
-                                          )),
+                                        if(mapdatacontroller.directionDetails.value.polylines !=  null)
+                                            ClipOval(
+                          child: Material(
+             
+                            child: InkWell(
+                             
+                              onTap: () {
+                                Infodialog.showInfo(context, 'Due to the limitation of google map features when providing route. We have added circle to the map. The red circle represent the actual position of your destination and purple circle represent your current location ');
+
+                              },
+                              child: Container(
+
+                            height: 26,
+                            width: 26,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(17)),
+                                //
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomLeft,
+                                  colors: [
+                                    ELSA_GREEN,
+                                    ELSA_BLUE,
+                                  ],
+                                )),
+                            child: Center(
+                                child: FaIcon(
+                              FontAwesomeIcons.exclamation,
+                              color: Colors.white,
+                            ))
+                            ),
+                          ),
+                        )
+                        ),
                                     ],
                                   ),
-                                  
+                          Verticalspace(8),
                           Divider(
                             thickness: 1,
                             color: ELSA_TEXT_LIGHT,
@@ -503,12 +548,7 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
                                             children: [
                                               Text('Checkout'.toUpperCase()),
                                               Horizontalspace(5),
-                                              // Container(
-                                              //     child: Center(
-                                              //         child: FaIcon(
-                                              //   FontAwesomeIcons.angleRight,
-                                              //   size: 24,
-                                              // )))
+                                              
                                             ],
                                           )),
                                 ),
@@ -523,91 +563,6 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
                           Verticalspace(16),
 
                          
-                          //   AnimatedSwitcher(
-                          //     transitionBuilder: (child, animation)=> ScaleTransition(
-                          //       child: child,
-                               
-                          //       scale: animation),
-                          //     duration: Duration(milliseconds: 300),
-                          //     child: !isRouteReady ?  Container(
-                          //   key: Key('b1'),
-                          //       height: 50,
-                          //       decoration: BoxDecoration(
-                          //         borderRadius:
-                          //             BorderRadius.all(Radius.circular(4)),
-                          //       ),
-                          //       child: ElevatedButton(
-                          //           style: ElevatedButton.styleFrom(
-                          //             primary: ELSA_BLUE_1_,
-                          //           ),
-                          //           onPressed: mapdatacontroller.droplocationDetails.value.placeid == null? null: ()  async{
-
-                          //           if(mapdatacontroller.lasdropid != mapdatacontroller.droplocationDetails.value.placeid){
-                          //                isRouteReady = await mapdatacontroller.prepaireRoute(context);   
-                          //             if(isRouteReady){
-                          //               print('ready napo sir');
-                          //               print(isRouteReady);
-
-                                     
-                          //                 setPolylines();
-                                        
-                          //             }else{
-                          //               print(isRouteReady);
-                          //               print('yugs di pa ready');
-
-                          //             }
-                          //           }
-                                    
-                                  
-                                      
-                          //             // Get.to(() => HomeScreen(),
-                          //             //     fullscreenDialog: true,
-                          //             //     transition: Transition.rightToLeft);
-                          //           },
-                          //           child: Row(
-                          //             mainAxisAlignment: MainAxisAlignment.center,
-                          //             crossAxisAlignment: CrossAxisAlignment.center,
-                          //             children: [
-                          //               Text('continue'.toUpperCase()),
-                          //               Horizontalspace(5),
-                          //               // Container(
-                          //               //     child: Center(
-                          //               //         child: FaIcon(
-                          //               //   FontAwesomeIcons.angleRight,
-                          //               //   size: 24,
-                          //               // )))
-                          //             ],
-                          //           )),
-                          // ): Container(
-                          //   key: Key('b2'),
-                          //       height: 50,
-                          //       decoration: BoxDecoration(
-                          //         borderRadius:
-                          //             BorderRadius.all(Radius.circular(4)),
-                          //       ),
-                          //       child: ElevatedButton(
-                          //           style: ElevatedButton.styleFrom(
-                          //             primary:ELSA_PINK,
-                          //           ),
-                          //           onPressed:(){
-                          //             print('go to payment');
-                          //           },
-                          //           child: Row(
-                          //             mainAxisAlignment: MainAxisAlignment.center,
-                          //             crossAxisAlignment: CrossAxisAlignment.center,
-                          //             children: [
-                          //               Text('Checkout'.toUpperCase()),
-                          //               Horizontalspace(5),
-                          //               // Container(
-                          //               //     child: Center(
-                          //               //         child: FaIcon(
-                          //               //   FontAwesomeIcons.angleRight,
-                          //               //   size: 24,
-                          //               // )))
-                          //             ],
-                          //           )),
-                          // ),
-                          //     ),
                          
                              ],
                            ),
@@ -625,8 +580,7 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
   
   }
 Widget buildFloatingSearchBar() {
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     return FloatingSearchBar(
       hint: 'Search...',
@@ -643,10 +597,16 @@ Widget buildFloatingSearchBar() {
       onFocusChanged: (_) {
         //isopen
         if (isSearchFocus == false) {
+          
           setSearchFocus(true);
         } else {
           //close
+          setState(() { 
+
+          searchcontroller.close();
+          });
           setSearchFocus(false);
+
         }
       },
       onQueryChanged: (query) {

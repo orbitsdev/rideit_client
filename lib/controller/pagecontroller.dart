@@ -12,7 +12,7 @@ void updatePageIndex(int index){
   pageindex = index.obs;
   print(pageindex);
 }
-
-
+//for request
+var currenStep = 0.obs;
 
 }

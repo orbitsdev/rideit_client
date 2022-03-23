@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path/path.dart';
 import 'package:tricycleapp/UI/constant.dart';
+import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapdatacontroller.dart';
 import 'package:tricycleapp/controller/permissioncontrooler.dart';
 import 'package:tricycleapp/uiconstant/widget_function.dart';
@@ -31,6 +32,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   int currenStep = 0;
   late String paymentmethod;
   var mapadatacontroller = Get.find<Mapdatacontroller>();
+  var authcontroller = Get.find<Authcontroller>();
 
   void setPaymentMethod(String value) {
     setState(() {
@@ -49,7 +51,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   void initState() {
     super.initState();
  
-    paymentmethod = "null";
+    paymentmethod = mapadatacontroller.paymentmethod;
   }
 
   
@@ -378,8 +380,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 Horizontalspace(16),
                                 Flexible(
-                                  child: Text(
-                                    mapadatacontroller.calculateFee(),
+                                  child: Text('₱ ${mapadatacontroller.calculateFee()}'
+                                    ,
                                     style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.w900),
@@ -412,10 +414,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     thickness: 1,
                     color: ELSA_TEXT_LIGHT,
                   ),
-                  Detailsbuilder(title: 'Your name', body: 'Kate Kristine'),
+                  Detailsbuilder(title: 'Your name', body: '${authcontroller.user.value.name}'),
                   Verticalspace(4),
                   Verticalspace(4),
-                  Detailsbuilder(title: 'Phone number', body: '0938383123'),
+                  Detailsbuilder(title: 'Phone number', body: '${authcontroller.user.value.phone}'),
                   Divider(
                     thickness: 1,
                     color: ELSA_TEXT_LIGHT,
@@ -430,9 +432,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     color: ELSA_TEXT_LIGHT,
                   ),
                   Verticalspace(4),
-                  Detailsbuilder(title: 'From', body: 'Isulan Sultan Kudarat'),
+                  Detailsbuilder(title: 'From', body: '${mapadatacontroller.pickuplocationDetails.value.placeformattedaddress}'),
                   Verticalspace(4),
-                  Detailsbuilder(title: 'To', body: 'Bamab Sultan Kudarat'),
+                  Detailsbuilder(title: 'To', body: '${mapadatacontroller.droplocationDetails.value.placeformattedaddress}'),
                   Verticalspace(4),
                   Detailsbuilder(title: 'Distance', body: '1.5 km'),
                   Divider(
@@ -449,7 +451,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     color: ELSA_TEXT_LIGHT,
                   ),
                   Verticalspace(4),
-                  Detailsbuilder(title: 'Payment method', body: 'Cash'),
+                  Detailsbuilder(title: 'Payment method', body: '${mapadatacontroller.paymentmethod}'),
                   Verticalspace(4),
                   Divider(
                     thickness: 1,

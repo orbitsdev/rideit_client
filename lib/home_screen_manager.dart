@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-badge.widget.dart';
@@ -16,10 +17,11 @@ import 'package:tricycleapp/screens/request_screen.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
 import 'package:tricycleapp/screens/trip_screen.dart';
 import 'package:tricycleapp/testwidgets/dashboard.dart';
+import 'package:tricycleapp/testwidgets/home_screen.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 import 'package:tricycleapp/uiconstant/hex_color.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
-
+import 'package:getwidget/getwidget.dart';
 import 'screens/ongoingtrip.dart';
 
 
@@ -45,14 +47,15 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
   TabController? _tabController;
   List<Widget> _pages =[
     Dashboard(),
-    RequestScreen(),
+    //HomeScreen(),
+   //RequestScreen(),
     TripScreen(),
     MeScreen(),
   ];
 
 
 
-  List<String?> _pagename = ["Dashboard", "Home", "Trip", "Me"];
+  List<String?> _pagename = ["Dashboard",  "Trip", "Me"];
 
   @override
   void initState() {
@@ -202,7 +205,7 @@ void requestListiners() async{
         initialSelectedTab: _pagename[pagexcontroller.pageindex.value] as String,
         useSafeArea: true, // default: true, apply safe area wrapper
         labels: _pagename,
-        icons: const [Icons.dashboard, Icons.home, Icons.history, Icons.people_alt],
+        icons: const [Icons.dashboard,  Icons.history, Icons.people_alt],
 
         // optional badges, length must be same with labels
         badges: [
@@ -256,6 +259,50 @@ void requestListiners() async{
              });
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton:GestureDetector(
+        onTap: (){
+          Get.to(()=> RequestScreen(), fullscreenDialog: true, transition: Transition.circularReveal, duration: Duration(milliseconds: 700));
+        },
+        child: ClipOval(
+                  child: Container(
+                    
+                    height: 80,
+                    width: 80,
+                    decoration: BoxDecoration(
+                    color: BACKGROUND_BLACK,
+                    
+                    ),
+                          child: Center(child: FaIcon(FontAwesomeIcons.motorcycle, size: 32, color: GREEN_LIGHT,)),
+                        ),
+                ),
+      ),
+  //      floatingActionButton:  GFFloatingWidget(
+     
+  //      child: GFIconBadge(
+              
+  //             child:  ClipOval(
+  //               child: Container(
+                  
+  //                 height: 100,
+  //                 width: 100,
+  //                 decoration: BoxDecoration(
+  //                 color: Colors.red,
+                  
+  //                 ),
+  //                       child: Text('data'),
+  //                     ),
+  //             ),
+  //          counterChild:  GFBadge(
+  //            color: Colors.transparent,
+  //          text: '',
+  //          shape: GFBadgeShape.circle,
+  //          )
+  //       ),
+   
+  //   verticalPosition: MediaQuery.of(context).size.height * 0.88,
+  //   horizontalPosition: MediaQuery.of(context).size.width / 2.933333333 ,
+  // )  ,
         body: 
         
         TabBarView(
