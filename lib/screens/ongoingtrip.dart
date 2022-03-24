@@ -1,170 +1,96 @@
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:tricycleapp/controller/pagecontroller.dart';
+import 'package:tricycleapp/UI/constant.dart';
+import 'package:tricycleapp/widgets/horizontalspace.dart';
+import 'package:tricycleapp/widgets/verticalspace.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:tricycleapp/controller/requestcontroller.dart';
-import 'package:tricycleapp/home_screen_manager.dart';
-import 'package:tricycleapp/screens/driver_location_screen.dart';
-import 'package:tricycleapp/screens/payment_screen.dart';
-
 class Ongoingtrip extends StatefulWidget {
-
-static const screenName = '/ongoingtrip';
-
-String? from;
-   Ongoingtrip({
-    Key? key,
-    this.from,
-  }) : super(key: key);
-
-
+  const Ongoingtrip({ Key? key }) : super(key: key);
+  static const screenName = '/ongoingtrip';
   @override
   _OngoingtripState createState() => _OngoingtripState();
 }
 
-
-
 class _OngoingtripState extends State<Ongoingtrip> {
-  var requestxcontroller = Get.find<Requestcontroller>();
-
-  @override
-  void initState() {
-    super.initState();
-    
-
-    //requestxcontroller.listenToOngoingTrip();
-
-    
-  
-  }
-
-  bool isdependciescalled  = false;
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-  
-
-
-    if(isdependciescalled == false){
-      print('caled from didpdencies ___________');
-      print('caled from didpdencies ______________');
-      print('caled from didpdencies _____________');
-      requestxcontroller.listenToOngoingTrip(context);
-      setState(() {
-        isdependciescalled = true;
-      });
-    }
-    super.didChangeDependencies();
-
-
-  }
-
-
-
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Title'),
       ),
-      body: Container(
-      color: Colors.white,
-      width: double.infinity,
-      child: Column(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 20,),
+        child:Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: double.infinity,
+            ),
+            Verticalspace(20),
+              ClipOval(
+                      child: Container(
+                        color: TEXT_WHITE_2,
+                        padding: EdgeInsets.all(2),
+                        child: ClipOval(
+                          child:  Image.asset(
+                                  'assets/images/images.jpg',
+                                  height: 120,
+                                  width: 120,
+                                  fit: BoxFit.cover,
+                                )
+                              
+                        ),)
+                        ),
+                        Verticalspace(8),
+                          Text('Brian Orbino',
+                    style: Get.textTheme.headline1!.copyWith(
+                        color: ELSA_TEXT_WHITE, fontWeight: FontWeight.w300),
+                    textAlign: TextAlign.center),
+                Verticalspace(4),
+                Text('Driver',
+                    style: Get.textTheme.headline1!.copyWith(
+                        color: ELSA_TEXT_GREY,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w300),
+                    textAlign: TextAlign.center),
+                      Verticalspace(24),
 
-        
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-
-
-          Container(
-            height: 170,
-            width: 170,
-            child: Image.asset('assets/images/default-user-avatar.jpg'),
-          ),
-          Text('John Hernadez', style: Get.theme.textTheme.headline3,),
-          Text('Driver', style: Get.theme.textTheme.bodyText1,),
-
-        Obx((){
-
-          if(requestxcontroller.tripisnotcompleted.value){
-            return Container();
-          }
-          return  Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              children: [
-                 Text('Your Driver Is ${requestxcontroller.ongoingtripdetails.value.tripstatus }', style: Get.theme.textTheme.headline3,),
-                 SizedBox(
-                   height: 12,
-                 ),
-                GestureDetector(
-                  onTap: () async{
+                  Material(
+                        color: BACKGROUND_BLACK,
+                         borderRadius: BorderRadius.all(Radius.circular(8)),
+                    child: InkWell(
+                     onTap: () async{
                       await launch('tel:09366303145');
                              },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FaIcon(FontAwesomeIcons.phoneAlt,),
-                
-                        SizedBox(
-                          width: 12,
+                      child: Container(
+                        padding: EdgeInsets.all(12),
+                      
+                        child: Row(
+                    
+                          children: [
+                            Container(
+                              height: 40,
+                              width: 40,
+                              child: Center(child: FaIcon(FontAwesomeIcons.mobileAlt, color: ELSA_GREEN,),),
+                            ),
+                            Verticalspace(5),
+                            Text(
+                                    '093877123327',
+                                    style: Get.textTheme.bodyText1!.copyWith(),
+                                  )
+                          ],
                         ),
-                    
-                    
-                      Text('093663123123 ', style: Get.theme.textTheme.headline3,),
-                     
-                    ],
-                  ),
-                ),
-                SizedBox(
-           height: 12,
-         ),
-
-
-       //  if(requestxcontroller.ongoingtripdetails.value.tripstatus != "prepairing")
-          ElevatedButton(onPressed: (){
-           Get.to(DriverLocationScreen(), fullscreenDialog: true,  transition: Transition.downToUp, duration: Duration(milliseconds: 700), curve: Curves.decelerate  );
-         }, child: Text('View Driver Location')),
-           Container(
-             height: 1,
-             color: Colors.red,
-                width: double.infinity,
-              ),
-              ],
-            ),
-          );
-        }),
-          
-          
-            ElevatedButton(onPressed: (){
-              goToScreen();
-            }, child: Text("Back") )
-          
-        ],
-
+                      ),
+                    ),
+                  )
+               
+          ],
+        ),
       ),
-    ),
     );
-  }
-
-
-  void goToScreen(){
-
-        print("called");
-      if(widget.from != null){
-          Get.put(Pagecontroller()).updatePageIndex(2);
-          Get.back();
-      }else{
-          Get.put(Pagecontroller()).updatePageIndex(2);
-          Get.to(()=> HomeScreenManager() );
-      }
     
   }
+
 }

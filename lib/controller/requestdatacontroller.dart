@@ -6,12 +6,15 @@ import 'package:get/get.dart';
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapdatacontroller.dart';
+import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/dialog/dialog_collection.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
+import 'package:tricycleapp/dialog/mapdialog/mapdialog.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/model/availabledriver.dart';
 import 'package:tricycleapp/model/request_details.dart';
 import 'package:http/http.dart' as http;
+import 'package:tricycleapp/screens/ongoingtrip.dart';
 
 class Requestdatacontroller extends GetxController {
   var listofavailabledriver = <Availabledriver>[].obs;
@@ -20,6 +23,7 @@ class Requestdatacontroller extends GetxController {
   var devicetokens = <String?>[].obs;
   var currentrequest = RequestDetails().obs;
   var monitorcurrentrequest = RequestDetails().obs;
+  var monitorequestaftersending = RequestDetails().obs;
 
   void createRequest(BuildContext context) async {
     Map<String, dynamic> picklocation = {
@@ -61,10 +65,39 @@ class Requestdatacontroller extends GetxController {
       
 
       await requestrefference.doc(authinstance.currentUser!.uid).set(newrequest).then((value) async{
-         sendNotification(authinstance.currentUser!.uid);
+       //  sendNotification(authinstance.currentUser!.uid);
          DialogCollection.requestDialog(context, 'Waiting driver to accept...');
 
+        requeststream!.listen((event) {
+          //store it locally
+          monitorequestaftersending(  RequestDetails.fromJson(event.data() as Map<String, dynamic>));
 
+          if (event.data() != null) {
+            var data = event.data() as Map;
+
+            if ((data['status'] == "accepted") &&
+                (data['tripstatus'] == 'notready')) {
+                 Get.back();
+                 
+                  Mapdialog.showMapProgress(context, 'Request accepted...');        
+                 Future.delayed(Duration(seconds: 1),(){
+                   Get.back();
+                  Mapdialog.showMapProgress(context, 'Prepairing trip please wait...');        
+
+                 });         
+                  
+            }
+            if ((data['status'] == "accepted") &&
+                (data['tripstatus'] == 'ready')) {
+                 Get.back();
+
+              // Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+              Future.delayed(Duration(milliseconds: 300), () {
+                Get.off(Ongoingtrip(), transition: Transition.zoom);
+              });
+            }
+          }
+        });
       });
     } catch (e) {
       Infodialog.showInfoToast(e.toString());
