@@ -13,6 +13,8 @@ import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapdatacontroller.dart';
 import 'package:tricycleapp/controller/permissioncontrooler.dart';
+import 'package:tricycleapp/controller/requestdatacontroller.dart';
+import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/uiconstant/widget_function.dart';
 import 'package:tricycleapp/widgets/homewidgets/detailsbuilder.dart';
 import 'package:tricycleapp/widgets/homewidgets/paymensummarybox.dart';
@@ -33,7 +35,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   late String paymentmethod;
   var mapadatacontroller = Get.find<Mapdatacontroller>();
   var authcontroller = Get.find<Authcontroller>();
-
+  var requestcontrolelr = Get.find<Requestdatacontroller>();
   void setPaymentMethod(String value) {
     setState(() {
       paymentmethod = value;
@@ -180,11 +182,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                     },
                                                   ),
                                                 ),
-                                                // style: ElevatedButton.styleFrom(
-                                                //   primary: currenStep == 2
-                                                //       ? GREEN_ONLINE
-                                                //       : ELSA_BLUE_1_,
-                                                // ),
+                                              
 
                                                 onPressed: paymentmethod ==
                                                             'null' &&
@@ -236,7 +234,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 final isLastStep =
                                     currenStep == getStep(context).length - 1;
                                 if (isLastStep) {
-                                  print('comoplerte');
+                                    if(requestcontrolelr.listofavailabledriver.length != 0){
+                                      
+                                        requestcontrolelr.createRequest(context);
+                                    }else{
+                                        Infodialog.showInfoToastCenter('No available drivers found');
+                                    }
+                                
+
                                 } else {
                                   setState(() {
                                     currenStep += 1;

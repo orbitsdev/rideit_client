@@ -18,7 +18,11 @@ import 'package:tricycleapp/services/mapservices.dart';
 
 class Mapdatacontroller extends GetxController {
   Position? currentPosition;
-  CameraPosition? cameraPosition;
+  CameraPosition? cameraPosition = CameraPosition(
+      bearing: 192.8334901395799,
+      target: LatLng(37.43296265331129, -122.08832357078792),
+      tilt: 59.440717697143555,
+      zoom: 19.151926040649414);
   LatLng? position;
 
   var pickuplocationDetails = Placeaddress().obs;
@@ -167,8 +171,7 @@ class Mapdatacontroller extends GetxController {
     if (response != 'failed') {
       droplocationDetails(Placeaddress.fromJson(response['result']));
       dropmarkerposition = LatLng(droplocationDetails.value.latitude as double, droplocationDetails.value.longitude as double);
-      //actualdropmarkerposition = dropmarkerposition as LatLng;
-      
+          
 
       isDropSet = true;
     } else {
@@ -246,7 +249,7 @@ class Mapdatacontroller extends GetxController {
 
   Future<bool> getDirection(
       BuildContext context, String origin_place_id, LatLng destination) async {
-    Mapdialog.showMapProgress(context, 'Prepairing direction please wait.. ');
+    Mapdialog.showMapProgress(context, 'Prepairing direction detais...');
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${origin_place_id}&destination=${destination.latitude},${destination.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     var response = await Mapservices.mapRequest(url);

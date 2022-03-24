@@ -105,6 +105,14 @@ class _RequestScreenState extends State<RequestScreen> {
   Set<Marker> markerSet = {};
   Set<Circle> circleSet = {};
   Set<Polyline> polylineSet = {};
+
+  static final CameraPosition _kLake = CameraPosition(
+      bearing: 192.8334901395799,
+      target: LatLng(37.43296265331129, -122.08832357078792),
+      tilt: 59.440717697143555,
+      zoom: 19.151926040649414);
+
+
   void setDropMarker(LatLng postion) {
     droplocationmarker = Marker(
       markerId: MarkerId('dropmarker'),
@@ -232,13 +240,20 @@ class _RequestScreenState extends State<RequestScreen> {
               icon: FaIcon(FontAwesomeIcons.times)),
         ),
         body: isMapReady == false
-            ? Container(
-                height: 500,
-                child: Center(
-                    child: CircularProgressIndicator(
-                  color: ELSA_BLUE_1_,
-                )),
-              )
+            ?  Container(
+
+            child: Column(
+              
+                  children: [
+                    Verticalspace(100),
+                    lottie.Lottie.asset('assets/images/99103-red-pin-map.json', width: 250, height: 250, fit: BoxFit.contain),
+                    Container(
+                      width: double.infinity
+                    )
+                  ],
+                ),
+            )
+    
             : Column(
                 children: [
                   Expanded(
@@ -278,7 +293,7 @@ class _RequestScreenState extends State<RequestScreen> {
                           polylines: polylineSet,
                           mapType: MapType.normal,
                           initialCameraPosition: mapdatacontroller
-                              .cameraPosition as CameraPosition,
+                              .cameraPosition as CameraPosition  ,
                           onMapCreated: (GoogleMapController controller) {
                             _macontroller.complete(controller);
                             newgooglemapcontroller = controller;
@@ -429,7 +444,7 @@ class _RequestScreenState extends State<RequestScreen> {
                                                   child: Column(
                                                     children: [
                                                       Text(
-                                                        ' Tap the map to select location',
+                                                        ' Tap map or use search bar to select your destination',
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: Theme.of(context)

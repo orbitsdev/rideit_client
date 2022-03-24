@@ -25,6 +25,26 @@ class Infodialog {
         textColor: txtcolor,
         fontSize: 16.0);
   }
+  static void showInfoToast(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: ELSA_TEXT_WHITE,
+        fontSize: 16.0);
+  }
+  static void showInfoToastCenter(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.white,
+        textColor: Colors.black,
+        fontSize: 16.0);
+  }
 
   static void info(BuildContext context, String message) {
     showDialog(

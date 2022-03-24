@@ -11,6 +11,7 @@ import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/UI/palette.dart';
 import 'package:tricycleapp/binding/gextbinding.dart';
 import 'package:tricycleapp/config/firebaseconfig.dart';
+import 'package:tricycleapp/controller/Permissioncontroller.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
@@ -34,6 +35,7 @@ import 'package:tricycleapp/testsign_screen.dart';
 import 'package:tricycleapp/testwidgets/dashboard.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 import 'package:tricycleapp/verifyingemail_screen.dart';
+import 'package:tricycleapp/constant.dart';
 
 Future<void> backgroundhandler(RemoteMessage message) async {
   print('notification from backgournd');
@@ -100,6 +102,10 @@ class _TricycleAppState extends State<TricycleApp> {
   @override
   void initState() {
     super.initState();
+     Get.put(Permissioncontroller());
+
+     pirmissioncontroller.geolocationServicePermission();
+
 
     Gextbinding().dependencies();
     user = FirebaseAuth.instance.authStateChanges().listen((user) {

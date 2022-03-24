@@ -8,7 +8,9 @@ import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
+import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
+import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/model/availabledriver.dart';
 import 'package:tricycleapp/model/request_details.dart';
 import 'package:tricycleapp/screens/payment_screen.dart';
@@ -35,7 +37,7 @@ static const screenName = '/homescreenmanager';
 }
 
 class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProviderStateMixin {
-  var requesstxcontroller = Get.put(Requestcontroller());
+  var requesstxcontroller = Get.put(Requestdatacontroller());
   var pagexcontroller = Get.put(Pagecontroller());
   var authxcontroller = Get.find<Authcontroller>();
 
@@ -69,14 +71,28 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
     // ever(pagexcontroller.pageindex , (_)=> refreshPage() );
     
     listentoavailabledriver();
-    listenIfHasRequest();
+    monitorifhasRequest();
 
 //    requesstxcontroller.checkIdhasOngoinRequestNotRead(); 
     authxcontroller.checkIfAcountDetailsIsNull();
     
   }
 
+void monitorifhasRequest () async {
 
+  requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
+
+    if(event.exists){
+    
+            requesstxcontroller.monitorcurrentrequest(RequestDetails.fromJson(event.data() as Map<String,dynamic>));
+            print(requesstxcontroller.monitorcurrentrequest.toJson());
+    }else{
+          print('no request');
+      requesstxcontroller.monitorcurrentrequest(RequestDetails());
+    }
+   });
+
+}
 
   void listentoavailabledriver() async{
 
@@ -92,7 +108,6 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
           Availabledriver availabledriver= Availabledriver.fromJson(data);
           return availabledriver;
         }).toList());
-
             requesstxcontroller.devicetokens.clear();
         if(requesstxcontroller.listofavailabledriver.length >0){
 
@@ -103,49 +118,18 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
         }
 
 
-        print('available_______________driver device');
-        print(requesstxcontroller.devicetokens.length);
-        print('available_______________driver lenth');
+      
+       
+        print('LESTINNG TO AVAILABLE DRIVER');
+        print(requesstxcontroller.devicetokens);
         print(requesstxcontroller.listofavailabledriver.length);
 
      });
   }
 
-  void listenIfHasRequest() async{
+ 
 
-      
-      requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) { 
-        
-          if(event.data() !=  null){
-           requesstxcontroller.currentrequest(RequestDetails.fromJson(event.data() as Map<String, dynamic>));
-           
-          }else{
-            print('_____________________listening to current request');
-            print('_____________________libut nolllt');
-            print('_____________________lio current request');
-
-          }
-     
-
-      });
-
-  }
-
-  bool isdiddepencicalled = false;
-
-  @override
-  void didChangeDependencies() {
-
-    if(isdiddepencicalled == false){
-      requesstxcontroller.checkIdhasOngoinRequestNotRead(context); 
-
-      setState(() {
-        isdiddepencicalled = true;
-      });
-
-    }
-    super.didChangeDependencies();
-  }
+  
 
   @override
   void setState(VoidCallback fn) {
@@ -157,34 +141,34 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
     // TODO: implement setState
   }
 
-void requestListiners() async{
-   var requeststatus =   requestrefference.doc(authinstance.currentUser!.uid).snapshots();
+// void requestListiners() async{
+//    var requeststatus =   requestrefference.doc(authinstance.currentUser!.uid).snapshots();
           
-         requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
-          if(event.data() != null){
-               var data = event.data()  as Map<String, dynamic>;
+//          requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
+//           if(event.data() != null){
+//                var data = event.data()  as Map<String, dynamic>;
 
-                  print('_______status');
-                  print(data['status']);
-                if(data['status'] =="accepted"){
-                  Get.back();
-                  pagexcontroller.updatePageIndex(2);
-                  Get.offNamed(Ongoingtrip.screenName);
+//                   print('_______status');
+//                   print(data['status']);
+//                 if(data['status'] =="accepted"){
+//                   Get.back();
+//                   pagexcontroller.updatePageIndex(2);
+//                   Get.offNamed(Ongoingtrip.screenName);
                   
 
-                }
+//                 }
 
-                 if(data['tripstatus'] =="complete"){
+//                  if(data['tripstatus'] =="complete"){
                   
-                  handelrDialog("completed");
+//                   handelrDialog("completed");
 
-                }
+//                 }
 
           
-          }      
+//           }      
          
-        });
-}
+//         });
+// }
 
 
   @override
@@ -262,7 +246,18 @@ void requestListiners() async{
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton:GestureDetector(
         onTap: (){
-          Get.to(()=> RequestScreen(), fullscreenDialog: true, transition: Transition.circularReveal, duration: Duration(milliseconds: 700));
+            if(requesstxcontroller.monitorcurrentrequest.value.drop_location_id == null){
+              if(requesstxcontroller.listofavailabledriver.length ==0){
+              Infodialog.showInfoToastCenter('No available drivers found');
+            }else{
+            Get.to(()=> RequestScreen(), fullscreenDialog: true, transition: Transition.circularReveal, duration: Duration(milliseconds: 700));
+
+            }
+
+            }else{
+              Infodialog.showInfoToastCenter('You can request again after the trip finish');
+            }
+            
         },
         child: ClipOval(
                   child: Container(
