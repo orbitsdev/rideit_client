@@ -224,10 +224,10 @@ class _RequestScreenState extends State<RequestScreen> {
         appBar: AppBar(
           leading: IconButton(
               onPressed: () {
-                setCurrentStep(0);
+                Get.back(); 
                 mapdatacontroller.clearRequestForm();
+                setCurrentStep(0);
                 startingCamera();
-                Get.back();
               },
               icon: FaIcon(FontAwesomeIcons.times)),
         ),

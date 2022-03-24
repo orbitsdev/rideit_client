@@ -148,6 +148,8 @@ class Mapdatacontroller extends GetxController {
     var response = await setDropOffDetails(placeid);
 
     if (response) {
+
+       actualdropmarkerposition = dropmarkerposition as LatLng;
       isdroploading(false);
       
       return true;
@@ -165,7 +167,7 @@ class Mapdatacontroller extends GetxController {
     if (response != 'failed') {
       droplocationDetails(Placeaddress.fromJson(response['result']));
       dropmarkerposition = LatLng(droplocationDetails.value.latitude as double, droplocationDetails.value.longitude as double);
-      actualdropmarkerposition = dropmarkerposition as LatLng;
+      //actualdropmarkerposition = dropmarkerposition as LatLng;
       
 
       isDropSet = true;

@@ -380,7 +380,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 Horizontalspace(16),
                                 Flexible(
-                                  child: Text('₱ ${mapadatacontroller.calculateFee()}'
+                                  child: Text('₱ ${mapadatacontroller.calculateFee()}.00'
                                     ,
                                     style: TextStyle(
                                         fontSize: 24,
@@ -436,7 +436,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   Verticalspace(4),
                   Detailsbuilder(title: 'To', body: '${mapadatacontroller.droplocationDetails.value.placeformattedaddress}'),
                   Verticalspace(4),
-                  Detailsbuilder(title: 'Distance', body: '1.5 km'),
+                  Detailsbuilder(title: 'Distance', body: '${mapadatacontroller.directionDetails.value.distanceText}'),
                   Divider(
                     thickness: 1,
                     color: ELSA_TEXT_LIGHT,
@@ -472,7 +472,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         Horizontalspace(16),
                         Flexible(
                           child: Text(
-                            '₱ 10.00',
+                            '${mapadatacontroller.calculateFee()}.00',
                             style: TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.w900),
                           ),
