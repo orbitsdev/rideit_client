@@ -13,6 +13,7 @@ import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/dialog/mapdialog/mapdialog.dart';
 import 'package:tricycleapp/model/direction_details.dart';
 import 'package:tricycleapp/model/placeaddress.dart';
+import 'package:tricycleapp/model/prediction_place.dart';
 import 'package:tricycleapp/services/mapservices.dart';
 
 class Mapdatacontroller extends GetxController {
@@ -20,15 +21,34 @@ class Mapdatacontroller extends GetxController {
   CameraPosition? cameraPosition;
   LatLng? position;
 
+  var pickuplocationDetails = Placeaddress().obs;
   var droplocationDetails = Placeaddress().obs;
   var directionDetails = DirectionDetails().obs;
-  var pickuplocationDetails = Placeaddress().obs;
   String paymentmethod = 'null';
 
-  LatLng? actualdropmarkerposition;
   LatLng? lastropmarkerposition;
+  LatLng? actualdropmarkerposition;
 
-  String? lasdropid;
+  
+  void clearRequestForm() {
+    
+    pickuplocationDetails(Placeaddress());
+    droplocationDetails(Placeaddress());
+    directionDetails(DirectionDetails());
+    lastropmarkerposition = null;
+    actualdropmarkerposition =  null;
+    paymentmethod = 'null';
+  }
+
+  Future<bool> prepaireRoute(BuildContext context) async {
+    lastropmarkerposition = actualdropmarkerposition;
+    var response = await gelocationDetailsandSetRoutDeriction(context);
+    if (response) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   Future<bool> setCameraPostionToMycurrenPostion() async {
     bool? isMapIsReady;
@@ -95,8 +115,7 @@ class Mapdatacontroller extends GetxController {
   var isdroploading = false.obs;
 
   void getDropOffLocation(LatLng position) async {
-     actualdropmarkerposition = position;
-
+    actualdropmarkerposition = position;
 
     isdroploading(true);
     try {
@@ -104,13 +123,15 @@ class Mapdatacontroller extends GetxController {
           "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
       var response = await Mapservices.mapRequest(url);
       if (response != 'failed') {
-        var isDropSet =  await setDropOffDetails(response['results'][0]['place_id']);
+        var isDropSet =
+            await setDropOffDetails(response['results'][0]['place_id']);
         if (isDropSet == false) {
           Infodialog.showToastCenter(
               Colors.black, ELSA_TEXT_WHITE, 'failed to set dropofflocation');
+          isdroploading(false);
         }
 
-       
+        isdroploading(false);
       } else {
         Infodialog.showToastCenter(
             Colors.black, ELSA_TEXT_WHITE, 'failed to get location details');
@@ -122,19 +143,38 @@ class Mapdatacontroller extends GetxController {
 
   //dropaddress set
 
+  Future<bool> setDropDetailFromSearch(String placeid) async {
+    isdroploading(true);
+    var response = await setDropOffDetails(placeid);
+
+    if (response) {
+      isdroploading(false);
+      
+      return true;
+    } else {
+      isdroploading(false);
+      return false;
+    }
+  }
+
+  LatLng? dropmarkerposition;
   Future<bool> setDropOffDetails(String placeid) async {
     bool isDropSet = false;
 
     var response = await placeDetails(placeid);
     if (response != 'failed') {
       droplocationDetails(Placeaddress.fromJson(response['result']));
+      dropmarkerposition = LatLng(droplocationDetails.value.latitude as double, droplocationDetails.value.longitude as double);
+      actualdropmarkerposition = dropmarkerposition as LatLng;
+      
+
       isDropSet = true;
     } else {
       Infodialog.showToastCenter(Colors.black, ELSA_TEXT_WHITE,
           'failed to get dropoff location details');
       isDropSet = false;
     }
-    isdroploading(false);
+
     return isDropSet;
   }
 
@@ -152,22 +192,7 @@ class Mapdatacontroller extends GetxController {
     return response;
   }
 
-  void clearRequestForm() {
-    droplocationDetails(Placeaddress());
-  }
-
-  Future<bool> prepaireRoute(BuildContext context) async {
-     lastropmarkerposition = actualdropmarkerposition; 
-         var response = await gelocationDetailsandSetRoutDeriction(context);
-    if (response) {
-      
-     
-      
-      return true;
-    } else {
-      return false;
-    }
-  }
+  
 
   Future<bool> gelocationDetailsandSetRoutDeriction(
       BuildContext context) async {
@@ -234,24 +259,36 @@ class Mapdatacontroller extends GetxController {
     }
   }
 
-
-  String calculateFee(){
+  String calculateFee() {
     int rate = 10;
     int distance = directionDetails.value.distanceValue as int;
     var km = distance / 1000;
-    var fee_by_km = rate * km ;
-  
-    
-     
-      if(km.round() <=2){
+    var fee_by_km = rate * km;
 
-        return rate.toString();
-      }else{
-        return fee_by_km.toStringAsFixed(0);
+    if (km.round() <= 2) {
+      return rate.toString();
+    } else {
+      return fee_by_km.toStringAsFixed(0);
+    }
+  }
 
-      }
+  var placeprediction = [].obs;
+  var isfetching = false.obs;
+  LatLng? dropOfMarker;
+  void searchPlace(String placename) async {
+    String url =
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${placename}}&key=${Mapconfig.GOOGLE_MAP_API_KEY}&components=country:ph";
 
+    isfetching(true);
+    var response = await Mapservices.mapRequest(url);
+    isfetching(false);
 
-
+    if (response != "failed") {
+      // print(response['predictions']);
+      var prediction = response["predictions"];
+      var placelist =
+          (prediction as List).map((e) => PredictionPlace.fromJson(e)).toList();
+      placeprediction = placelist.obs;
+    }
   }
 }

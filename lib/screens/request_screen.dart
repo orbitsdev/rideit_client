@@ -15,6 +15,7 @@ import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/mapdatacontroller.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/dialog/mapdialog/mapdialog.dart';
+import 'package:tricycleapp/model/prediction_place.dart';
 import 'package:tricycleapp/screens/payment_screen.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 
@@ -31,12 +32,12 @@ class RequestScreen extends StatefulWidget {
 class _RequestScreenState extends State<RequestScreen> {
   int currenStep = 0;
 
-
-  void setCurrentStep(int value){
-    setState(() { 
+  void setCurrentStep(int value) {
+    setState(() {
       currenStep = value;
     });
   }
+
   late String paymentmethod;
 
   void setPaymentMethod(String value) {
@@ -65,15 +66,14 @@ class _RequestScreenState extends State<RequestScreen> {
     });
   }
 
+  var searchcontroller = FloatingSearchBarController();
+  bool isSearchFocus = false;
 
-    var searchcontroller = FloatingSearchBarController();
-    bool isSearchFocus = false;
-
-    setSearchFocus(bool value){
-     setState(() {
-       isSearchFocus = value;
-     });
-    }
+  setSearchFocus(bool value) {
+    setState(() {
+      isSearchFocus = value;
+    });
+  }
 
   @override
   void initState() {
@@ -87,7 +87,7 @@ class _RequestScreenState extends State<RequestScreen> {
     if (newgooglemapcontroller != null) {
       newgooglemapcontroller!.dispose();
     }
-  searchcontroller.dispose();
+    searchcontroller.dispose();
     super.dispose();
   }
 
@@ -120,11 +120,11 @@ class _RequestScreenState extends State<RequestScreen> {
 
   @override
   void setState(VoidCallback fn) {
-    if(mounted){
-
-    super.setState(fn);
+    if (mounted) {
+      super.setState(fn);
     }
   }
+
   void placeMarker(LatLng position) {
     mapdatacontroller.getDropOffLocation(position);
     setDropMarker(position);
@@ -136,19 +136,23 @@ class _RequestScreenState extends State<RequestScreen> {
     ));
   }
 
-  void startingCamera(){
-     
-     newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-            target: mapdatacontroller.position as LatLng, zoom: 16.999, tilt: 40, bearing: -1000),));
+  void startingCamera() {
+    newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+          target: mapdatacontroller.position as LatLng,
+          zoom: 16.999,
+          tilt: 40,
+          bearing: -1000),
+    ));
   }
 
-int _polylincecounter = 1;
-void setPolylines() async{
-
-
-LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude as double, mapdatacontroller.pickuplocationDetails.value.longitude as double);
+  int _polylincecounter = 1;
+  void setPolylines() async {
+    LatLng piclatlng = LatLng(
+        mapdatacontroller.pickuplocationDetails.value.latitude as double,
+        mapdatacontroller.pickuplocationDetails.value.longitude as double);
     //LatLng picklatlng = mapdatacontroller.actualdropmarkerposition as LatLng;
-  pickcircle = Circle(
+    pickcircle = Circle(
         zIndex: 1,
         fillColor: Colors.purpleAccent.withOpacity(0.5),
         strokeWidth: 1,
@@ -159,18 +163,17 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
 
     dropcircle = Circle(
         fillColor: Colors.redAccent.withOpacity(0.5),
-        center:mapdatacontroller.actualdropmarkerposition as LatLng,
+        center: mapdatacontroller.actualdropmarkerposition as LatLng,
         strokeWidth: 1,
         radius: 15,
         strokeColor: Colors.redAccent,
         circleId: CircleId("dropcircle"));
 
-   // print(mapdatacontroller.directionDetails.value.polylines_encoded);
-   String polylineIdVal = "polyline_id${_polylincecounter}";
+    // print(mapdatacontroller.directionDetails.value.polylines_encoded);
+    String polylineIdVal = "polyline_id${_polylincecounter}";
     polylineSet.clear();
     circleSet.clear();
     setState(() {
-
       circleSet.add(dropcircle as Circle);
       circleSet.add(pickcircle as Circle);
 
@@ -178,34 +181,42 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
       polylineSet.add(
         Polyline(
             polylineId: PolylineId(polylineIdVal),
-            width: 5,
+            width: 7,
             jointType: JointType.mitered,
-            endCap: Cap.roundCap,
-            startCap: Cap.roundCap,
-            color: ELSA_BLUE_2_,
-            points: mapdatacontroller
-                .directionDetails.value.polylines_encoded!
+            endCap: Cap.squareCap,
+            startCap: Cap.squareCap,
+            color: Colors.blue,
+            points: mapdatacontroller.directionDetails.value.polylines_encoded!
                 .map((e) => LatLng(e.latitude, e.longitude))
                 .toList()),
       );
     });
 
     _caneraBoundToRoute();
-}
-
-
+  }
 
   void _caneraBoundToRoute() {
-    var bound_sw =
-        mapdatacontroller.directionDetails.value.bound_sw as LatLng;
-    var bound_ne =
-        mapdatacontroller.directionDetails.value.bound_ne as LatLng;
+    var bound_sw = mapdatacontroller.directionDetails.value.bound_sw as LatLng;
+    var bound_ne = mapdatacontroller.directionDetails.value.bound_ne as LatLng;
 
     newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
         LatLngBounds(southwest: bound_sw, northeast: bound_ne), 45));
   }
 
   bool isRouteReady = false;
+
+  void setDropOffMarker(LatLng position) {
+    droplocationmarker = Marker(
+      markerId: MarkerId('dropmarker'),
+      position: position,
+    );
+
+    setState(() {
+      markerSet.add(droplocationmarker as Marker);
+    });
+
+    moveCamera(position);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -215,9 +226,10 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
               onPressed: () {
                 setCurrentStep(0);
                 mapdatacontroller.clearRequestForm();
-                  startingCamera();
-                  Get.back();
-              }, icon: FaIcon(FontAwesomeIcons.times)),
+                startingCamera();
+                Get.back();
+              },
+              icon: FaIcon(FontAwesomeIcons.times)),
         ),
         body: isMapReady == false
             ? Container(
@@ -231,7 +243,7 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
                 children: [
                   Expanded(
                     child: Stack(
-                       fit: StackFit.expand,
+                      fit: StackFit.expand,
                       children: [
                         GoogleMap(
                           gestureRecognizers: {
@@ -239,13 +251,22 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
                               () => EagerGestureRecognizer(),
                             ),
                           },
-                          onTap: currenStep == 0 ? placeMarker : (LatLng point){
-                            
-                            Infodialog.showToastCenter(Colors.black, ELSA_TEXT_WHITE, 'Go back to first step if you want to change your destination');
-                          },
-                          onLongPress: currenStep == 0 ? placeMarker : (LatLng point){
-                            Infodialog.showToastCenter(Colors.black, ELSA_TEXT_WHITE, 'Go back to first step if you want to change your destination');
-                          },
+                          onTap: currenStep == 0
+                              ? placeMarker
+                              : (LatLng point) {
+                                  Infodialog.showToastCenter(
+                                      Colors.black,
+                                      ELSA_TEXT_WHITE,
+                                      'Go back to first step if you want to change your destination');
+                                },
+                          onLongPress: currenStep == 0
+                              ? placeMarker
+                              : (LatLng point) {
+                                  Infodialog.showToastCenter(
+                                      Colors.black,
+                                      ELSA_TEXT_WHITE,
+                                      'Go back to first step if you want to change your destination');
+                                },
                           padding:
                               EdgeInsets.only(top: 100, bottom: mappadding),
                           myLocationButtonEnabled: true,
@@ -268,319 +289,395 @@ LatLng piclatlng = LatLng(mapdatacontroller.pickuplocationDetails.value.latitude
                             // });
                           },
                         ),
-
+                        if(currenStep == 0)
                         buildFloatingSearchBar(),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 20,
-                    ),
-                    constraints: BoxConstraints(minHeight: 225),
-                    decoration: BoxDecoration(
-                        color: BOTTOMNAVIGATOR_COLOR,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12))),
-                    child: Obx(() {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          
-                          
-                          Verticalspace(5),
-
-                          
-
-
-                          Column(
-                            children: [
-                              if(mapdatacontroller.droplocationDetails.value.placeid != null)
-                              Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 34,
-                                            child: Center(
-                                                child: FaIcon(
-                                              FontAwesomeIcons.mapMarkerAlt,
-                                              color: ELSA_PINK,
-                                            )),
-                                          ),
-                                          Text('Your Destination'.toUpperCase(),
-                                              style: Get.textTheme.headline1!.copyWith(
-                                                color: ELSA_TEXT_WHITE,
-                                                fontSize: 16,
-                                              )),
-                                        ],
-
-                                      ),
-                                        if(mapdatacontroller.directionDetails.value.polylines !=  null)
-                                            ClipOval(
-                          child: Material(
-             
-                            child: InkWell(
-                             
-                              onTap: () {
-                                Infodialog.showInfo(context, 'Due to the limitation of google map features when providing route. We have added circle to the map. The red circle represent the actual position of your destination and purple circle represent your current location ');
-
-                              },
-                              child: Container(
-
-                            height: 26,
-                            width: 26,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(17)),
-                                //
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomLeft,
-                                  colors: [
-                                    ELSA_GREEN,
-                                    ELSA_BLUE,
-                                  ],
-                                )),
-                            child: Center(
-                                child: FaIcon(
-                              FontAwesomeIcons.exclamation,
-                              color: Colors.white,
-                            ))
+                  AnimatedSwitcher(
+                    transitionBuilder: (child, animation) => ScaleTransition(
+                        alignment: Alignment.bottomCenter,
+                        child: child,
+                        scale: animation),
+                    duration: Duration(milliseconds: 300),
+                    child: isSearchFocus
+                        ? Container(
+                            key: Key('c1'),
+                          )
+                        : Container(
+                            key: Key('c2'),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 20,
                             ),
-                          ),
-                        )
-                        ),
+                            constraints: BoxConstraints(minHeight: 225),
+                            decoration: BoxDecoration(
+                                color: BOTTOMNAVIGATOR_COLOR,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(12),
+                                    topRight: Radius.circular(12))),
+                            child: Obx(() {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Verticalspace(5),
+                                  Column(
+                                    children: [
+                                      if (mapdatacontroller.droplocationDetails
+                                              .value.placeid !=
+                                          null)
+                                        Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      width: 34,
+                                                      child: Center(
+                                                          child: FaIcon(
+                                                        FontAwesomeIcons
+                                                            .mapMarkerAlt,
+                                                        color: ELSA_PINK,
+                                                      )),
+                                                    ),
+                                                    Text(
+                                                        'Your Destination'
+                                                            .toUpperCase(),
+                                                        style: Get.textTheme
+                                                            .headline1!
+                                                            .copyWith(
+                                                          color:
+                                                              ELSA_TEXT_WHITE,
+                                                          fontSize: 16,
+                                                        )),
+                                                  ],
+                                                ),
+                                                if (mapdatacontroller
+                                                        .directionDetails
+                                                        .value
+                                                        .polylines !=
+                                                    null)
+                                                  ClipOval(
+                                                      child: Material(
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        Infodialog.showInfo(
+                                                            context,
+                                                            'Due to the limitation of google map features when providing route. We have added circle to the map. The red circle represent the actual position of your destination and purple circle represent your current location ');
+                                                      },
+                                                      child: Container(
+                                                          height: 26,
+                                                          width: 26,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              17)),
+                                                                  //
+                                                                  gradient:
+                                                                      LinearGradient(
+                                                                    begin: Alignment
+                                                                        .topCenter,
+                                                                    end: Alignment
+                                                                        .bottomLeft,
+                                                                    colors: [
+                                                                      ELSA_GREEN,
+                                                                      ELSA_BLUE,
+                                                                    ],
+                                                                  )),
+                                                          child: Center(
+                                                              child: FaIcon(
+                                                            FontAwesomeIcons
+                                                                .exclamation,
+                                                            color: Colors.white,
+                                                          ))),
+                                                    ),
+                                                  )),
+                                              ],
+                                            ),
+                                            Verticalspace(8),
+                                            Divider(
+                                              thickness: 1,
+                                              color: ELSA_TEXT_LIGHT,
+                                            ),
+                                          ],
+                                        ),
+                                      mapdatacontroller.isdroploading.value
+                                          ? Container(
+                                              height: 150,
+                                              padding: EdgeInsets.all(12),
+                                              child: Center(
+                                                child: SpinKitThreeBounce(
+                                                  duration: Duration(
+                                                      milliseconds: 700),
+                                                  color: ELSA_GREEN,
+                                                  size: 20.0,
+                                                ),
+                                              ),
+                                            )
+                                          : mapdatacontroller
+                                                      .droplocationDetails
+                                                      .value
+                                                      .placeid ==
+                                                  null
+                                              ? Container(
+                                                  child: Column(
+                                                    children: [
+                                                      Text(
+                                                        ' Tap the map to select location',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .subtitle1!
+                                                            .copyWith(
+                                                                color:
+                                                                    ELSA_TEXT_WHITE),
+                                                      ),
+                                                      Container(
+                                                          height: 160,
+                                                          width: 160,
+                                                          child: Center(
+                                                              child: lottie
+                                                                      .Lottie
+                                                                  .asset(
+                                                                      "assets/images/86234-select-location.json"))),
+                                                    ],
+                                                  ),
+                                                )
+                                              : Column(
+                                                  children: [
+                                                    Material(
+                                                      color: LIGHT_CONTAINER,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          print('hey');
+                                                          moveCamera(LatLng(
+                                                            mapdatacontroller
+                                                                .droplocationDetails
+                                                                .value
+                                                                .latitude as double,
+                                                            mapdatacontroller
+                                                                    .droplocationDetails
+                                                                    .value
+                                                                    .longitude
+                                                                as double,
+                                                          ));
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  12),
+                                                          width:
+                                                              double.infinity,
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8)),
+                                                          child: Text(
+                                                            '${mapdatacontroller.droplocationDetails.value.placeformattedaddress}',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodyText1!
+                                                                .copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Verticalspace(16),
+                                                    AnimatedSwitcher(
+                                                      transitionBuilder: (child,
+                                                              animation) =>
+                                                          ScaleTransition(
+                                                              child: child,
+                                                              scale: animation),
+                                                      duration: Duration(
+                                                          milliseconds: 300),
+                                                      child: currenStep == 0
+                                                          ? Container(
+                                                              key: Key('b1'),
+                                                              height: 50,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            4)),
+                                                              ),
+                                                              child: ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    primary:
+                                                                        ELSA_BLUE_1_,
+                                                                  ),
+                                                                  onPressed: mapdatacontroller.droplocationDetails.value.placeid == null
+                                                                      ? null
+                                                                      : () async {
+                                                                          if (mapdatacontroller.lastropmarkerposition.toString() !=  mapdatacontroller.actualdropmarkerposition.toString()) {
+                                                                            isRouteReady =
+                                                                                await mapdatacontroller.prepaireRoute(context);
+                                                                            if (isRouteReady) {
+                                                                              print('ready napo sir');
+                                                                              print(isRouteReady);
+                                                                              setState(() {
+                                                                                setCurrentStep(1);
+                                                                              });
+
+                                                                              setPolylines();
+                                                                            } else {
+                                                                              print(isRouteReady);
+                                                                              print('yugs di pa ready');
+                                                                            }
+                                                                          } else {
+
+                                                                            print(mapdatacontroller.lastropmarkerposition.toString() +' actual marker');
+                                                                            print('_____________________________________________--');
+                                                                            print('_____________________________________________');
+                                                                            print(mapdatacontroller.actualdropmarkerposition.toString() +' actual marker');
+                                                                            print('bri thi ma procceess');
+                                                                            setCurrentStep(1);
+                                                                          }
+
+                                                                          // Get.to(() => HomeScreen(),
+                                                                          //     fullscreenDialog: true,
+                                                                          //     transition: Transition.rightToLeft);
+                                                                        },
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Text('Get Route'
+                                                                          .toUpperCase()),
+                                                                      Horizontalspace(
+                                                                          5),
+                                                                      // Container(
+                                                                      //     child: Center(
+                                                                      //         child: FaIcon(
+                                                                      //   FontAwesomeIcons.angleRight,
+                                                                      //   size: 24,
+                                                                      // )))
+                                                                    ],
+                                                                  )),
+                                                            )
+                                                          : Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              key: Key('b2'),
+                                                              children: [
+                                                                Container(
+                                                                  width: 120,
+                                                                  height: 50,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.all(
+                                                                            Radius.circular(4)),
+                                                                  ),
+                                                                  child: ElevatedButton(
+                                                                      style: ElevatedButton.styleFrom(
+                                                                        primary:
+                                                                            LIGHT_CONTAINER2,
+                                                                      ),
+                                                                      onPressed: () {
+                                                                        setState(
+                                                                            () {
+                                                                          setCurrentStep(
+                                                                              0);
+                                                                        });
+                                                                      },
+                                                                      child: Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        children: [
+                                                                          Container(
+                                                                              child: Center(
+                                                                                  child: FaIcon(
+                                                                            FontAwesomeIcons.angleLeft,
+                                                                            size:
+                                                                                24,
+                                                                          ))),
+                                                                          Horizontalspace(
+                                                                              5),
+                                                                          Text('Back'
+                                                                              .toUpperCase()),
+                                                                        ],
+                                                                      )),
+                                                                ),
+                                                                Horizontalspace(
+                                                                    20),
+                                                                Expanded(
+                                                                  child:
+                                                                      Container(
+                                                                    height: 50,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(
+                                                                              Radius.circular(4)),
+                                                                    ),
+                                                                    child: ElevatedButton(
+                                                                        style: ElevatedButton.styleFrom(
+                                                                          primary:
+                                                                              ELSA_PINK,
+                                                                        ),
+                                                                        onPressed: () {
+                                                                          Get.to(
+                                                                            () =>
+                                                                                PaymentScreen(),
+                                                                            fullscreenDialog:
+                                                                                true,
+                                                                            transition:
+                                                                                Transition.rightToLeft,
+                                                                          );
+                                                                        },
+                                                                        child: Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.center,
+                                                                          children: [
+                                                                            Text('Checkout'.toUpperCase()),
+                                                                            Horizontalspace(5),
+                                                                          ],
+                                                                        )),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                    ),
+                                                    Verticalspace(16),
+                                                  ],
+                                                ),
                                     ],
                                   ),
-                          Verticalspace(8),
-                          Divider(
-                            thickness: 1,
-                            color: ELSA_TEXT_LIGHT,
-                          ),
                                 ],
-                              ),
-                           mapdatacontroller.isdroploading.value 
-                                ? Container(
-                                  height: 150,
-                                  padding: EdgeInsets.all(12),
-                                 
-                                  child: Center(
-                                    child: SpinKitThreeBounce(
-                                      duration: Duration(milliseconds: 700),
-                                      color: ELSA_GREEN,
-                                      size: 20.0,
-                                    ),
-                                  ),
-                                )
-                                : 
-
-                                mapdatacontroller.droplocationDetails.value.placeid == null? 
-                                  Container(
-                                    child: Column(
-                                                            children: [
-                                                              Text(
-                                                                ' Tap the map to select location',
-                                                                textAlign: TextAlign.center,
-                                                                style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle1!
-                                      .copyWith(color: ELSA_TEXT_WHITE),
-                                                              ),
-                                                              Container(
-                                    height: 160,
-                                    width: 160 ,
-                                    child: Center(
-                                        child: lottie.Lottie.asset(
-                                            "assets/images/86234-select-location.json"))),
-                                                            ],
-                                                          ),
-                                  ):
-                           Column(
-                             children: [
-                               Material(
-
-                                 color: LIGHT_CONTAINER,
-                                 child: InkWell(
-                                    onTap: (){
-                                        print('hey');
-                                        moveCamera(LatLng(mapdatacontroller.droplocationDetails.value.latitude as double,mapdatacontroller.droplocationDetails.value.longitude as double,));
-                                      },
-                                   child: Container(
-                                    padding: EdgeInsets.all(12),
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      
-                                        borderRadius: BorderRadius.circular(8)),
-                                    child:Text(
-                                            '${mapdatacontroller.droplocationDetails.value.placeformattedaddress }',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyText1!
-                                                .copyWith(fontWeight: FontWeight.w300),
-                                          ),
-                                                           ),
-                                 ),
-                               ),
-                            
-                          Verticalspace(16),
-
-                          
-                            AnimatedSwitcher(
-                              transitionBuilder: (child, animation)=> ScaleTransition(
-                                child: child,
-                               
-                                scale: animation),
-                              duration: Duration(milliseconds: 300),
-                              child: currenStep == 0 ?  Container(
-                            key: Key('b1'),
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(4)),
-                                ),
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      primary: ELSA_BLUE_1_,
-                                    ),
-                                    onPressed: mapdatacontroller.droplocationDetails.value.placeid == null? null: ()  async{
-
-                                    if(mapdatacontroller.lastropmarkerposition.toString()!= mapdatacontroller.actualdropmarkerposition.toString()){
-                                         isRouteReady = await mapdatacontroller.prepaireRoute(context);   
-                                      if(isRouteReady){
-                                        print('ready napo sir');
-                                        print(isRouteReady);
-                                          setState(() {
-                                            setCurrentStep(1);
-                                           });
-
-                                     
-                                          setPolylines();
-                                        
-                                      }else{
-                                        print(isRouteReady);
-                                        print('yugs di pa ready');
-
-                                      }
-                                    }else{
-                                        setCurrentStep(1);
-                                    }
-                                    
-                                  
-                                      
-                                      // Get.to(() => HomeScreen(),
-                                      //     fullscreenDialog: true,
-                                      //     transition: Transition.rightToLeft);
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Text('Get Route'.toUpperCase()),
-                                        Horizontalspace(5),
-                                        // Container(
-                                        //     child: Center(
-                                        //         child: FaIcon(
-                                        //   FontAwesomeIcons.angleRight,
-                                        //   size: 24,
-                                        // )))
-                                      ],
-                                    )),
-                          ):  
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            key: Key('b2'),
-                            children: [
-                              Container(
-                                    width: 120,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(4)),
-                                    ),
-                                    child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          primary:LIGHT_CONTAINER2,
-                                        ),
-                                        onPressed:(){
-                                          setState(() { 
-
-                                            setCurrentStep(0);
-                                          });
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                                child: Center(
-                                                    child: FaIcon(
-                                              FontAwesomeIcons.angleLeft,
-                                              size: 24,
-                                            ))),
-                                            Horizontalspace(5),
-                                            Text('Back'.toUpperCase()),
-                                          ],
-                                        )),
-                              ),
-                              Horizontalspace(20),
-                              Expanded(
-                                child: Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.all(Radius.circular(4)),
-                                      ),
-                                      child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            primary:ELSA_PINK,
-                                          ),
-                                          onPressed:(){
-                                            Get.to(()=> PaymentScreen() , fullscreenDialog: true , transition: Transition.rightToLeft,);
-                                          },
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              Text('Checkout'.toUpperCase()),
-                                              Horizontalspace(5),
-                                              
-                                            ],
-                                          )),
-                                ),
-                              ),
-                            ],
-                          ), ),
-
-                        
-                         
-
-                         
-                          Verticalspace(16),
-
-                         
-                         
-                             ],
-                           ),
-                            ],
+                              );
+                            }),
                           ),
-
-                         
-                        ],
-                      );
-                    }),
                   ),
                 ],
               ));
-  
-  
   }
-Widget buildFloatingSearchBar() {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
+  Widget buildFloatingSearchBar() {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
 
     return FloatingSearchBar(
       hint: 'Search...',
@@ -597,43 +694,45 @@ Widget buildFloatingSearchBar() {
       onFocusChanged: (_) {
         //isopen
         if (isSearchFocus == false) {
-          
           setSearchFocus(true);
         } else {
           //close
-          setState(() { 
-
-          searchcontroller.close();
+          setState(() {
+            searchcontroller.close();
           });
           setSearchFocus(false);
-
         }
       },
       onQueryChanged: (query) {
         if (query.isEmpty || query == '') {
-         // mapxcontroller.placeprediction.clear();
+          mapdatacontroller.placeprediction.clear();
         }
 
-       // mapxcontroller.searchPlace(query);
+        mapdatacontroller.searchPlace(query);
 
         // Call your model, bloc, controller here.
       },
       onSubmitted: (query) async {
-        // if (mapxcontroller.placeprediction.length != 0) {
-        //   PredictionPlace firstresult = mapxcontroller.placeprediction[0];
-        //   var ismarkerSet = await mapxcontroller
-        //       .setDropOffLocationFromSearch(firstresult.placeId as String);
-        //   setDropOffMarker(mapxcontroller.markerPositon as LatLng);
-        //   if (ismarkerSet) {
-        //     setState(() {
-        //       searchcontroller.close();
-        //       mapxcontroller.placeprediction.clear();
-        //     });
-        //   }
-        // }
+       
 
-        //mapxcontroller.searchPlace(query);
-        // searchcontroller.close();
+        if (mapdatacontroller.placeprediction.length != 0) {
+          PredictionPlace firstresult = mapdatacontroller.placeprediction[0];
+          print('___________________________');
+          print('_____________________________________');
+          // print(firstresult.toJson());
+          var ismarkerSet = await mapdatacontroller
+              .setDropDetailFromSearch(firstresult.placeId as String);
+
+          if (ismarkerSet) {
+            print(mapdatacontroller.droplocationDetails.toJson());
+
+            setDropMarker(mapdatacontroller.dropmarkerposition as LatLng);
+          }
+
+          
+        }
+          closeGoogleMapSearch();
+        
       },
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
@@ -643,7 +742,9 @@ Widget buildFloatingSearchBar() {
           showIfOpened: false,
           child: CircularButton(
             icon: const Icon(Icons.place),
-            onPressed: () {},
+            onPressed: () {
+             
+            },
           ),
         ),
         FloatingSearchBarAction.searchToClear(
@@ -661,13 +762,19 @@ Widget buildFloatingSearchBar() {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                 
-                   ListView.separated(
+                  Obx(() {
+                    if (mapdatacontroller.isfetching.value) {
+                      // when fetching
+                    }
+                    if (mapdatacontroller.placeprediction.length <= 0) {
+                      return Container();
+                    }
+                    return ListView.separated(
                         separatorBuilder: (context, index) => Divider(
                               height: 2,
                               thickness: 1,
                             ),
-                        itemCount: 10,
+                        itemCount: mapdatacontroller.placeprediction.length,
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
@@ -680,15 +787,26 @@ Widget buildFloatingSearchBar() {
                                   FontAwesomeIcons.mapMarkerAlt,
                                 ))),
                             title: Text(
-                                'Isulan Sultan Kudarat'),
+                                '${mapdatacontroller.placeprediction[index].maintext}'),
                             subtitle: Text(
-                                'Isulan',),
+                                '${mapdatacontroller.placeprediction[index].secondrarytext}'),
                             onTap: () async {
-                              
+                              var ismarkerSet = await mapdatacontroller
+                                  .setDropDetailFromSearch(mapdatacontroller
+                                      .placeprediction[index].placeId);
+
+                              setDropOffMarker(mapdatacontroller
+                                  .dropmarkerposition as LatLng);
+                              if (ismarkerSet) {
+                                setState(() {
+                                  searchcontroller.close();
+                                  mapdatacontroller.placeprediction.clear();
+                                });
+                              }
                             },
                           );
-                        })
-                
+                        });
+                  }),
                 ],
               ),
             ),
@@ -698,5 +816,10 @@ Widget buildFloatingSearchBar() {
     );
   }
 
-  
+  void closeGoogleMapSearch() {
+     setState(() {
+      searchcontroller.close();
+      mapdatacontroller.placeprediction.clear();
+    });
+  }
 }
