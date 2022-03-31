@@ -41,21 +41,23 @@ class TripdetailsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
             
-             columnBuilder('Driver', '#1'),
-             columnBuilder('Driver name', 'Juan Delacruz'),
-
+             //columnBuilder('Driver', '#1'),
+           
              Verticalspace(12),
             seperator(),
-             columnBuilder('Pickup address', '${trip!.pickaddress_name}'),
+             columnBuilder('From'.toUpperCase(), '${trip!.pickaddress_name}'),
              Verticalspace(12),
-             columnBuilder('Dropped address', '${trip!.dropddress_name}'),
+             columnBuilder('To'.toUpperCase(), '${trip!.dropddress_name}'),
              Verticalspace(12),
              seperator(),
-             columnBuilder('Total amount payed', '${trip!.payedamount}'),
+               Verticalspace(12),
+             columnBuilder('Driver name'.toUpperCase(), 'Juan Delacruz'),
+               Verticalspace(12),
+             columnBuilder('Total amount payed'.toUpperCase(), '₱ ${trip!.fee}.00'),
              Verticalspace(12),
-             columnBuilder('Trip Status', '${trip!.tripstatus}'),
+             columnBuilder('Trip Status'.toUpperCase(), '${trip!.tripstatus}'),
              Verticalspace(12),
-             columnBuilder('Date', DateFormat.yMMMMd().format(DateTime.parse('${trip!.created_at}')) ),
+             columnBuilder('Date'.toUpperCase(), DateFormat.yMMMMd().format(DateTime.parse('${trip!.created_at}')) ),
              Verticalspace(12),
              
             ],

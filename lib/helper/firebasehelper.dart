@@ -16,8 +16,8 @@ CollectionReference ongoingtriprefference = firestore.collection('ongointrip');
 CollectionReference ratingsrefference = firestore.collection('ratings');
 CollectionReference passengertriphistoryreferrence = firestore.collection('passengertriphistory');
 Stream<DocumentSnapshot<Object?>>? requeststream =  requestrefference.doc(authinstance.currentUser!.uid).snapshots();
-Stream<DocumentSnapshot<Object?>>? ongoingtripstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
-Stream<DocumentSnapshot<Object?>>? driverlocationstream =  ongoingtriprefference.doc(authinstance.currentUser!.uid).snapshots();
+Stream<DocumentSnapshot<Object?>>? ongoingtripstream =  requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).snapshots();
+Stream<DocumentSnapshot<Object?>>? driverlocationstream = requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).snapshots();
 StreamSubscription<DocumentSnapshot<Object?>>?  driverstream;
 
 

@@ -6,7 +6,9 @@ import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-badge.widget.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
+import 'package:tricycleapp/controller/drivercontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
+import 'package:tricycleapp/controller/passenger_controller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
@@ -26,38 +28,35 @@ import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:getwidget/getwidget.dart';
 import 'screens/ongoingtrip.dart';
 
-
-
 class HomeScreenManager extends StatefulWidget {
-static const screenName = '/homescreenmanager';
-  
+  static const screenName = '/homescreenmanager';
 
   @override
   _HomeScreenManagerState createState() => _HomeScreenManagerState();
 }
 
-class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProviderStateMixin {
+class _HomeScreenManagerState extends State<HomeScreenManager>
+    with TickerProviderStateMixin {
   var requesstxcontroller = Get.put(Requestdatacontroller());
   var pagexcontroller = Get.put(Pagecontroller());
+    var passengerxcontroller = Get.find<PassengerController>();
   var authxcontroller = Get.find<Authcontroller>();
+  var driverxcontroller = Get.find<Drivercontroller>();
 
-    Color colorwhite = HexColor("#fbfefb");
-    Color iconcolor = HexColor("#2F2191");
-    Color iconcolorsecondary = HexColor("#594DAF");
-     
+  Color colorwhite = HexColor("#fbfefb");
+  Color iconcolor = HexColor("#2F2191");
+  Color iconcolorsecondary = HexColor("#594DAF");
 
   TabController? _tabController;
-  List<Widget> _pages =[
+  List<Widget> _pages = [
     Dashboard(),
     //HomeScreen(),
-   //RequestScreen(),
+    //RequestScreen(),
     TripScreen(),
     MeScreen(),
   ];
 
-
-
-  List<String?> _pagename = ["Dashboard",  "Trip", "Me"];
+  List<String?> _pagename = ["Dashboard", "Trip", "Me"];
 
   @override
   void initState() {
@@ -67,108 +66,25 @@ class _HomeScreenManagerState extends State<HomeScreenManager> with TickerProvid
       length: _pages.length,
       vsync: this,
     );
-
-    // ever(pagexcontroller.pageindex , (_)=> refreshPage() );
     
-    listentoavailabledriver();
-    monitorifhasRequest();
+    authxcontroller.monitorUserAccount();
+    driverxcontroller.monitorAvailableDriver();
+    passengerxcontroller.listenToAllTrip();
 
-//    requesstxcontroller.checkIdhasOngoinRequestNotRead(); 
-    authxcontroller.checkIfAcountDetailsIsNull();
-    
-  }
+    requesstxcontroller.monitorRequest();
+    requesstxcontroller.monitorTrip();
 
-void monitorifhasRequest () async {
-
-  requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
-
-    if(event.exists){
-    
-            requesstxcontroller.monitorcurrentrequest(RequestDetails.fromJson(event.data() as Map<String,dynamic>));
-            print(requesstxcontroller.monitorcurrentrequest.toJson());
-    }else{
-          print('no request');
-      requesstxcontroller.monitorcurrentrequest(RequestDetails());
-    }
-   });
-
-}
-
-  void listentoavailabledriver() async{
-
-        List<String> testlist = [];
-       availabledriversrefference.where('status',isEqualTo: 'online').snapshots().listen((qeurySnapShot) {
-        
-
-        print("_____________listetning to availbale driver");
-
-       requesstxcontroller.listofavailabledriver(qeurySnapShot.docs.map((e) {
-          var data = e.data() as Map<String, dynamic>;
-          data['driver_id'] = e.id;
-          Availabledriver availabledriver= Availabledriver.fromJson(data);
-          return availabledriver;
-        }).toList());
-            requesstxcontroller.devicetokens.clear();
-        if(requesstxcontroller.listofavailabledriver.length >0){
-
-              requesstxcontroller.listofavailabledriver.forEach((element) {
-                print(element.device_token);
-                requesstxcontroller.devicetokens.add(element.device_token);    
-               });
-        }
-
-
-      
-       
-        print('LESTINNG TO AVAILABLE DRIVER');
-        print(requesstxcontroller.devicetokens);
-        print(requesstxcontroller.listofavailabledriver.length);
-
-     });
   }
 
  
 
-  
-
   @override
   void setState(VoidCallback fn) {
-    
-    if(mounted){
-    super.setState(fn);
-
+    if (mounted) {
+      super.setState(fn);
     }
-    // TODO: implement setState
+    
   }
-
-// void requestListiners() async{
-//    var requeststatus =   requestrefference.doc(authinstance.currentUser!.uid).snapshots();
-          
-//          requestrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
-//           if(event.data() != null){
-//                var data = event.data()  as Map<String, dynamic>;
-
-//                   print('_______status');
-//                   print(data['status']);
-//                 if(data['status'] =="accepted"){
-//                   Get.back();
-//                   pagexcontroller.updatePageIndex(2);
-//                   Get.offNamed(Ongoingtrip.screenName);
-                  
-
-//                 }
-
-//                  if(data['tripstatus'] =="complete"){
-                  
-//                   handelrDialog("completed");
-
-//                 }
-
-          
-//           }      
-         
-//         });
-// }
 
 
   @override
@@ -177,23 +93,19 @@ void monitorifhasRequest () async {
     _tabController!.dispose();
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme =  Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
-    
       bottomNavigationBar: MotionTabBar(
-        
-        initialSelectedTab: _pagename[pagexcontroller.pageindex.value] as String,
+        initialSelectedTab:
+            _pagename[pagexcontroller.pageindex.value] as String,
         useSafeArea: true, // default: true, apply safe area wrapper
         labels: _pagename,
-        icons: const [Icons.dashboard,  Icons.history, Icons.people_alt],
+        icons: const [Icons.dashboard, Icons.history, Icons.people_alt],
 
         // optional badges, length must be same with labels
         badges: [
-          
           // Default Motion Badge Widget
           // const MotionBadgeWidget(
           //   text: '99+',
@@ -228,84 +140,96 @@ void monitorifhasRequest () async {
         ],
         tabSize: 50,
         tabBarHeight: 55,
-        textStyle:TextStyle(fontSize: 12, color: TEXT_WHITE, fontWeight: FontWeight.w300),
+        textStyle: TextStyle(
+            fontSize: 12, color: TEXT_WHITE, fontWeight: FontWeight.w300),
         tabIconColor: ICON_GREY,
         tabIconSize: 28.0,
         tabIconSelectedSize: 26.0,
-        tabSelectedColor:  Colors.transparent,
+        tabSelectedColor: Colors.transparent,
         tabIconSelectedColor: GREEN_LIGHT,
         tabBarColor: BACKGROUND_BLACK,
         onTabItemSelected: (int value) {
-            pagexcontroller.updatePageIndex(value);
-             setState(() {
+          pagexcontroller.updatePageIndex(value);
+          setState(() {
             _tabController!.index = pagexcontroller.pageindex.value;
-            
-             });
+          });
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton:GestureDetector(
-        onTap: (){
-            if(requesstxcontroller.monitorcurrentrequest.value.drop_location_id == null){
-              if(requesstxcontroller.listofavailabledriver.length ==0){
+      floatingActionButtonLocation:  FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Obx((){
+
+          if(requesstxcontroller.monitorcurrentrequest.value.drop_location_id != null){
+            return Container(height: 0,);
+          }
+        
+        return GestureDetector(
+        onTap: () {
+          if (requesstxcontroller
+                  .monitorcurrentrequest.value.drop_location_id ==
+              null) {
+            if (requesstxcontroller.listofavailabledriver.length == 0) {
               Infodialog.showInfoToastCenter('No available drivers found');
-            }else{
-            Get.to(()=> RequestScreen(), fullscreenDialog: true, transition: Transition.circularReveal, duration: Duration(milliseconds: 700));
-
+            } else {
+              Get.to(() => RequestScreen(),
+                  fullscreenDialog: true,
+                  transition: Transition.circularReveal,
+                  duration: Duration(milliseconds: 700));
             }
-
-            }else{
-              Infodialog.showInfoToastCenter('You can request again after the trip finish');
-            }
-            
+          } else {
+            Infodialog.showInfoToastCenter(
+                'You can request tricycle again after you finish the current trip ');
+          }
         },
         child: ClipOval(
-                  child: Container(
-                    
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                    color: BACKGROUND_BLACK,
-                    
-                    ),
-                          child: Center(child: FaIcon(FontAwesomeIcons.motorcycle, size: 32, color: GREEN_LIGHT,)),
-                        ),
-                ),
-      ),
-  //      floatingActionButton:  GFFloatingWidget(
-     
-  //      child: GFIconBadge(
-              
-  //             child:  ClipOval(
-  //               child: Container(
-                  
-  //                 height: 100,
-  //                 width: 100,
-  //                 decoration: BoxDecoration(
-  //                 color: Colors.red,
-                  
-  //                 ),
-  //                       child: Text('data'),
-  //                     ),
-  //             ),
-  //          counterChild:  GFBadge(
-  //            color: Colors.transparent,
-  //          text: '',
-  //          shape: GFBadgeShape.circle,
-  //          )
-  //       ),
-   
-  //   verticalPosition: MediaQuery.of(context).size.height * 0.88,
-  //   horizontalPosition: MediaQuery.of(context).size.width / 2.933333333 ,
-  // )  ,
-        body: 
-        
-        TabBarView(
-          physics: NeverScrollableScrollPhysics(), // swipe navigation handling is not supported
-          controller: _tabController,
-          // ignore: prefer_const_literals_to_create_immutables
-          children:_pages,
+          child: Container(
+            height: 80,
+            width: 80,
+            decoration: BoxDecoration(
+              color: BACKGROUND_BLACK,
+            ),
+            child: Center(
+                child: FaIcon(
+              FontAwesomeIcons.motorcycle,
+              size: 32,
+              color: GREEN_LIGHT,
+            )),
+          ),
         ),
+      );
+      })  ,
+      //      floatingActionButton:  GFFloatingWidget(
+
+      //      child: GFIconBadge(
+
+      //             child:  ClipOval(
+      //               child: Container(
+
+      //                 height: 100,
+      //                 width: 100,
+      //                 decoration: BoxDecoration(
+      //                 color: Colors.red,
+
+      //                 ),
+      //                       child: Text('data'),
+      //                     ),
+      //             ),
+      //          counterChild:  GFBadge(
+      //            color: Colors.transparent,
+      //          text: '',
+      //          shape: GFBadgeShape.circle,
+      //          )
+      //       ),
+
+      //   verticalPosition: MediaQuery.of(context).size.height * 0.88,
+      //   horizontalPosition: MediaQuery.of(context).size.width / 2.933333333 ,
+      // )  ,
+      body: TabBarView(
+        physics:
+            NeverScrollableScrollPhysics(), // swipe navigation handling is not supported
+        controller: _tabController,
+        // ignore: prefer_const_literals_to_create_immutables
+        children: _pages,
+      ),
     );
   }
 }

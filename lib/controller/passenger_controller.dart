@@ -81,7 +81,7 @@ class PassengerController extends GetxController {
           0,
           (prev, trip) =>
               int.parse(prev.toString()) +
-              int.parse(trip.payedamount.toString())));
+              int.parse(trip.fee.toString())));
 
       totalsuccestrip(listofsuccesstrip.length);
       canceledtrip(listofcanceledtrip.length);

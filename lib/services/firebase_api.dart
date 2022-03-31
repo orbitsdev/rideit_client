@@ -53,8 +53,8 @@ class FirebaseApi {
           "image_file": file,
           
         }).then((value) async {
-          if(lastimagefile != null){
-          await storage.ref(lastimagefile).delete();
+          // if(lastimagefile != null){
+          // await storage.ref(lastimagefile).delete();
           isupdate = true;    
 
            Fluttertoast.showToast(
@@ -65,7 +65,7 @@ class FirebaseApi {
                                     backgroundColor: Colors.black,
                                     textColor: ELSA_GREEN,
                                     fontSize: 16.0);
-          }
+          //}
           
         });
 

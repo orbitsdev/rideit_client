@@ -31,7 +31,7 @@ class ListScreen extends StatelessWidget {
         child: AnimationLimiter(
           child: ListView.builder(
           shrinkWrap: true,
-          itemCount: 10,
+          itemCount: collection!.length,
           itemBuilder: (context, index) {
             return AnimationConfiguration.staggeredList(
             position: index,

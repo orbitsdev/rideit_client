@@ -101,7 +101,8 @@ class _TricycleAppState extends State<TricycleApp> {
 
   @override
   void initState() {
-    super.initState();
+        Future.delayed(Duration.zero).then((value){
+            listenToInternetConnection(context);
      Get.put(Permissioncontroller());
 
      pirmissioncontroller.geolocationServicePermission();
@@ -147,21 +148,14 @@ class _TricycleAppState extends State<TricycleApp> {
 
       Get.toNamed(message.data["screenname"]);
     });
+    });
+    
+
+    
+    super.initState();
   }
 
-  bool isdidchangecalled = false;
-
-  @override
-  void didChangeDependencies() {
-    if (isdidchangecalled == false) {
-      listenToInternetConnection(context);
-      setState(() {
-        isdidchangecalled = true;
-      });
-    }
-
-    super.didChangeDependencies();
-  }
+  
 
   @override
   void dispose() {
@@ -187,11 +181,9 @@ class _TricycleAppState extends State<TricycleApp> {
           ? SigninScreen()
           : FirebaseAuth.instance.currentUser!.emailVerified == false
               ? VerifyingemailScreen()
-              : HomeScreenManager(),
-      //HomeScreenManager(),
-      //Testcloudfunction(),
-      //SigninScreen(),
-      //   authinstance.currentUser ==  null?  SigninScreen() : HomeScreenManager(),
+              :
+               //Ongoingtrip(),
+             HomeScreenManager(),
       getPages: [
         GetPage(
             name: SignupScreen.screenName,

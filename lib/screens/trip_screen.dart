@@ -5,6 +5,18 @@ import 'package:lottie/lottie.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/passenger_controller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
+import 'package:tricycleapp/controller/requestdatacontroller.dart';
+import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
+import 'package:tricycleapp/screens/tripdetails_screen.dart';
+import 'package:tricycleapp/testwidget/elsabutton.dart';
+import 'package:tricycleapp/widgets/horizontalspace.dart';
+import 'package:tricycleapp/widgets/tripwidget/custompinlocation.dart';
+import 'package:tricycleapp/widgets/tripwidget/listcontainer.dart';
+import 'package:tricycleapp/widgets/tripwidget/nodatabuilder.dart';
+import 'package:tricycleapp/widgets/tripwidget/ongoing_trip_builder.dart';
+import 'package:tricycleapp/widgets/tripwidget/records_builder.dart';
+import 'package:tricycleapp/widgets/tripwidget/request_builder.dart';
+import 'package:tricycleapp/widgets/verticalspace.dart';
 
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,9 +30,10 @@ class TripScreen extends StatefulWidget {
   _TripScreenState createState() => _TripScreenState();
 }
 
-class _TripScreenState extends State<TripScreen> with SingleTickerProviderStateMixin {
+class _TripScreenState extends State<TripScreen>
+    with SingleTickerProviderStateMixin {
   late TabController tabController;
-  var requestxcontroller = Get.find<Requestcontroller>();
+  var requestxcontroller = Get.find<Requestdatacontroller>();
   var passengerxcontroller = Get.find<PassengerController>();
   bool hasongointrip = false;
   bool loadingrequest = true;
@@ -32,22 +45,10 @@ class _TripScreenState extends State<TripScreen> with SingleTickerProviderStateM
     this.tabController.addListener(() => setState(() {}));
   }
 
-  bool isdepencycalled = false;
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    
-  }
-
-
-  
- 
-
-@override
   void setState(VoidCallback fn) {
-    if(mounted){
-    super.setState(fn);
-
+    if (mounted) {
+      super.setState(fn);
     }
   }
 
@@ -63,15 +64,12 @@ class _TripScreenState extends State<TripScreen> with SingleTickerProviderStateM
     });
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
-        child:
-         Column(children: [
+        child: Column(children: [
           Container(
             padding: EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
@@ -108,7 +106,7 @@ class _TripScreenState extends State<TripScreen> with SingleTickerProviderStateM
                   Tab(
                     child: Align(
                       alignment: Alignment.center,
-                      child: Text("Pending".toUpperCase()),
+                      child: Text("Request".toUpperCase()),
                     ),
                   ),
                   Tab(
@@ -142,22 +140,103 @@ class _TripScreenState extends State<TripScreen> with SingleTickerProviderStateM
               child: TabBarView(
                 controller: tabController,
                 children: [
-                  Container(child: Center(child: Text('pending request'),),),
-                  Container(child: Center(child: Text('Ongoingtirp'),),),
-                  Container(child: Center(child: Text('Records'),),),
+                  Container(
+                    color: BOTTOMNAVIGATOR_COLOR,
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(20),
+                      child:Obx((){
+                        return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+
+                          requestxcontroller.monitorcurrentrequest.value.drop_location_id == null
+                          ? Nodatabuilder(title: 'No request yet', subtitle: 'Where would you like to go?')
+                          : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RequestBuilder(picklocationname: '${requestxcontroller.monitorcurrentrequest.value.pickaddress_name}', droplocationname: '${requestxcontroller.monitorcurrentrequest.value.dropddress_name}', pickicon: FontAwesomeIcons.mapMarkerAlt, dropicon: FontAwesomeIcons.mapPin),
+                              Verticalspace(12),
+                               Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Payment'),
+                                  Text('₱ ${requestxcontroller.monitorcurrentrequest.value.fee}.00'),
+                                ],
+                              ),
+                              Verticalspace(12),
+                              Divider(
+                                thickness: 1,
+                                color: ELSA_TEXT_GREY,
+                              ),
+                             
+                              Verticalspace(12),
+
+                              if(requestxcontroller.monitorcurrentrequest.value.status == 'pending')
+                               requestxcontroller.iscancel.value
+                          ? Center(child: CircularProgressIndicator())
+                          :
+                              Container(
+                                    
+                                   width: double.infinity,
+                                      height: 60,
+                                    decoration: const ShapeDecoration(
+                                      shape: StadiumBorder(),
+                                      gradient: LinearGradient(
+                                        end: Alignment.bottomCenter,
+                                        begin: Alignment.topCenter,
+                                        colors: [
+                                             ELSA_PINK,
+                                                PINK_1  ,
+                                        ],
+                                      ),
+                                    ),
+                                    child: MaterialButton(
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      shape: const StadiumBorder(),
+                                      child:  Text(
+                                       'Cancel'
+                                       ,
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
+                                      onPressed: () async{
+                                         requestxcontroller.cancelRequest(context);
+                                      },  
+                                    ),
+                                  )
+                            ],
+                          )
+                        ],
+                      );
+                      }) 
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                           requestxcontroller.monitorongoingtrip.value.drop_location_id ==  null
+                      ?Nodatabuilder(title:requestxcontroller.monitorcurrentrequest.value.status == "pending"? 'You have a pending request ': 'No current trip yet', subtitle: requestxcontroller.monitorcurrentrequest.value.status == "pending"? 'Wait for the driver to accept' :'Where would you like to go?')
+                      :
+                     OngoingTripBuilder(topay: '500', drivername: 'bnriadn', driverphone: '021039123', picklocation: 'Isulan Sultan Kudarat', droplocation: 'Bambad'),
+                                   
+                      ],
+                    ),
+                  ),
+                 
+                  Container(
+                    child:  AnimationLimiter(
+           child:RecordsBuilder(),
+         ),
+                  ),
                 ],
               ),
             ),
           ),
         ]),
-       
       ),
     );
   }
-
-  
-  
-
-  
 
 }

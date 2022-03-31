@@ -52,6 +52,7 @@ class Authcontroller extends GetxController {
 
   void createUser(String name, String phone, String email, String password,
       BuildContext context) async {
+        String defaultimage = 'https://firebasestorage.googleapis.com/v0/b/tricyleapp-f8fff.appspot.com/o/passengerusers%2Fdefaultprofile.jpg?alt=media&token=7b691d04-8406-45c7-9182-fb13f600ae4a';
     gname = name.trim();
     gphone = "+63" + phone.trim();
     gemail = email.trim();
@@ -70,7 +71,7 @@ class Authcontroller extends GetxController {
           "name": gname as String,
           "email": gemail as String,
           "phone": gphone as String,
-          "image_url": null,
+          "image_url": defaultimage,
           "image_file": null,
           'device_token': devicetoken,
         };
@@ -91,10 +92,10 @@ class Authcontroller extends GetxController {
           mailverified = authinstance.currentUser!.emailVerified;
 
           if (mailverified == false) {
-           // await sendVerification();
-            Get.back();
+            await sendVerification();
+          
             Future.delayed(Duration(milliseconds: 300),
-                () => Get.offNamed(EmailverifyingScreen.screenName));
+                () =>Get.offAndToNamed(VerifyingemailScreen.screenName));
           } else {
             progressDialog('Authenticating..');
             Future.delayed(Duration(seconds: 1), () {
@@ -179,6 +180,7 @@ class Authcontroller extends GetxController {
 
 
            await getDeviceToken();
+           
           if(devicetoken !=  null){
             if(user.value.device_token != devicetoken){
               await updateDeviceToken(devicetoken);
@@ -218,7 +220,7 @@ class Authcontroller extends GetxController {
     }
   }
 
-  void checkIfAcountDetailsIsNull() async {
+  void monitorUserAccount() async {
     if (user.value.id == null) {
 
       await firestore

@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:tricycleapp/controller/driverlocationcontroller.dart';
+import 'package:tricycleapp/controller/drivercontroller.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 
 class DriverLocationScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class DriverLocationScreen extends StatefulWidget {
 
 class _DriverLocationScreenState extends State<DriverLocationScreen> {
 
-    var driverxcontroller = Get.put(Driverlocationcontroller());
+    var driverxcontroller = Get.put(Drivercontroller());
     CameraPosition? drivercameraposition;
     Marker? drivermarker;
     Marker? pickupmarker;
@@ -193,7 +194,11 @@ static double checkDouble(dynamic value) {
 createCustomMarker();
     
     return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(onPressed: (){
 
+          }, icon:FaIcon(FontAwesomeIcons.angleLeft)),
+        ),
       body: isMapReady ==false ? Container(
         child: Center(
           child: CircularProgressIndicator(),
@@ -227,61 +232,8 @@ createCustomMarker();
          
         },
       ),
-    Positioned(
-            top: 30,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: Get.theme.primaryColor,
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ElevatedButton(onPressed: (){
-                    
-                    Get.back();
-                  }, child: Text('x')),
-                ],
-              ),
-            ),
-          ),
-        Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: AnimatedContainer(
-
-                    constraints: BoxConstraints(minHeight: 300),
-                    duration: Duration(milliseconds: 1500),
-                    curve: Curves.fastOutSlowIn,
-                    decoration: BoxDecoration(
-                      color: Colors.white
-                      
-                    ),
-                    child: AnimatedSwitcher(
-                      reverseDuration: Duration(milliseconds: 300),
-                      switchInCurve: Curves.easeInOutBack,
-                      duration: Duration(milliseconds: 300),
-                    
-                      transitionBuilder: (child, animatin) => ScaleTransition(
-                        scale: animatin,
-                        child: child,
-                      ),
-                      child: Column(
-                        children: [
-                          ElevatedButton(onPressed: (){
-                            setState(() {
-                              focusOnDriver = !focusOnDriver;
-                            });
-                            
-                            print(focusOnDriver);
-                          }, child: Text(focusOnDriver  ? 'Un focus camera' : 'Focus Camera To Driver'))
-                        ],
-                      )
-                    ),
-                  ),
-                ),
+    
+        
         ],
       ),
     );

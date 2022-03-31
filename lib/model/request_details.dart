@@ -8,6 +8,7 @@ class RequestDetails {
   //personal infromation
   String? passenger_name;
   String? passenger_phone;
+  String? passenger_image_url;
 
   //location information
   String? pick_location_id;
@@ -27,12 +28,14 @@ class RequestDetails {
   String? tripstatus;
   String? device_token;
   String? created_at;
+  
 
 
 
   RequestDetails({
     this.passenger_name,
     this.passenger_phone,
+    this.passenger_image_url,
     this.pick_location_id,
     this.drop_location_id,
     this.pick_location,
@@ -59,6 +62,7 @@ class RequestDetails {
     RequestDetails requestdetails = RequestDetails();
     requestdetails.passenger_name = json['passenger_name'];
     requestdetails.passenger_phone = json['passenger_phone'];
+    requestdetails.passenger_image_url = json['passenger_image_url'];
     requestdetails.pick_location_id = json['pick_location_id'];
     requestdetails.drop_location_id = json['drop_location_id'];
     requestdetails.pick_location = picklocation;
@@ -72,6 +76,7 @@ class RequestDetails {
     requestdetails.tripstatus = json['tripstatus'];
     requestdetails.device_token = json['device_token'];
     requestdetails.created_at = json['created_at'];
+
     return requestdetails;  
 
   }
@@ -97,6 +102,7 @@ class RequestDetails {
     return {
     'passenger_name':  passenger_name,
     'passenger_phone':     passenger_phone,
+    'passenger_image_url':     passenger_phone,
     'pick_location_id':     pick_location_id,
     'drop_location_id':     drop_location_id,
     'pick_location':     picklocation,

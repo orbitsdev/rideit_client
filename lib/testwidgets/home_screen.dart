@@ -16,7 +16,7 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
-import 'package:tricycleapp/controller/driverlocationcontroller.dart';
+import 'package:tricycleapp/controller/drivercontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var mapxcontroller = Get.find<Mapcontroller>();
   var requestxcontroller = Get.find<Requestcontroller>();
   var authxcontroller = Get.find<Authcontroller>();
-  var driverxcontroller = Get.find<Driverlocationcontroller>();
+  var driverxcontroller = Get.find<Drivercontroller>();
 
   //_____________ gor google map
   Completer<GoogleMapController> _googlmapcompleter = Completer();

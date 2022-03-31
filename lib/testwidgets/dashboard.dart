@@ -25,7 +25,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    passengerxcontroller.listenToAllTrip();
+   
     
   }
 

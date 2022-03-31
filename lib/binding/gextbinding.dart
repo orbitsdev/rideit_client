@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
-import 'package:tricycleapp/controller/driverlocationcontroller.dart';
+import 'package:tricycleapp/controller/drivercontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
 import 'package:tricycleapp/controller/mapdatacontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
@@ -18,7 +18,7 @@ class Gextbinding implements Bindings{
     Get.lazyPut(() => Authcontroller());
     Get.lazyPut(() => Mapcontroller());
     Get.lazyPut(() =>Requestcontroller());
-    Get.lazyPut(() =>Driverlocationcontroller());
+    Get.lazyPut(() =>Drivercontroller());
     Get.lazyPut(() =>Pagecontroller());
     Get.lazyPut(() =>PassengerController());
     Get.lazyPut(() =>Permissioncontrooler());

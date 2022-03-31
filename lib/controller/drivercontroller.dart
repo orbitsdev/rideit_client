@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/model/availabledriver.dart';
 import 'package:tricycleapp/model/neardriver.dart';
 
-class Driverlocationcontroller extends GetxController {
+class Drivercontroller extends GetxController {
+  var requesstxcontroller = Get.find<Requestdatacontroller>();
   LatLng? pickuplocation;
   Marker? pickupmarker;
   Marker? drivermarker;
@@ -20,7 +22,7 @@ class Driverlocationcontroller extends GetxController {
 Future<bool> setMapCameraInitialValue() async {
     bool? isMapIsReady;
 
-    await ongoingtriprefference.doc(authinstance.currentUser!.uid).get().then((value) {
+    await requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).get().then((value) {
     
 
     if(value.data() != null){
@@ -107,59 +109,39 @@ Future<bool> setMapCameraInitialValue() async {
   }
 
 
-  
-Future<bool> getAllOnlineDrivers() async{
-bool hasonlindrivers = false;
-  try{ 
-    availabledriver.clear();
+void monitorAvailableDriver() async {
+  print('MONITORING AVAILABLE');
+    List<String> testlist = [];
+    availabledriversrefference
+        .where('status', isEqualTo: 'online')
+        .snapshots()
+        .listen((qeurySnapShot) {
+      if (qeurySnapShot.docs.length > 0) {
+        requesstxcontroller.listofavailabledriver(qeurySnapShot.docs.map((e) {
+          var data = e.data() as Map<String, dynamic>;
+          data['driver_id'] = e.id;
+          Availabledriver availabledriver = Availabledriver.fromJson(data);
+          return availabledriver;
+        }).toList());
+       
+      }
+
+     requesstxcontroller.devicetokens.clear();
+       if (requesstxcontroller.listofavailabledriver.length > 0) {
+          requesstxcontroller.listofavailabledriver.forEach((element) {
+            print(element.device_token);
+            requesstxcontroller.devicetokens.add(element.device_token);
+          });
+        }
+
     
-    await availabledriversrefference.get().then((value)  async{
+        
 
-            if(value.docs.isNotEmpty){
-
-              value.docs.forEach((element) { 
-              
-                var data =  element.data() as Map<String, dynamic>;
-                data['id'] = element.id;
-                
-              Availabledriver newavailabledriver = Availabledriver.fromJson(data);
-
-              availabledriver.add(newavailabledriver);
-            
-              print('__________________________________________________________');
-              print('__________________________________________________________');
-              print('__________________________________________________________');
-              print('___________________________token_____________________________');
-              print(newavailabledriver.driver_location);
-              print('__________________________________________________________');
-
-            });
-
-            hasonlindrivers = true;
-
-            }else{
-               
-              print('__________________________________________________________');
-              print('__________________________________________________________');
-              print('__________________________________________________________');
-              print('__________________________________________________________');
-              print('empty');
-              print('__________________________________________________________');
-            }
-            
-    }); 
-
-  
-
-  }catch(e){
-    hasonlindrivers =false;
-    print(e);
+        print('AVAILABLE DRIVER ');
+        print(requesstxcontroller.listofavailabledriver.length);
+        print('AVAILABLE DRIVER TOKEN');
+        print(requesstxcontroller.devicetokens);
+    });
   }
-
-
-  return hasonlindrivers;
-  
-}
-
 
 }
