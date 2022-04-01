@@ -36,7 +36,7 @@ import 'package:tricycleapp/testsign_screen.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 import 'package:tricycleapp/verifyingemail_screen.dart';
 import 'package:tricycleapp/constant.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 Future<void> backgroundhandler(RemoteMessage message) async {
   print('notification from backgournd');
   print(message.notification!.title);
@@ -175,15 +175,19 @@ class _TricycleAppState extends State<TricycleApp> {
       theme: ThemeData(
         scaffoldBackgroundColor: BOTTOMNAVIGATOR_COLOR,
         textTheme: TEXT_THEME_DEFAULT_DARK,
+      //   textTheme: GoogleFonts.robotoTextTheme(
+      // Theme.of(context).textTheme.copyWith(),
+    //),
         primarySwatch: Palette.generateMaterialColor(0xFF151147),
       ),
       home: FirebaseAuth.instance.currentUser == null
           ? SigninScreen()
           : FirebaseAuth.instance.currentUser!.emailVerified == false
               ? VerifyingemailScreen()
-              :RatingScreen(),
+              :
+              RatingScreen(),
                //Ongoingtrip(),
-            // HomeScreenManager(),
+             //HomeScreenManager(),
       getPages: [
         GetPage(
             name: SignupScreen.screenName,

@@ -330,7 +330,8 @@ void monitorTrip() async {
 
         }
          if(monitorongoingtrip.value.tripstatus =="complete" && monitorongoingtrip.value.payed==true){
-            if(isRatingShowed.value == true){
+          
+            if(isRatingShowed.value == false){
                Get.off(()=> RatingScreen() ,fullscreenDialog: true, transition: Transition.zoom);
               isRatingShowed(true);  
             }
@@ -353,7 +354,7 @@ void rateDriver(String? comment, int rate, String ratedescription) async{
 
     try{
       isRatingload(true);
-       await ratingsrefference.doc(ongoingtrip.value.driver_id).collection('ratings').doc().set({
+       await ratingsrefference.doc(monitorongoingtrip.value.driver_id).collection('ratings').doc().set({
 
       'rate': rate,
       'comment': comment,
@@ -406,6 +407,7 @@ Future<void> clearLocalData()async{
    monitorongoingtrip(OngoingTripDetails());
    currentStatus(0);
    isPaymentShowed(false);
+   isRatingShowed(false);
   
 }
 

@@ -259,6 +259,22 @@ const PINK_1 =  Color(0xFFFD007A);
 //|_________________________________________
 //
 
+
+// const TextTheme TEXT_THEME_DEFAULT_DARK  =  TextTheme(
+// headline1: TextStyle(fontSize: ) ,
+// headline2: TextStyle(fontSize: ) ,
+// headline3: TextStyle(fontSize: ) ,
+// headline4: TextStyle(fontSize: ) ,
+// headline5: TextStyle(fontSize: ) ,
+// headline6: TextStyle(fontSize: ) ,
+// bodyText1: TextStyle(fontSize: ) ,
+// bodyText2: TextStyle(fontSize: ) ,
+// subtitle1: TextStyle(fontSize: ) ,
+// subtitle2: TextStyle(fontSize: , fontFamily:) ,
+
+// );
+
+
 const TextTheme TEXT_THEME_DEFAULT_DARK  =  TextTheme(
 
   headline1: TextStyle(color:BACKGROUND_BLACK_LIGHT,fontWeight: FontWeight.w900,  fontSize: 26 , ),

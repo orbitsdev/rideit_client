@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/widgets/verticalspace.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class RatingScreen extends StatefulWidget {
   const RatingScreen({Key? key}) : super(key: key);
@@ -23,7 +24,13 @@ class _RatingScreenState extends State<RatingScreen> {
   ConfettiController? conffetecontroller;
   int rate = 3;
   String ratedescription="Excellent";
-  
+   
+
+void playSound(){ 
+
+ final player = AudioCache(); 
+  player.play('sounds/216676__robinhood76__04864-notification-music-box.wav');  
+}
 
 @override
   void setState(VoidCallback fn) {
@@ -36,11 +43,11 @@ class _RatingScreenState extends State<RatingScreen> {
 
   @override
   void initState() { 
+    playSound();
     comment.addListener(() => setState(() { }));
   
     conffetecontroller = ConfettiController(duration: Duration(seconds: 2));
-    //conffetecontroller!.play();
-
+    conffetecontroller!.play();
     super.initState();
     
   }
@@ -217,7 +224,18 @@ class _RatingScreenState extends State<RatingScreen> {
 
                           Verticalspace(24),
 
-                          Container(
+                          Obx((){
+
+                            if(requestxcontroller.isRatingload.value){
+                              return Container(
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: ELSA_BLUE_1_,
+                                  ),
+                                ),
+                              );
+                            }
+                            return  Container(
                                           margin: EdgeInsets.symmetric(horizontal: 12,),
                                           width: double.infinity,
                                               height: 60,
@@ -245,8 +263,14 @@ class _RatingScreenState extends State<RatingScreen> {
                                               rateRider();
                                             },
                                           ),
-                                        )
-                                        
+                                        );
+                          }),
+
+                         
+                                  ElevatedButton(onPressed: (){
+                                    playSound();
+
+                                  }, child: Text('test'))
                         ],
                       ),
                     ),

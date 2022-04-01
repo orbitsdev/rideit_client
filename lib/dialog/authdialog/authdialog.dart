@@ -13,12 +13,15 @@ class Authdialog {
     Get.defaultDialog(
       title: '',
       barrierDismissible: false,
+      backgroundColor: Colors.black,
+      contentPadding:   EdgeInsets.all(16),
+      radius:  6,
       content: Container(
               decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.all(Radius.circular(6)),
+               
+               
               ),
-              padding: EdgeInsets.all(16),
+            
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

@@ -29,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.8.2"
+  audioplayers:
+    dependency: "direct main"
+    description:
+      name: audioplayers
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.20.1"
   awesome_dialog:
     dependency: "direct main"
     description:
@@ -314,13 +321,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_animarker:
-    dependency: "direct main"
-    description:
-      name: flutter_animarker
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.2.0"
   flutter_geofire:
     dependency: "direct main"
     description:
@@ -492,6 +492,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.5"
+  google_fonts:
+    dependency: "direct main"
+    description:
+      name: google_fonts
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.3.1"
   google_maps_flutter:
     dependency: "direct main"
     description:
@@ -889,6 +896,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.0"
+  uuid:
+    dependency: transitive
+    description:
+      name: uuid
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.6"
   vector_math:
     dependency: transitive
     description:
@@ -926,4 +940,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=2.16.0 <3.0.0"
-  flutter: ">=2.8.0"
+  flutter: ">=2.10.0-0"

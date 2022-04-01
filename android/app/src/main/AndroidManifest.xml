@@ -31,7 +31,9 @@
    <application
         android:label="tricycleapp"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        >
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyAyBh1oNe0wqgv4NBQ3AjbxGYIh5mvl9YU"/>
         <activity
@@ -45,6 +47,7 @@
             android:usesCleartextTraffic="true"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
+            
 
             >
             <!-- Specifies an Android theme to apply to this Activity as soon as
