@@ -8,14 +8,12 @@ import 'package:tricycleapp/widgets/horizontalspace.dart';
 import 'package:tricycleapp/widgets/verticalspace.dart';
 
 class Authdialog {
-  static void showAuthProGress(BuildContext context, String message) {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            child: Container(
+  static void showAuthProGress( String message) {
+
+    Get.defaultDialog(
+      title: '',
+      barrierDismissible: false,
+      content: Container(
               decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.all(Radius.circular(6)),
@@ -41,8 +39,8 @@ class Authdialog {
                 ],
               ),
             ),
-          );
-        });
+    );
+   
   }
 
   static void shouwLogoutDialog(BuildContext context) {

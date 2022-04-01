@@ -4,11 +4,10 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/passenger_controller.dart';
-import 'package:tricycleapp/controller/requestcontroller.dart';
 import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
+import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/screens/tripdetails_screen.dart';
-import 'package:tricycleapp/testwidget/elsabutton.dart';
 import 'package:tricycleapp/widgets/horizontalspace.dart';
 import 'package:tricycleapp/widgets/tripwidget/custompinlocation.dart';
 import 'package:tricycleapp/widgets/tripwidget/listcontainer.dart';
@@ -140,7 +139,9 @@ class _TripScreenState extends State<TripScreen>
               child: TabBarView(
                 controller: tabController,
                 children: [
-                  Container(
+                   requestxcontroller.monitorcurrentrequest.value.drop_location_id == null
+                          ? Nodatabuilder(title: 'No request yet', subtitle: 'Do you want to go somewhere?')
+                          :Container(
                     color: BOTTOMNAVIGATOR_COLOR,
                     child: SingleChildScrollView(
                       padding: EdgeInsets.all(20),
@@ -149,9 +150,7 @@ class _TripScreenState extends State<TripScreen>
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
 
-                          requestxcontroller.monitorcurrentrequest.value.drop_location_id == null
-                          ? Nodatabuilder(title: 'No request yet', subtitle: 'Where would you like to go?')
-                          : Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               RequestBuilder(picklocationname: '${requestxcontroller.monitorcurrentrequest.value.pickaddress_name}', droplocationname: '${requestxcontroller.monitorcurrentrequest.value.dropddress_name}', pickicon: FontAwesomeIcons.mapMarkerAlt, dropicon: FontAwesomeIcons.mapPin),
@@ -212,19 +211,21 @@ class _TripScreenState extends State<TripScreen>
                       }) 
                     ),
                   ),
-                  SingleChildScrollView(
+                     requestxcontroller.monitorongoingtrip.value.drop_location_id ==  null
+                      ?Nodatabuilder(title:requestxcontroller.monitorcurrentrequest.value.status == "pending"? 'You have a pending request ': 'No current trip yet', subtitle: requestxcontroller.monitorcurrentrequest.value.status == "pending"? 'Wait for the driver to accept' :'You have to request first')
+                      : SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                           requestxcontroller.monitorongoingtrip.value.drop_location_id ==  null
-                      ?Nodatabuilder(title:requestxcontroller.monitorcurrentrequest.value.status == "pending"? 'You have a pending request ': 'No current trip yet', subtitle: requestxcontroller.monitorcurrentrequest.value.status == "pending"? 'Wait for the driver to accept' :'Where would you like to go?')
-                      :
+                       
                      OngoingTripBuilder(topay: '500', drivername: 'bnriadn', driverphone: '021039123', picklocation: 'Isulan Sultan Kudarat', droplocation: 'Bambad'),
                                    
                       ],
                     ),
                   ),
-                 
+                  passengerxcontroller.lisoftriprecord.length == 0
+                  ? Nodatabuilder(title: 'No record yet ', subtitle: 'All of your pass tip will display here')
+                  : 
                   Container(
                     child:  AnimationLimiter(
            child:RecordsBuilder(),

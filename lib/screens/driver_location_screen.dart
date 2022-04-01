@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/controller/drivercontroller.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
+import 'package:tricycleapp/screens/ongoingtrip.dart';
 
 class DriverLocationScreen extends StatefulWidget {
 
@@ -195,8 +196,14 @@ createCustomMarker();
     
     return Scaffold(
         appBar: AppBar(
+          title: Text('Driver Location', style: Get.textTheme.bodyText1!.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          
+          ),),
           leading: IconButton(onPressed: (){
 
+              Get.back();
           }, icon:FaIcon(FontAwesomeIcons.angleLeft)),
         ),
       body: isMapReady ==false ? Container(

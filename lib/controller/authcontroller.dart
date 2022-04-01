@@ -161,7 +161,7 @@ class Authcontroller extends GetxController {
 
   void logInUser(String email, String password, BuildContext context) async {
     try {
-      Authdialog.showAuthProGress(context, 'Please wait...');
+      Authdialog.showAuthProGress('Please wait...');
       var authuser = await authinstance.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
 

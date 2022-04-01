@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapdatacontroller.dart';
-import 'package:tricycleapp/controller/requestcontroller.dart';
+
 import 'package:tricycleapp/dialog/authdialog/authdialog.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/dialog/dialog_collection.dart';
@@ -19,12 +19,14 @@ import 'package:tricycleapp/model/ongoing_trip_details.dart';
 import 'package:tricycleapp/model/request_details.dart';
 import 'package:http/http.dart' as http;
 import 'package:tricycleapp/screens/ongoingtrip.dart';
+import 'package:tricycleapp/screens/rating_screen.dart';
 
 class Requestdatacontroller extends GetxController {
   var listofavailabledriver = <Availabledriver>[].obs;
   var autxcontroller = Get.find<Authcontroller>();
   var mapxcontroller = Get.find<Mapdatacontroller>();
   var devicetokens = <String?>[].obs;
+
   var currentrequest = RequestDetails().obs;
   var monitorcurrentrequest = RequestDetails().obs;
   var monitorequestaftersending = RequestDetails().obs;
@@ -32,6 +34,9 @@ class Requestdatacontroller extends GetxController {
   var ongoingtrip = OngoingTripDetails().obs;
   var monitorongoingtrip = OngoingTripDetails().obs;
   var currentStatus = 0.obs;
+
+  var isPaymentShowed = false.obs;
+  var isRatingShowed = false.obs;
 
   void createRequest(BuildContext context) async {
     Map<String, dynamic> picklocation = {
@@ -92,7 +97,7 @@ class Requestdatacontroller extends GetxController {
                   (data['tripstatus'] == 'notready')) {
                 Get.back();
 
-                Authdialog.showAuthProGress(context, 'Request accepted...');
+                Authdialog.showAuthProGress('Request accepted...');
                 Future.delayed(Duration(seconds: 1), () {
                   Get.back();
                   Mapdialog.showMapProgress(
@@ -267,6 +272,22 @@ class Requestdatacontroller extends GetxController {
         currentStatus(3);
       } else if (ongoingtrip.value.tripstatus == "complete") {
         currentStatus(4);
+        
+        if(ongoingtrip.value.tripstatus =="complete" && ongoingtrip.value.payed==false){
+            if(isPaymentShowed.value == false){
+              DialogCollection.showpaymentToBePayed((ongoingtrip.value.fee).toString());
+              isPaymentShowed(true);  
+            }
+
+        }
+
+        if(ongoingtrip.value.tripstatus =="complete" && ongoingtrip.value.payed==true){
+            if(isRatingShowed.value == false){
+              Get.off(()=> RatingScreen() ,fullscreenDialog: true, transition: Transition.zoom);
+              isRatingShowed(true);  
+            }
+
+        }
       }
 
       print('__________TRIPS STATUS');
@@ -293,16 +314,99 @@ class Requestdatacontroller extends GetxController {
     });
   }
 
-  void monitorTrip() async {
+void monitorTrip() async {
+
+    print(isPaymentShowed.value);
         print('MONITOR ONGOING TRIP START');
     ongoingtripstream!.listen((event) async {
       if (event.exists) {
-        monitorongoingtrip(
-            OngoingTripDetails.fromJson(event.data() as Map<String, dynamic>));
+        monitorongoingtrip(  OngoingTripDetails.fromJson(event.data() as Map<String, dynamic>));
+
+         if(monitorongoingtrip.value.tripstatus =="complete" && monitorongoingtrip.value.payed==false){
+            if(isPaymentShowed.value == false){
+              DialogCollection.showpaymentToBePayed((monitorongoingtrip.value.fee).toString());
+              isPaymentShowed(true);  
+            }
+
+        }
+         if(monitorongoingtrip.value.tripstatus =="complete" && monitorongoingtrip.value.payed==true){
+            if(isRatingShowed.value == true){
+               Get.off(()=> RatingScreen() ,fullscreenDialog: true, transition: Transition.zoom);
+              isRatingShowed(true);  
+            }
+
+        }
+        
       } else {
         monitorongoingtrip(OngoingTripDetails());
       }
     });
   }
+
+
+
+
+var isRatingload = false.obs;
+void rateDriver(String? comment, int rate, String ratedescription) async{
+
+
+
+    try{
+      isRatingload(true);
+       await ratingsrefference.doc(ongoingtrip.value.driver_id).collection('ratings').doc().set({
+
+      'rate': rate,
+      'comment': comment,
+      'passenger_image_url': autxcontroller.user.value.image_url,
+      'passenger_name':autxcontroller.user.value.name,
+      'passenger_id':authinstance.currentUser!.uid,
+      'rate_description':ratedescription,
+      'created_at': DateTime.now().toString(), 
+      
+    });
+    await deleteTrip();
+    isRatingload(false);
+    }catch(e){
+            isRatingload(false);
+      Infodialog.showInfoToastCenter(e.toString());
+    }
+   
+
+  
+    
+
+}
+
+Future<void> deleteTrip() async{
+
+  try{
+       Authdialog.showAuthProGress('Please wait...');
+    await requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).delete().then((value) async {
+       await requestrefference.doc(authinstance.currentUser!.uid).delete();
+    });
+    await clearLocalData();
+    Get.back();
+    Get.offAll(HomeScreenManager());
+  }catch(e){
+    Get.back();
+    Infodialog.showInfoToastCenter(e.toString());
+    Get.offAll(HomeScreenManager());
+  };
+
+  
+}
+
+Future<void> clearLocalData()async{
+
+   currentrequest(RequestDetails());
+   monitorcurrentrequest(RequestDetails());
+   monitorequestaftersending(RequestDetails());
+
+   ongoingtrip(OngoingTripDetails());
+   monitorongoingtrip(OngoingTripDetails());
+   currentStatus(0);
+   isPaymentShowed(false);
+  
+}
 
 }

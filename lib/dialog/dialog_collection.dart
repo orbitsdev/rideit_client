@@ -3,40 +3,77 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
-import 'package:tricycleapp/controller/requestcontroller.dart';
+
 import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/widgets/horizontalspace.dart';
+import 'package:tricycleapp/widgets/verticalspace.dart';
 
 class DialogCollection {
-  static void showpaymentToBePayed(BuildContext context) {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return Dialog(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(
-              height: 12,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('₱ 50'),
-                Text('To Be Payed'),
-                ElevatedButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    child: Text("OK"))
-              ],
-            ),
-          ]));
-        });
+  static void showpaymentToBePayed(String payment) {
+    var requestxcontoller = Get.find<Requestdatacontroller>();
+    Get.defaultDialog(
+      title: '',
+      barrierDismissible: false,
+      backgroundColor: BOTTOMNAVIGATOR_COLOR,
+      radius: 2,
+      content: Container(
+                decoration: BoxDecoration(
+               
+                  borderRadius: BorderRadius.all(Radius.circular(containerRadius))
+                ),
+              
+
+                child: Column(
+                  
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min, children: [
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text('Total amount to pay'.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 14, fontWeight: FontWeight.w100)),
+                  Verticalspace(6),
+                  Text('₱ ${payment}.00', style: Get.textTheme.headline1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 34),),
+                  Verticalspace(16),
+
+                  Container(
+                                      margin: EdgeInsets.symmetric(horizontal: 12,),
+                                      width: double.infinity,
+                                          height: 60,
+                                      decoration: const ShapeDecoration(
+                                        shape: StadiumBorder(),
+                                        gradient: LinearGradient(
+                                          end: Alignment.topLeft,
+                                          begin: Alignment.bottomRight,
+                                          colors: [
+                                              ELSA_BLUE,
+                                              ELSA_GREEN,
+                                          ],
+                                        ),
+                                      ),
+                                      child: MaterialButton(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        shape: const StadiumBorder(),
+                                        child:  Text(
+                                          'OK',
+                                          style: TextStyle(
+                                              color: Colors.white, fontSize: 20),
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      ),
+                                    )
+              
+                 
+                ]),
+              ),
+    );
   }
 
   static void showRequestInfo(BuildContext context) {
-    var requestxcontroller = Get.find<Requestcontroller>();
+    var requestxcontroller = Get.find<Requestdatacontroller>();
     var pagexcontroller = Get.find<Pagecontroller>();
     showDialog(
         barrierDismissible: false,
@@ -61,7 +98,7 @@ class DialogCollection {
                         ),
                         Row(
                           children: [
-                            requestxcontroller.canceling.value
+                            requestxcontroller.iscancel.value
                                 ? Center(child: CircularProgressIndicator())
                                 : ElevatedButton(
                                     onPressed: () {

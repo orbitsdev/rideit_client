@@ -8,6 +8,7 @@ import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapdatacontroller.dart';
 import 'package:tricycleapp/controller/requestdatacontroller.dart';
+import 'package:tricycleapp/dialog/dialog_collection.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
@@ -88,7 +89,7 @@ void prepaireData () async{
       appBar: AppBar(
         leading: IconButton(onPressed: (){
           Get.off(()=> HomeScreenManager());
-        }, icon: FaIcon(FontAwesomeIcons.angleLeft)),
+        }, icon: FaIcon(FontAwesomeIcons.times)),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -107,6 +108,7 @@ void prepaireData () async{
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+         
           Lottie.asset(
             'assets/images/66528-qntm.json',
           ),
@@ -142,6 +144,9 @@ void prepaireData () async{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+          //          ElevatedButton(onPressed: (){
+          //   DialogCollection.showpaymentToBePayed((requestxcontroller.ongoingtrip.value.fee).toString());
+          // }, child: Text('text')),
                   Container(
                     width: double.infinity,
                   ),
@@ -316,27 +321,27 @@ void prepaireData () async{
                     color: ELSA_TEXT_GREY,
                   ),
                   Verticalspace(8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                                                padding: EdgeInsets.symmetric(horizontal: 8.0,),
-                        constraints: BoxConstraints(
-                          minWidth: 50
-                        ),
-                        child: Text('Distance')),
-                      Horizontalspace(30), 
-                      Flexible(child: Text('${mapdataxcontroller.directionDetails.value.distanceText}', style: Get.textTheme.bodyText1!.copyWith(
-                        fontWeight: FontWeight.w100
-                      ),), ), 
-                    ],
-                  ),
+                  // Row(
+                  //   crossAxisAlignment: CrossAxisAlignment.start,
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     Container(
+                  //                               padding: EdgeInsets.symmetric(horizontal: 8.0,),
+                  //       constraints: BoxConstraints(
+                  //         minWidth: 50
+                  //       ),
+                  //       child: Text('Distance')),
+                  //     Horizontalspace(30), 
+                  //     Flexible(child: Text('${mapdataxcontroller.directionDetails.value.distanceText}', style: Get.textTheme.bodyText1!.copyWith(
+                  //       fontWeight: FontWeight.w100
+                  //     ),), ), 
+                  //   ],
+                  // ),
                  
-                 Divider(
-                    thickness: 1,
-                    color: ELSA_TEXT_GREY,
-                  ),
+                //  Divider(
+                //     thickness: 1,
+                //     color: ELSA_TEXT_GREY,
+                //   ),
                   Verticalspace(8),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,

@@ -19,20 +19,20 @@ import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/localnotification/local_notification_services.dart';
+import 'package:tricycleapp/screens/dashboard.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
 import 'package:tricycleapp/screens/editprofile_screen.dart';
 import 'package:tricycleapp/screens/payment_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
+import 'package:tricycleapp/screens/rating_screen.dart';
 import 'package:tricycleapp/screens/request_screen.dart';
 import 'package:tricycleapp/screens/request_tricycle_sreen.dart';
 import 'package:tricycleapp/screens/trip_screen.dart';
 import 'package:tricycleapp/signin_screen.dart';
 import 'package:tricycleapp/sigup_screen.dart';
-import 'package:tricycleapp/testcloudfunction.dart';
 import 'package:tricycleapp/testotp.dart';
 import 'package:tricycleapp/testsign_screen.dart';
-import 'package:tricycleapp/testwidgets/dashboard.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 import 'package:tricycleapp/verifyingemail_screen.dart';
 import 'package:tricycleapp/constant.dart';
@@ -181,9 +181,9 @@ class _TricycleAppState extends State<TricycleApp> {
           ? SigninScreen()
           : FirebaseAuth.instance.currentUser!.emailVerified == false
               ? VerifyingemailScreen()
-              :
+              :RatingScreen(),
                //Ongoingtrip(),
-             HomeScreenManager(),
+            // HomeScreenManager(),
       getPages: [
         GetPage(
             name: SignupScreen.screenName,

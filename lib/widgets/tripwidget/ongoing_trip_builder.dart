@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
-import 'package:tricycleapp/testwidget/elsabutton.dart';
+import 'package:tricycleapp/widgets/elsabutton.dart';
+
 import 'package:tricycleapp/widgets/horizontalspace.dart';
 import 'package:tricycleapp/widgets/tripwidget/custompinlocation.dart';
 import 'package:tricycleapp/widgets/verticalspace.dart';
