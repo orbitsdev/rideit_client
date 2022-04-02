@@ -163,11 +163,12 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
         
         return GestureDetector(
         onTap: () {
-          if (requesstxcontroller
-                  .monitorcurrentrequest.value.drop_location_id ==
-              null) {
+           //print(Get.find<Requestdatacontroller>().listofavailabledriver.length);
+          if (requesstxcontroller.monitorcurrentrequest.value.drop_location_id == null) {
+            
             if (requesstxcontroller.listofavailabledriver.length == 0) {
               Infodialog.showInfoToastCenter('No available drivers found');
+             
             } else {
               Get.to(() => RequestScreen(),
                   fullscreenDialog: true,
@@ -186,15 +187,20 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
             decoration: BoxDecoration(
               color: BACKGROUND_BLACK,
             ),
-            child: Center(
-                child: FaIcon(
-              FontAwesomeIcons.motorcycle,
-              size: 32,
-              color: GREEN_LIGHT,
-            )),
+            child:
+            Center(
+              child:  
+              Center(
+                  child: FaIcon(
+                FontAwesomeIcons.motorcycle,
+                size: 32,
+                color: GREEN_LIGHT,
+              )),
+              ),
+            ),
           ),
-        ),
-      );
+        );
+      
       })  ,
       //      floatingActionButton:  GFFloatingWidget(
 

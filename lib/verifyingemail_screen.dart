@@ -9,6 +9,7 @@ import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
+import 'package:tricycleapp/screens/onboard_screen.dart';
 import 'package:tricycleapp/signin_screen.dart';
 
 import 'package:url_launcher/link.dart';
@@ -130,7 +131,14 @@ class _VerifyingemailScreenState extends State<VerifyingemailScreen>
 
     if (mailverified) {
       time!.cancel();
-      Get.offAllNamed(HomeScreenManager.screenName);
+
+      if(authxcontroller.user.value.new_acount == true){
+
+      Get.offAllNamed(OnboardScreen.screenName);
+      }else{
+          Get.offAllNamed(HomeScreenManager.screenName);
+
+      }
     }
   }
 

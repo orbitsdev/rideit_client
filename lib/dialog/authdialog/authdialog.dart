@@ -12,9 +12,11 @@ class Authdialog {
 
     Get.defaultDialog(
       title: '',
+      titlePadding: EdgeInsets.all(0),
+    
       barrierDismissible: false,
       backgroundColor: Colors.black,
-      contentPadding:   EdgeInsets.all(16),
+      contentPadding:   EdgeInsets.only(right: 18, left: 18, bottom: 0, top: 18),
       radius:  6,
       content: Container(
               decoration: BoxDecoration(

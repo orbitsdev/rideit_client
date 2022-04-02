@@ -1,7 +1,10 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/passenger_controller.dart';
+import 'package:tricycleapp/dialog/dialog_collection.dart';
 import 'package:tricycleapp/screens/list_screen.dart';
 import 'package:tricycleapp/widgets/homewidgets/customsbox.dart';
 import 'package:tricycleapp/widgets/homewidgets/totalearningline.dart';
@@ -58,14 +61,18 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   width: MediaQuery.of(context).size.width,
                   child: Column(
+
+
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
+                    
                     children: [
                       Text(
                         'Total Spend',
                         style: Get.textTheme.bodyText1,
                       ),
                       Verticalspace(8),
+                     
                       Container(
                         child: RichText(
                           text: TextSpan(

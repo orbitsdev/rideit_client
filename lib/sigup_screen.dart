@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/UI/constant.dart';
+import 'package:tricycleapp/helper/audiiomanger.dart';
 
 import '../../controller/authcontroller.dart';
 
@@ -102,6 +103,8 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             child: Column(
               children: [
+
+               
                 SizedBox(height: 24),
                 Container(
                   child: Image.asset(
@@ -110,6 +113,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   height: 180,
                 ),
+                
                 SizedBox(height: 34),
                 // ElevatedButton(onPressed: (){
                 //   //Failuredialog.showErrorDialog(context, 'OPS', 'ERROR');

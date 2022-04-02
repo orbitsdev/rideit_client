@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/requestdatacontroller.dart';
+import 'package:tricycleapp/helper/audiiomanger.dart';
 import 'package:tricycleapp/widgets/verticalspace.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -26,11 +27,6 @@ class _RatingScreenState extends State<RatingScreen> {
   String ratedescription="Excellent";
    
 
-void playSound(){ 
-
- final player = AudioCache(); 
-  player.play('sounds/216676__robinhood76__04864-notification-music-box.wav');  
-}
 
 @override
   void setState(VoidCallback fn) {
@@ -43,7 +39,7 @@ void playSound(){
 
   @override
   void initState() { 
-    playSound();
+    Audiiomanger.player.play('sounds/applause.wav');  
     comment.addListener(() => setState(() { }));
   
     conffetecontroller = ConfettiController(duration: Duration(seconds: 2));
@@ -267,10 +263,6 @@ void playSound(){
                           }),
 
                          
-                                  ElevatedButton(onPressed: (){
-                                    playSound();
-
-                                  }, child: Text('test'))
                         ],
                       ),
                     ),

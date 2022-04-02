@@ -14,6 +14,7 @@ import 'package:tricycleapp/config/firebaseconfig.dart';
 import 'package:tricycleapp/controller/Permissioncontroller.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapcontroller.dart';
+import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
@@ -22,6 +23,7 @@ import 'package:tricycleapp/localnotification/local_notification_services.dart';
 import 'package:tricycleapp/screens/dashboard.dart';
 import 'package:tricycleapp/screens/driver_location_screen.dart';
 import 'package:tricycleapp/screens/editprofile_screen.dart';
+import 'package:tricycleapp/screens/onboard_screen.dart';
 import 'package:tricycleapp/screens/payment_screen.dart';
 import 'package:tricycleapp/screens/me_screen.dart';
 import 'package:tricycleapp/screens/ongoingtrip.dart';
@@ -135,7 +137,7 @@ class _TricycleAppState extends State<TricycleApp> {
         print(message.notification!.title);
         print(message.notification!.body);
 
-        LocalNotificationServices.display(message);
+       // LocalNotificationServices.display(message);
       }
     });
 
@@ -184,10 +186,11 @@ class _TricycleAppState extends State<TricycleApp> {
           ? SigninScreen()
           : FirebaseAuth.instance.currentUser!.emailVerified == false
               ? VerifyingemailScreen()
-              :
-              RatingScreen(),
+              : 
+                //OnboardScreen(),
+              //RatingScreen(),
                //Ongoingtrip(),
-             //HomeScreenManager(),
+             HomeScreenManager(),
       getPages: [
         GetPage(
             name: SignupScreen.screenName,
@@ -239,9 +242,14 @@ class _TricycleAppState extends State<TricycleApp> {
             name: VerifyingemailScreen.screenName,
             page: () => VerifyingemailScreen(),
             binding: Gextbinding()),
+
         GetPage(
             name: RequestScreen.screenName,
             page: () => RequestScreen(),
+            binding: Gextbinding()),
+        GetPage(
+            name: OnboardScreen.screenName,
+            page: () => OnboardScreen(),
             binding: Gextbinding()),
       ],
       debugShowCheckedModeBanner: false,

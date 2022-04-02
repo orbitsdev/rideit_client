@@ -71,6 +71,126 @@ class DialogCollection {
               ),
     );
   }
+  static void showInfo(String mesage) {
+    var requestxcontoller = Get.find<Requestdatacontroller>();
+    Get.defaultDialog(
+      title: '',
+      barrierDismissible: false,
+      backgroundColor: BOTTOMNAVIGATOR_COLOR,
+      radius: 2,
+      content: Container(
+                decoration: BoxDecoration(
+               
+                  borderRadius: BorderRadius.all(Radius.circular(containerRadius))
+                ),
+              
+
+                child: Column(
+                  
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min, children: [
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text(mesage.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 20, fontWeight: FontWeight.w600)),
+                  Verticalspace(16),
+
+                  Container(
+                                      margin: EdgeInsets.symmetric(horizontal: 12,),
+                                      width: double.infinity,
+                                          height: 40,
+                                      decoration: const ShapeDecoration(
+                                        shape: StadiumBorder(),
+                                        gradient: LinearGradient(
+                                          end: Alignment.topLeft,
+                                          begin: Alignment.bottomRight,
+                                          colors: [
+                                              ELSA_BLUE,
+                                              ELSA_GREEN,
+                                          ],
+                                        ),
+                                      ),
+                                      child: MaterialButton(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        shape: const StadiumBorder(),
+                                        child:  Text(
+                                          'OK',
+                                          style: TextStyle(
+                                              color: Colors.white, fontSize: 20),
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      ),
+                                    )
+              
+                 
+                ]),
+              ),
+    );
+  }
+  static void showCancelInfo(String mesage) {
+    var requestxcontoller = Get.find<Requestdatacontroller>();
+    Get.defaultDialog(
+      title: '',
+      barrierDismissible: false,
+      backgroundColor: BOTTOMNAVIGATOR_COLOR,
+      radius: 2,
+      content: Container(
+                decoration: BoxDecoration(
+               
+                  borderRadius: BorderRadius.all(Radius.circular(containerRadius))
+                ),
+              
+
+                child: Column(
+                  
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min, children: [
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text(mesage.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 20, fontWeight: FontWeight.w600)),
+                  Verticalspace(16),
+
+                  Container(
+                                      margin: EdgeInsets.symmetric(horizontal: 12,),
+                                      width: double.infinity,
+                                          height: 40,
+                                      decoration: const ShapeDecoration(
+                                        shape: StadiumBorder(),
+                                        gradient: LinearGradient(
+                                          end: Alignment.topLeft,
+                                          begin: Alignment.bottomRight,
+                                          colors: [
+                                              ELSA_BLUE,
+                                              ELSA_GREEN,
+                                          ],
+                                        ),
+                                      ),
+                                      child: MaterialButton(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        shape: const StadiumBorder(),
+                                        child:  Text(
+                                          'OK',
+                                          style: TextStyle(
+                                              color: Colors.white, fontSize: 20),
+                                        ),
+                                        onPressed: ()async {
+                                            Get.back();
+                                            requestxcontoller.deleteTrip();
+                                          
+                                        },
+                                      ),
+                                    )
+              
+                 
+                ]),
+              ),
+    );
+  }
 
   static void showRequestInfo(BuildContext context) {
     var requestxcontroller = Get.find<Requestdatacontroller>();

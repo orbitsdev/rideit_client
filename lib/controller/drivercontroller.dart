@@ -124,6 +124,9 @@ void monitorAvailableDriver() async {
           return availabledriver;
         }).toList());
        
+      }else{
+        print('calleind clear');
+         requesstxcontroller.listofavailabledriver.clear();
       }
 
      requesstxcontroller.devicetokens.clear();

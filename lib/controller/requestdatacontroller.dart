@@ -12,6 +12,7 @@ import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/dialog/dialog_collection.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/dialog/mapdialog/mapdialog.dart';
+import 'package:tricycleapp/helper/audiiomanger.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/model/availabledriver.dart';
@@ -37,6 +38,7 @@ class Requestdatacontroller extends GetxController {
 
   var isPaymentShowed = false.obs;
   var isRatingShowed = false.obs;
+  var isDriverShowed = false.obs;
 
   void createRequest(BuildContext context) async {
     Map<String, dynamic> picklocation = {
@@ -261,6 +263,12 @@ class Requestdatacontroller extends GetxController {
 
       ongoingtrip(
           OngoingTripDetails.fromJson(event.data() as Map<String, dynamic>));
+        
+      
+      if(ongoingtrip.value.tripstatus == "canceled"){
+          DialogCollection.showCancelInfo('Your Trip has been canceled');
+          
+      }
 
       if (ongoingtrip.value.tripstatus == "prepairing") {
         currentStatus(0);
@@ -268,6 +276,13 @@ class Requestdatacontroller extends GetxController {
         currentStatus(1);
       } else if (ongoingtrip.value.tripstatus == "arrived") {
         currentStatus(2);
+         
+            if(isDriverShowed.value == false){
+              DialogCollection.showInfo('The driver has arrived');
+              isDriverShowed(true);  
+            }
+
+        
       } else if (ongoingtrip.value.tripstatus == "travelling") {
         currentStatus(3);
       } else if (ongoingtrip.value.tripstatus == "complete") {
@@ -322,6 +337,15 @@ void monitorTrip() async {
       if (event.exists) {
         monitorongoingtrip(  OngoingTripDetails.fromJson(event.data() as Map<String, dynamic>));
 
+           if(monitorongoingtrip.value.tripstatus == "canceled"){
+          DialogCollection.showCancelInfo('Your Trip has been canceled');
+          
+        }
+
+
+        if(monitorongoingtrip.value.tripstatus =="arrived"){
+             Audiiomanger.player.play('sounds/216676__robinhood76__04864-notification-music-box.wav');  
+        }
          if(monitorongoingtrip.value.tripstatus =="complete" && monitorongoingtrip.value.payed==false){
             if(isPaymentShowed.value == false){
               DialogCollection.showpaymentToBePayed((monitorongoingtrip.value.fee).toString());
@@ -329,6 +353,10 @@ void monitorTrip() async {
             }
 
         }
+      
+         
+
+        
          if(monitorongoingtrip.value.tripstatus =="complete" && monitorongoingtrip.value.payed==true){
           
             if(isRatingShowed.value == false){
@@ -368,7 +396,7 @@ void rateDriver(String? comment, int rate, String ratedescription) async{
     await deleteTrip();
     isRatingload(false);
     }catch(e){
-            isRatingload(false);
+      isRatingload(false);
       Infodialog.showInfoToastCenter(e.toString());
     }
    
@@ -408,6 +436,7 @@ Future<void> clearLocalData()async{
    currentStatus(0);
    isPaymentShowed(false);
    isRatingShowed(false);
+   isDriverShowed(false);
   
 }
 

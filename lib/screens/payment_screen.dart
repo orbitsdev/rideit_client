@@ -71,7 +71,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+
         appBar: AppBar(
+          elevation: 0,
+
           leading: IconButton(onPressed: currenStep == 0?  (){
               Get.back();
           }:  null, icon:FaIcon(FontAwesomeIcons.arrowLeft)),
@@ -79,7 +82,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         body: SingleChildScrollView(
             child: Column(
                     children: [
-                      
+                     
                       Container(
                         height: MediaQuery.of(context).size.height,
                         child: Theme(
@@ -92,13 +95,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               controlsBuilder: (BuildContext context,
                                   ControlsDetails functions) {
                                 return Container(
+                                  margin: EdgeInsets.only(top: 4, bottom: 100),
                                   padding: EdgeInsets.all(8),
                                   decoration: BoxDecoration(
+
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(6))),
-                                  margin: EdgeInsets.symmetric(
-                                    vertical: 20,
-                                  ),
+                                  
                                   child: Center(
                                     child: Row(
                                       mainAxisAlignment:
@@ -149,8 +152,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                   )),
                                             ),
                                           ),
-                                        if (currenStep != 0)
-                                          Horizontalspace(50),
+                                        
                                         Expanded(
                                           child: Container(
                                             height: 50,
@@ -178,7 +180,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                         return LIGHT_CONTAINER2;
                                                       return currenStep == getStep(context).length -1
                                                           ? GREEN_ONLINE
-                                                          : ELSA_BLUE_1_; // Use the component's default.
+                                                          :  DARK_GREEN; // Use the component's default.
                                                     },
                                                   ),
                                                 ),
@@ -275,17 +277,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Container(
-                    //   width: double.infinity,
-                    //   child: Text(
-                    //     'Payment Details',
-                    //     style: Get.textTheme.headline5!.copyWith(
-                    //       fontSize: 20,
-                    //     ),
-                    //     textAlign: TextAlign.center,
-                    //   ),
-                    // ),
-                    Verticalspace(20),
+                   
+                  
                     Container(
                       padding:
                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -308,7 +301,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             toggleable: true,
                             value: 'Cash',
                             groupValue: paymentmethod,
-                            activeColor: ELSA_BLUE,
+                            activeColor:  DARK_GREEN,
                             onChanged: (val) {
                               setPaymentMethod(val.toString());
                             },
@@ -370,6 +363,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             color: ELSA_TEXT_LIGHT,
                           ),
                           Container(
+
                             padding: EdgeInsets.symmetric(vertical: 5),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -394,7 +388,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                               ],
                             ),
-                          )
+                          ),
+
                         ],
                       ),
                     ),
@@ -407,6 +402,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
             isActive: currenStep >= 1,
             title: Text('Review'),
             content: Container(
+              padding: EdgeInsets.all(8),
+              color: LIGHT_CONTAINER,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -477,7 +474,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         Horizontalspace(16),
                         Flexible(
                           child: Text(
-                            '${mapadatacontroller.calculateFee()}.00',
+                            '₱ ${mapadatacontroller.calculateFee()}.00',
                             style: TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.w900),
                           ),

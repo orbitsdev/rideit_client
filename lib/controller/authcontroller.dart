@@ -7,10 +7,12 @@ import 'package:tricycleapp/config/twilioconfig.dart';
 import 'package:tricycleapp/dialog/authdialog/authdialog.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/dialog/failuredialog/failuredialog.dart';
+import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/model/users.dart';
+import 'package:tricycleapp/screens/onboard_screen.dart';
 import 'package:tricycleapp/verifyingemail_screen.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 
@@ -74,6 +76,7 @@ class Authcontroller extends GetxController {
           "image_url": defaultimage,
           "image_file": null,
           'device_token': devicetoken,
+          'new_acount': true,
         };
         await firestore
             .collection('passengers')
@@ -101,7 +104,13 @@ class Authcontroller extends GetxController {
             Future.delayed(Duration(seconds: 1), () {
               clearFields();
               Get.back();
-              Get.offAndToNamed(HomeScreenManager.screenName);
+
+              if(user.value.new_acount== true){
+                      Get.offAndToNamed(OnboardScreen.screenName);
+              }else{
+                  Get.offAndToNamed(HomeScreenManager.screenName);
+
+              }
             });
           }
 
@@ -197,10 +206,16 @@ class Authcontroller extends GetxController {
                 () => Get.offNamed(VerifyingemailScreen.screenName));
           } else {
               
-            Future.delayed(Duration(seconds: 1), () {
-           
+                Future.delayed(Duration(seconds: 1), () {
+
             Get.back();
-              Get.offAndToNamed(HomeScreenManager.screenName);
+
+            if(user.value.new_acount== true){
+                      Get.offAndToNamed(OnboardScreen.screenName);
+              }else{
+                  Get.offAndToNamed(HomeScreenManager.screenName);
+
+              }
             });
           }
 
@@ -284,5 +299,20 @@ class Authcontroller extends GetxController {
       "device_token": devicetoken
     });
     print('device token updated');
+  }
+
+  var gettingstartedload = false.obs;
+  Future<void> updateToOld() async{
+    gettingstartedload(true);
+    await userrefference.doc(authinstance.currentUser!.uid).update({
+      'new_acount': false,
+    }).then((value) {
+           gettingstartedload(false);
+        Get.offAndToNamed(HomeScreenManager.screenName);
+    }).catchError((e){
+       gettingstartedload(false);
+       Infodialog.showInfoToastCenter(e.toString());
+    });
+
   }
 }

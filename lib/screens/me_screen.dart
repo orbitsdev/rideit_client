@@ -49,8 +49,8 @@ class _MeScreenState extends State<MeScreen> {
     ELSA_BLUE_1_,
     iconcolorsecondary,
   ];
-  var authxcontroller = Get.find<Authcontroller>();
-  var passengerxcontroller = Get.find<PassengerController>();
+  var authxcontroller = Get.put(Authcontroller());
+  var passengerxcontroller = Get.put(PassengerController());
 
   Random random = Random();
   @override

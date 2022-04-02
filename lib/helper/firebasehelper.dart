@@ -27,5 +27,3 @@ FirebaseStorage storage = FirebaseStorage.instance;
 //cloudmessaging
 FirebaseMessaging messaginginstance = FirebaseMessaging.instance;
 
-
- 

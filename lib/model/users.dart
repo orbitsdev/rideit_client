@@ -9,6 +9,7 @@ class Users {
   String? image_url;
   String? image_file;
   String? device_token;
+  bool? new_acount;
  
  
   Users({
@@ -19,6 +20,8 @@ class Users {
     this.image_url,
     this.image_file,
     this.device_token,
+    this.new_acount,
+    
 
   });
 
@@ -35,6 +38,7 @@ class Users {
     user.image_url = json['image_url'];
     user.image_file = json['image_file'];
     user.device_token = json["device_token"];
+    user.new_acount = json["new_acount"];
 
     return user;
   }
