@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/config/mapconfig.dart';
+import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/dialog/authdialog/authdialog.dart';
 import 'package:tricycleapp/dialog/failuredialog/failuredialog.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
@@ -265,12 +266,13 @@ class Mapdatacontroller extends GetxController {
   }
 
   String calculateFee() {
-    int rate = 10;
+    int rate = Get.find<Requestdatacontroller>().publicdata.value.fee as int;
+    int minimumratedistance = Get.find<Requestdatacontroller>().publicdata.value.minimum_km_basis as int;
     int distance = directionDetails.value.distanceValue as int;
     var km = distance / 1000;
     var fee_by_km = rate * km;
 
-    if (km.round() <= 2) {
+    if (km.round() <= minimumratedistance) {
       return rate.toString();
     } else {
       return fee_by_km.toStringAsFixed(0);

@@ -17,6 +17,7 @@ import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/model/availabledriver.dart';
 import 'package:tricycleapp/model/ongoing_trip_details.dart';
+import 'package:tricycleapp/model/public_data.dart';
 import 'package:tricycleapp/model/request_details.dart';
 import 'package:http/http.dart' as http;
 import 'package:tricycleapp/screens/ongoingtrip.dart';
@@ -35,6 +36,7 @@ class Requestdatacontroller extends GetxController {
   var ongoingtrip = OngoingTripDetails().obs;
   var monitorongoingtrip = OngoingTripDetails().obs;
   var currentStatus = 0.obs;
+  var publicdata =  PublicData().obs;
 
   var isPaymentShowed = false.obs;
   var isRatingShowed = false.obs;
@@ -439,5 +441,19 @@ Future<void> clearLocalData()async{
    isDriverShowed(false);
   
 }
+
+void monitorAdminData() async{
+    publicreferrence.doc('data').snapshots().listen((event) { 
+      print('PUBLIC DATA IS MONITORING');
+      if(event.exists){
+           
+          publicdata(PublicData.fromJson(event.data() as Map<String, dynamic>));
+
+          print(publicdata.toJson());
+        
+      }
+
+   }); 
+ }
 
 }

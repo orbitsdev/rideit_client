@@ -69,7 +69,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
     authxcontroller.monitorUserAccount();
     driverxcontroller.monitorAvailableDriver();
     passengerxcontroller.listenToAllTrip();
-
+    requesstxcontroller.monitorAdminData();
     requesstxcontroller.monitorRequest();
     requesstxcontroller.monitorTrip();
 

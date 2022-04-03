@@ -18,6 +18,7 @@ CollectionReference passengertriphistoryreferrence = firestore.collection('passe
 Stream<DocumentSnapshot<Object?>>? requeststream =  requestrefference.doc(authinstance.currentUser!.uid).snapshots();
 Stream<DocumentSnapshot<Object?>>? ongoingtripstream =  requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).snapshots();
 Stream<DocumentSnapshot<Object?>>? driverlocationstream = requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).snapshots();
+CollectionReference publicreferrence = firestore.collection('public');
 StreamSubscription<DocumentSnapshot<Object?>>?  driverstream;
 
 
