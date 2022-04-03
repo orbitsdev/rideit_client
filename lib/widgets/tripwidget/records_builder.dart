@@ -39,7 +39,11 @@ var passengerxcontroller = Get.find<PassengerController>();
                           droplocation:
                               passengerxcontroller.lisoftriprecord[index].dropddress_name.toString(),
                           date:
-                               DateFormat.yMMMMd().format(DateTime.parse('${passengerxcontroller.lisoftriprecord[index].created_at}')))));
+                          //DateFormat().format(DateTime.parse('${passengerxcontroller.lisoftriprecord[index].created_at}'))
+                         DateFormat('EEEE MMMM d, y h:m a ').format(DateTime.parse('${passengerxcontroller.lisoftriprecord[index].created_at}'))
+                          )
+                          )
+                          );
             }),
          );
   }

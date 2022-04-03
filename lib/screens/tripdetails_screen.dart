@@ -32,10 +32,14 @@ class TripdetailsScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+          ),
+          //padding: EdgeInsets.all(8),
           padding: EdgeInsets.all(20),
           width: double.infinity,
           
-          height: MediaQuery.of(context).size.height,
+
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,8 +47,7 @@ class TripdetailsScreen extends StatelessWidget {
             
              //columnBuilder('Driver', '#1'),
            
-             Verticalspace(12),
-            seperator(),
+             Verticalspace(8),
              columnBuilder('From'.toUpperCase(), '${trip!.pickaddress_name}'),
              Verticalspace(12),
              columnBuilder('To'.toUpperCase(), '${trip!.dropddress_name}'),
@@ -57,7 +60,11 @@ class TripdetailsScreen extends StatelessWidget {
              Verticalspace(12),
              columnBuilder('Trip Status'.toUpperCase(), '${trip!.tripstatus}'),
              Verticalspace(12),
-             columnBuilder('Date'.toUpperCase(), DateFormat.yMMMMd().format(DateTime.parse('${trip!.created_at}')) ),
+             columnBuilder('Date'.toUpperCase(), 
+             DateFormat('EEEE MMMM d, y  h:m a ').format(DateTime.parse('${trip!.created_at}'))
+              // DateFormat().format(DateTime.parse('${trip!.created_at}'))
+             //DateFormat.yMMMMd().format(DateTime.parse('${trip!.created_at}')) 
+             ),
              Verticalspace(12),
              
             ],

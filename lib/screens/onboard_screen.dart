@@ -45,7 +45,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
           children: [
             OnboardingBuilder(title: 'Ride service solution', body: 'Our goal is to connect passengers and driver wherever they are. ', image: 'assets/images/rider.png'),
             OnboardingBuilder(title: 'How It works', body: 'Select destination, review request details and make request.', image: 'assets/images/Directions-rafiki.png'),
-            OnboardingBuilder(title: 'Come and join with us', body: 'We are ready to serve you create account now and let\'s go!', image: 'assets/images/Welcome-cuate.png'),
+            OnboardingBuilder(title: 'Join with us', body: 'We are ready to serve you let\'s go!', image: 'assets/images/Welcome-cuate.png'),
           ],
         ),
       ),

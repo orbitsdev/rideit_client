@@ -54,7 +54,13 @@ class ListScreen extends StatelessWidget {
                         statuscolor: ELSA_GREEN,
                         picklocation: '${collection![index].pickaddress_name}',
                         droplocation: '${collection![index].dropddress_name}',
-                        date:   DateFormat.yMMMMd().format(DateTime.parse('${collection![index].created_at}'))  ))),
+                        date:
+                        DateFormat('EEEE MMMM d, y h:m a ').format(DateTime.parse('${collection![index].created_at}'))
+                         //DateFormat().format(DateTime.parse('${collection![index].created_at}'))
+                          // DateFormat.yMMMMd().format(DateTime.parse('${collection![index].created_at}'))  
+                           )
+                           )
+                           ),
               ),
             ),
           );
