@@ -49,9 +49,12 @@ class _RatingScreenState extends State<RatingScreen> {
   }
 
   void rateRider(){
+  String? reservvalue = comment.text;
   String? commentvalue = comment.text.replaceAll(' ', '');
   if(commentvalue == '') {
     commentvalue = null;
+  }else{
+     commentvalue =  reservvalue;
   }
     
     requestxcontroller.rateDriver(commentvalue, rate, ratedescription);

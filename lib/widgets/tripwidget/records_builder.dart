@@ -32,7 +32,7 @@ var passengerxcontroller = Get.find<PassengerController>();
                             fullscreenDialog: true, transition: Transition.zoom);
                       },
                       child: Listcontainer(
-                          status: passengerxcontroller.lisoftriprecord[index].status.toString(),
+                          status: passengerxcontroller.lisoftriprecord[index].tripstatus.toString(),
                           statuscolor: ELSA_GREEN,
                           picklocation:
                               passengerxcontroller.lisoftriprecord[index].pickaddress_name.toString(),

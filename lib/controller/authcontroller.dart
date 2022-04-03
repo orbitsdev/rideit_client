@@ -248,7 +248,10 @@ class Authcontroller extends GetxController {
           var useracount = Users.fromJson(querySnapshot.data() as Map<String, dynamic>);
           useracount.id = authinstance.currentUser!.uid;
           user(useracount);
-          
+          if(user.value.new_acount == true){
+            Get.off(()=> OnboardScreen());
+          }
+
           await getDeviceToken();
        
           if(devicetoken !=  null){

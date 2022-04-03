@@ -42,6 +42,15 @@ class Users {
 
     return user;
   }
-
+  Map<String, dynamic> toJson()=>{
+     'id':id,
+   'name':    name,
+   'email':    email,
+   'phone':    phone,
+   'image_url':    image_url,
+   'image_file':    image_file,
+   'device_token':    device_token,
+   'new_acount':    new_acount,
+  };
    
 }

@@ -153,6 +153,8 @@ class _TripScreenState extends State<TripScreen>
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+
+                              
                               RequestBuilder(picklocationname: '${requestxcontroller.monitorcurrentrequest.value.pickaddress_name}', droplocationname: '${requestxcontroller.monitorcurrentrequest.value.dropddress_name}', pickicon: FontAwesomeIcons.mapMarkerAlt, dropicon: FontAwesomeIcons.mapPin),
                               Verticalspace(12),
                                Row(

@@ -66,6 +66,7 @@ class PassengerController extends GetxController {
         .listen((event) {
       listofsuccesstrip.clear();
       listofcanceledtrip.clear();
+      lisoftriprecord.clear();
       event.docs.forEach((element) {
         var data = element.data() as Map<String, dynamic>;
 

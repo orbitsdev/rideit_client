@@ -417,11 +417,11 @@ Future<void> deleteTrip() async{
     });
     await clearLocalData();
     Get.back();
-    Get.offAll(HomeScreenManager());
+   Get.offAndToNamed(HomeScreenManager.screenName);
   }catch(e){
     Get.back();
     Infodialog.showInfoToastCenter(e.toString());
-    Get.offAll(HomeScreenManager());
+   Get.offAndToNamed(HomeScreenManager.screenName);
   };
 
   
