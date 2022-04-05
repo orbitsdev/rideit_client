@@ -96,7 +96,7 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 flutter_native_splash:
   color: "#0D101A"
-  image: assets/images/Isulan.png
+  image: assets/images/Group1.png
 # The following section is specific to Flutter.
 flutter:
 

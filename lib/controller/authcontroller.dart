@@ -261,22 +261,23 @@ class Authcontroller extends GetxController {
             }
           }
         
-
-          print(user.value.id);
-          print(user.value.name);
-          print(user.value.phone);
-          print('________________________________________');
-          print('__________________________________________');
-          print('____________________________________________');
-          print('______________________________________________');
-          print(user.value.image_file);
-          print(user.value.image_url);
-          print(user.value.device_token);
+          print(user.toJson());
+         
         }
       });
 
 
 
+    }else{
+      //check divice token
+      await getDeviceToken();
+       
+          if(devicetoken !=  null){
+            if(user.value.device_token !=  devicetoken){
+              await updateDeviceToken(devicetoken);
+              user.value.device_token = devicetoken;
+            }
+          }
     }
   }
 

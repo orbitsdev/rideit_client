@@ -113,7 +113,8 @@ class Requestdatacontroller extends GetxController {
               if ((data['status'] == "accepted") &&
                   (data['tripstatus'] == 'ready')) {
                 Future.delayed(Duration(milliseconds: 300), () {
-                  Get.off(() => Ongoingtrip());
+                  Get.offAll(()=> Ongoingtrip());
+                 // Get.off(() => Ongoingtrip());
                 });
               }
             }

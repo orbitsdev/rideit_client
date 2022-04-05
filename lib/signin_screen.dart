@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/sigup_screen.dart';
+import 'package:tricycleapp/widgets/verticalspace.dart';
 
 
 
@@ -77,12 +78,13 @@ class _SigninScreenState extends State<SigninScreen> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  
+                Verticalspace(MediaQuery.of(context).size.height *0.1),
+               
                 SizedBox(
                   height: 24
                 ),
                   Container(
-                  child: Image.asset('assets/images/Isulan.png', fit: BoxFit.cover,),
+                  child: Image.asset('assets/images/Group1.png', fit: BoxFit.cover,),
                   height: 180,
                 ),
                 SizedBox(

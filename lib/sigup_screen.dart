@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/UI/constant.dart';
 import 'package:tricycleapp/helper/audiiomanger.dart';
+import 'package:tricycleapp/widgets/verticalspace.dart';
 
 import '../../controller/authcontroller.dart';
 
@@ -104,11 +105,10 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               children: [
 
-               
                 SizedBox(height: 24),
                 Container(
                   child: Image.asset(
-                    'assets/images/Isulan.png',
+                    'assets/images/Group1.png',
                     fit: BoxFit.cover,
                   ),
                   height: 180,
