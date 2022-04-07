@@ -215,11 +215,7 @@ class Mapdatacontroller extends GetxController {
     var isSet = await setPickUplocation(response['results'][0]['place_id']);
     if (isSet) {
       Get.back();
-      var isdirectionReady = await getDirection(
-          context,
-          pickuplocationDetails.value.placeid as String,
-          LatLng(droplocationDetails.value.latitude as double,
-              droplocationDetails.value.longitude as double));
+      var isdirectionReady = await getDirection( context, pickuplocationDetails.value.placeid as String, LatLng(pickuplocationDetails.value.latitude as double , pickuplocationDetails.value.longitude as double), LatLng(droplocationDetails.value.latitude as double,droplocationDetails.value.longitude as double));
       if (isdirectionReady) {
         return true;
       } else {
@@ -249,10 +245,10 @@ class Mapdatacontroller extends GetxController {
   }
 
   Future<bool> getDirection(
-      BuildContext context, String origin_place_id, LatLng destination) async {
+      BuildContext context, String origin_place_id,  LatLng currentlocation , LatLng destination) async {
     Mapdialog.showMapProgress(context, 'Prepairing direction detais...');
-    String url =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${origin_place_id}&destination=${destination.latitude},${destination.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
+    //String url = "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${origin_place_id}&destination=${destination.latitude},${destination.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
+    String url = "https://maps.googleapis.com/maps/api/directions/json?origin=${currentlocation.latitude},${currentlocation.longitude}&destination=${destination.latitude},${destination.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     var response = await Mapservices.mapRequest(url);
     if (response != "failed") {
       print(response);
