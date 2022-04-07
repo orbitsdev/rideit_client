@@ -12,15 +12,19 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart' as lottie;
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:tricycleapp/UI/constant.dart';
+import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/mapdatacontroller.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
 import 'package:tricycleapp/dialog/mapdialog/mapdialog.dart';
+import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/model/prediction_place.dart';
 import 'package:tricycleapp/screens/payment_screen.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 
 import 'package:tricycleapp/widgets/horizontalspace.dart';
 import 'package:tricycleapp/widgets/verticalspace.dart';
+
+enum MapMode { normal, hybrid, satelite, darkmode }
 
 class RequestScreen extends StatefulWidget {
   const RequestScreen({Key? key}) : super(key: key);
@@ -30,6 +34,85 @@ class RequestScreen extends StatefulWidget {
 }
 
 class _RequestScreenState extends State<RequestScreen> {
+  var authcontroller = Get.find<Authcontroller>();
+
+  MapMode mapmode = MapMode.hybrid;
+  MapType maptype = MapType.hybrid;
+
+  void getCurrenMaptyoe() {
+    print(authcontroller.user.value.map_mode);
+    if (authcontroller.user.value.map_mode == 'normal') {
+      newgooglemapcontroller!.setMapStyle(null);
+    }
+    if (authcontroller.user.value.map_mode == 'darkmode') {
+      newgooglemapcontroller!.setMapStyle(mapdarktheme);
+    }
+    if (authcontroller.user.value.map_mode == 'satelite') {
+      setState(() {
+        mapmode = MapMode.satelite;
+        maptype = MapType.satellite;
+      });
+    }
+    if (authcontroller.user.value.map_mode == 'hybrid') {
+      setState(() {
+        mapmode = MapMode.hybrid;
+        maptype = MapType.hybrid;
+      });
+    }
+  }
+
+  void mapTypeChange(MapMode value) async {
+    print('MAP MODE');
+    print(value);
+
+    if (value == MapMode.normal) {
+      setState(() {
+        mapmode = value;
+        maptype = MapType.normal;
+        newgooglemapcontroller!.setMapStyle(null);
+      });
+    }
+    if (value == MapMode.darkmode) {
+      setState(() {
+        mapmode = value;
+        maptype = MapType.normal;
+        newgooglemapcontroller!.setMapStyle(mapdarktheme);
+      });
+    }
+    if (value == MapMode.satelite) {
+      setState(() {
+        mapmode = value;
+        maptype = MapType.satellite;
+      });
+    }
+    if (value == MapMode.hybrid) {
+      setState(() {
+        mapmode = value;
+        maptype = MapType.hybrid;
+      });
+    }
+
+    await authcontroller.updateMapOfUser(value.name);
+  }
+
+  void setMapStyle(bool value) {
+    if (value) {
+      setState(() {
+        newgooglemapcontroller!.setMapStyle(mapdarktheme);
+      });
+    } else {
+      setState(() {
+        newgooglemapcontroller!.setMapStyle(null);
+      });
+    }
+  }
+
+  void setMapStylle(MapType value) {
+    setState(() {
+      maptype = value;
+    });
+  }
+
   int currenStep = 0;
 
   void setCurrentStep(int value) {
@@ -79,6 +162,7 @@ class _RequestScreenState extends State<RequestScreen> {
   void initState() {
     super.initState();
     setCameraPostionToMyCurrentLocation();
+
     paymentmethod = "null";
   }
 
@@ -111,7 +195,6 @@ class _RequestScreenState extends State<RequestScreen> {
       target: LatLng(37.43296265331129, -122.08832357078792),
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
-
 
   void setDropMarker(LatLng postion) {
     droplocationmarker = Marker(
@@ -189,11 +272,11 @@ class _RequestScreenState extends State<RequestScreen> {
       polylineSet.add(
         Polyline(
             polylineId: PolylineId(polylineIdVal),
-            width: 7,
+            width: 8,
             jointType: JointType.mitered,
             endCap: Cap.squareCap,
             startCap: Cap.squareCap,
-            color: Colors.blue,
+            color: ELSA_BLUE,
             points: mapdatacontroller.directionDetails.value.polylines_encoded!
                 .map((e) => LatLng(e.latitude, e.longitude))
                 .toList()),
@@ -232,28 +315,47 @@ class _RequestScreenState extends State<RequestScreen> {
         appBar: AppBar(
           leading: IconButton(
               onPressed: () {
-                Get.back(); 
+                Get.back();
                 mapdatacontroller.clearRequestForm();
                 setCurrentStep(0);
                 startingCamera();
               },
               icon: FaIcon(FontAwesomeIcons.times)),
+          actions: [
+            GestureDetector(
+              onTap: (){
+                  Mapdialog.showMapOption(context,mapTypeChange);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                    gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    LIGHT_CONTAINER,
+                    LIGHT_CONTAINER2,
+                  ],
+                )),
+                margin: EdgeInsets.all(10),
+                width: 35,
+                child:  Center(child: FaIcon(FontAwesomeIcons.satellite,size: 20,)),
+              ),
+            ),
+
+          ],
         ),
         body: isMapReady == false
-            ?  Container(
-
-            child: Column(
-              
+            ? Container(
+                child: Column(
                   children: [
                     Verticalspace(100),
-                    lottie.Lottie.asset('assets/images/99103-red-pin-map.json', width: 250, height: 250, fit: BoxFit.contain),
-                    Container(
-                      width: double.infinity
-                    )
+                    lottie.Lottie.asset('assets/images/99103-red-pin-map.json',
+                        width: 250, height: 250, fit: BoxFit.contain),
+                    Container(width: double.infinity)
                   ],
                 ),
-            )
-    
+              )
             : Column(
                 children: [
                   Expanded(
@@ -291,21 +393,21 @@ class _RequestScreenState extends State<RequestScreen> {
                           markers: markerSet,
                           circles: circleSet,
                           polylines: polylineSet,
-                          mapType: MapType.normal,
+                          mapType: maptype,
                           initialCameraPosition: mapdatacontroller
-                              .cameraPosition as CameraPosition  ,
+                              .cameraPosition as CameraPosition,
                           onMapCreated: (GoogleMapController controller) {
                             _macontroller.complete(controller);
                             newgooglemapcontroller = controller;
                             //newgooglemapcontroller!.setMapStyle(mapdarktheme);
                             getCurrentLocation();
+                            getCurrenMaptyoe();
                             // setState(() {
                             //   mappadding = 300;
                             // });
                           },
                         ),
-                        if(currenStep == 0)
-                        buildFloatingSearchBar(),
+                        if (currenStep == 0) buildFloatingSearchBar(),
                       ],
                     ),
                   ),
@@ -382,7 +484,7 @@ class _RequestScreenState extends State<RequestScreen> {
                                                       onTap: () {
                                                         Infodialog.showInfo(
                                                             context,
-                                                            'Due to the limitation of google map features when providing route. We have added circle to the map. The red circle represent the actual position of your destination and purple circle represent your current location ');
+                                                            'If the guide route did not reach your selected destination it is probably because you are located inside the scope of the same address or  google map cannot draw route to your location. Due to this limitation of google map features. We have added circle to the map. The red circle represent the actual position of your selected destination and purple circle represent your current location. ');
                                                       },
                                                       child: Container(
                                                           height: 26,
@@ -529,63 +631,63 @@ class _RequestScreenState extends State<RequestScreen> {
                                                                         .circular(
                                                                             4)),
                                                               ),
-                                                              child: ElevatedButton(
-                                                                  style: ElevatedButton.styleFrom(
-                                                                    primary:
-                                                                        DARK_GREEN,
-                                                                  ),
-                                                                  onPressed: mapdatacontroller.droplocationDetails.value.placeid == null
-                                                                      ? null
-                                                                      : () async {
-                                                                          if (mapdatacontroller.lastropmarkerposition.toString() !=  mapdatacontroller.actualdropmarkerposition.toString()) {
-                                                                            isRouteReady =
-                                                                                await mapdatacontroller.prepaireRoute(context);
-                                                                            if (isRouteReady) {
-                                                                              print('ready napo sir');
-                                                                              print(isRouteReady);
-                                                                              setState(() {
+                                                              child:
+                                                                  ElevatedButton(
+                                                                      style: ElevatedButton
+                                                                          .styleFrom(
+                                                                        primary:
+                                                                            DARK_GREEN,
+                                                                      ),
+                                                                      onPressed: mapdatacontroller.droplocationDetails.value.placeid ==
+                                                                              null
+                                                                          ? null
+                                                                          : () async {
+                                                                              if (mapdatacontroller.lastropmarkerposition.toString() != mapdatacontroller.actualdropmarkerposition.toString()) {
+                                                                                isRouteReady = await mapdatacontroller.prepaireRoute(context);
+                                                                                if (isRouteReady) {
+                                                                                  print('ready napo sir');
+                                                                                  print(isRouteReady);
+                                                                                  setState(() {
+                                                                                    setCurrentStep(1);
+                                                                                  });
+
+                                                                                  setPolylines();
+                                                                                } else {
+                                                                                  print(isRouteReady);
+                                                                                  print('yugs di pa ready');
+                                                                                }
+                                                                              } else {
+                                                                                print(mapdatacontroller.lastropmarkerposition.toString() + ' actual marker');
+                                                                                print('_____________________________________________--');
+                                                                                print('_____________________________________________');
+                                                                                print(mapdatacontroller.actualdropmarkerposition.toString() + ' actual marker');
+                                                                                print('bri thi ma procceess');
                                                                                 setCurrentStep(1);
-                                                                              });
+                                                                              }
 
-                                                                              setPolylines();
-                                                                            } else {
-                                                                              print(isRouteReady);
-                                                                              print('yugs di pa ready');
-                                                                            }
-                                                                          } else {
-
-                                                                            print(mapdatacontroller.lastropmarkerposition.toString() +' actual marker');
-                                                                            print('_____________________________________________--');
-                                                                            print('_____________________________________________');
-                                                                            print(mapdatacontroller.actualdropmarkerposition.toString() +' actual marker');
-                                                                            print('bri thi ma procceess');
-                                                                            setCurrentStep(1);
-                                                                          }
-
-                                                                          // Get.to(() => HomeScreen(),
-                                                                          //     fullscreenDialog: true,
-                                                                          //     transition: Transition.rightToLeft);
-                                                                        },
-                                                                  child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Text('Get Route'
-                                                                          .toUpperCase()),
-                                                                      Horizontalspace(
-                                                                          5),
-                                                                      // Container(
-                                                                      //     child: Center(
-                                                                      //         child: FaIcon(
-                                                                      //   FontAwesomeIcons.angleRight,
-                                                                      //   size: 24,
-                                                                      // )))
-                                                                    ],
-                                                                  )),
+                                                                              // Get.to(() => HomeScreen(),
+                                                                              //     fullscreenDialog: true,
+                                                                              //     transition: Transition.rightToLeft);
+                                                                            },
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        children: [
+                                                                          Text('Get Route'
+                                                                              .toUpperCase()),
+                                                                          Horizontalspace(
+                                                                              5),
+                                                                          // Container(
+                                                                          //     child: Center(
+                                                                          //         child: FaIcon(
+                                                                          //   FontAwesomeIcons.angleRight,
+                                                                          //   size: 24,
+                                                                          // )))
+                                                                        ],
+                                                                      )),
                                                             )
                                                           : Row(
                                                               mainAxisAlignment:
@@ -728,8 +830,6 @@ class _RequestScreenState extends State<RequestScreen> {
         // Call your model, bloc, controller here.
       },
       onSubmitted: (query) async {
-       
-
         if (mapdatacontroller.placeprediction.length != 0) {
           PredictionPlace firstresult = mapdatacontroller.placeprediction[0];
           print('___________________________');
@@ -743,11 +843,8 @@ class _RequestScreenState extends State<RequestScreen> {
 
             setDropMarker(mapdatacontroller.dropmarkerposition as LatLng);
           }
-
-          
         }
-          closeGoogleMapSearch();
-        
+        closeGoogleMapSearch();
       },
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
@@ -757,9 +854,7 @@ class _RequestScreenState extends State<RequestScreen> {
           showIfOpened: false,
           child: CircularButton(
             icon: const Icon(Icons.place),
-            onPressed: () {
-             
-            },
+            onPressed: () {},
           ),
         ),
         FloatingSearchBarAction.searchToClear(
@@ -832,7 +927,7 @@ class _RequestScreenState extends State<RequestScreen> {
   }
 
   void closeGoogleMapSearch() {
-     setState(() {
+    setState(() {
       searchcontroller.close();
       mapdatacontroller.placeprediction.clear();
     });

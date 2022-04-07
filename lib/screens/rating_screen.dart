@@ -23,7 +23,7 @@ class _RatingScreenState extends State<RatingScreen> {
 
   var comment  = TextEditingController();
   ConfettiController? conffetecontroller;
-  int rate = 3;
+  int rate = 5;
   String ratedescription="Excellent";
    
 
@@ -131,7 +131,7 @@ class _RatingScreenState extends State<RatingScreen> {
                     minRating: 1,
                     direction: Axis.horizontal,
                     allowHalfRating: false,
-                    itemCount: 3,
+                    itemCount: 5,
                     itemSize: 50,
                     ratingWidget: RatingWidget(
                     full: FaIcon(FontAwesomeIcons.solidStar, color: Colors.yellow),
@@ -146,15 +146,23 @@ class _RatingScreenState extends State<RatingScreen> {
 
                         if(rate ==1){
 
-                          ratedescription = "Unsatisfied ";
+                          ratedescription = "Very Unsatisfied ";
                         }
 
                         if(rate== 2){
-                          ratedescription = "Nice";
+                          ratedescription = "Unsatisfied";
 
                         }
 
                         if(rate ==3){
+                          ratedescription = "Nice";
+                        }
+
+                        if(rate ==4){
+                          ratedescription = "Very Satisfied";
+                        }
+
+                        if(rate ==5){
                           ratedescription = "Excellent";
                         }
 

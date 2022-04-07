@@ -77,6 +77,7 @@ class Authcontroller extends GetxController {
           "image_file": null,
           'device_token': devicetoken,
           'new_acount': true,
+          'map_type': null,
         };
         await firestore
             .collection('passengers')
@@ -319,4 +320,17 @@ class Authcontroller extends GetxController {
     });
 
   }
+
+   Future<void> updateMapOfUser(String mapmode) async{  
+
+      
+    await userrefference.doc(authinstance.currentUser!.uid).update({
+       'map_mode': mapmode,
+     }).then((value) {
+       user.value.map_mode =mapmode;
+     }).catchError((e){
+       
+       Infodialog.showInfoToastCenter(e.toString());  
+     });
+   }
 }

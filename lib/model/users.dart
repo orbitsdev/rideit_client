@@ -10,6 +10,7 @@ class Users {
   String? image_file;
   String? device_token;
   bool? new_acount;
+  String? map_mode;
  
  
   Users({
@@ -21,8 +22,8 @@ class Users {
     this.image_file,
     this.device_token,
     this.new_acount,
+    this.map_mode,
     
-
   });
 
 
@@ -39,6 +40,7 @@ class Users {
     user.image_file = json['image_file'];
     user.device_token = json["device_token"];
     user.new_acount = json["new_acount"];
+    user.map_mode = json["map_mode"];
 
     return user;
   }
@@ -51,6 +53,7 @@ class Users {
    'image_file':    image_file,
    'device_token':    device_token,
    'new_acount':    new_acount,
+   'map_mode': map_mode
   };
    
 }
