@@ -42,10 +42,23 @@ class _RequestScreenState extends State<RequestScreen> {
   void getCurrenMaptyoe() {
     print(authcontroller.user.value.map_mode);
     if (authcontroller.user.value.map_mode == 'normal') {
-      newgooglemapcontroller!.setMapStyle(null);
+
+      setState(() {
+        mapmode = MapMode.normal;
+        maptype = MapType.normal;
+         newgooglemapcontroller!.setMapStyle(null);
+      });
+     
     }
     if (authcontroller.user.value.map_mode == 'darkmode') {
-      newgooglemapcontroller!.setMapStyle(mapdarktheme);
+        
+        setState(() {
+          
+        mapmode = MapMode.normal;
+        maptype = MapType.normal;
+        newgooglemapcontroller!.setMapStyle(mapdarktheme);
+        });
+
     }
     if (authcontroller.user.value.map_mode == 'satelite') {
       setState(() {
@@ -397,10 +410,13 @@ class _RequestScreenState extends State<RequestScreen> {
                           initialCameraPosition: mapdatacontroller
                               .cameraPosition as CameraPosition,
                           onMapCreated: (GoogleMapController controller) {
-                            _macontroller.complete(controller);
+                            if(!_macontroller.isCompleted){
+                          _macontroller.complete(controller);
                             newgooglemapcontroller = controller;
                             //newgooglemapcontroller!.setMapStyle(mapdarktheme);
                             getCurrentLocation();
+                            }
+                           
                             getCurrenMaptyoe();
                             // setState(() {
                             //   mappadding = 300;

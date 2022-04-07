@@ -29,8 +29,8 @@ class Ongoingtrip extends StatefulWidget {
 
 class _OngoingtripState extends State<Ongoingtrip> {
 
-var requestxcontroller = Get.find<Requestdatacontroller>();
-var mapdataxcontroller = Get.find<Mapdatacontroller>();
+var requestxcontroller = Get.put(Requestdatacontroller());
+var mapdataxcontroller = Get.put(Mapdatacontroller());
 
   
 @override

@@ -89,7 +89,7 @@ textAlign: TextAlign.center,
                             changeMapType(MapMode.satelite);
                             Get.back();
                          },
-                         child: MaptypeBuilder(name: 'Satilite', image: 'assets/images/flutter-google-maps3 1.png',)
+                         child: MaptypeBuilder(name: 'Satilite', image: 'assets/images/flutter-google-maps31.png',)
                          ),
                      
                       

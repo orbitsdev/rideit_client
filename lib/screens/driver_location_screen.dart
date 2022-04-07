@@ -216,7 +216,7 @@ createCustomMarker();
         children: [
          
           GoogleMap(
-        padding: EdgeInsets.only(top: mapapdding, bottom: mapapdding),
+        padding: EdgeInsets.only(top:30, bottom: 30),
         mapType: MapType.hybrid,
         initialCameraPosition: drivercameraposition as CameraPosition,
         markers: markerSet,
