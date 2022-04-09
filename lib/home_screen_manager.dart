@@ -38,9 +38,9 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
     with TickerProviderStateMixin {
   var requesstxcontroller = Get.put(Requestdatacontroller());
   var pagexcontroller = Get.put(Pagecontroller());
-    var passengerxcontroller = Get.find<PassengerController>();
-  var authxcontroller = Get.find<Authcontroller>();
-  var driverxcontroller = Get.find<Drivercontroller>();
+    var passengerxcontroller = Get.put(PassengerController());
+  var authxcontroller = Get.put(Authcontroller());
+  var driverxcontroller = Get.put(Drivercontroller());
 
   Color colorwhite = HexColor("#fbfefb");
   Color iconcolor = HexColor("#2F2191");
@@ -71,7 +71,8 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
     passengerxcontroller.listenToAllTrip();
     requesstxcontroller.monitorAdminData();
     requesstxcontroller.monitorRequest();
-    requesstxcontroller.monitorTrip();
+    requesstxcontroller.monitorTrip();  
+    authxcontroller.monitorAccountifblock();
 
   }
 

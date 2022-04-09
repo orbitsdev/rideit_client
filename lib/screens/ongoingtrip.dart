@@ -54,9 +54,8 @@ void prepaireData () async{
 
 
   var response = await requestxcontroller.checkTripData();
-  print('_____resposmne');
-  print(response);
-   if(response){
+  
+    if(response){
     
     
     setState(() {

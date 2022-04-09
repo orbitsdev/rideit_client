@@ -58,14 +58,14 @@ class OngoingTripDetails {
   });
 
   factory OngoingTripDetails.fromJson(Map<String, dynamic> json) {
-    LatLng picklocation = LatLng(checkDouble(json['pick_location']['latitude']),
+    LatLng? picklocation = LatLng(checkDouble(json['pick_location']['latitude']),
         checkDouble(json['pick_location']['longitude']));
-    LatLng droplocation = LatLng(checkDouble(json['drop_location']['latitude']),
+    LatLng? droplocation = LatLng(checkDouble(json['drop_location']['latitude']),
         checkDouble(json['drop_location']['longitude']));
-    LatLng actualmarker = LatLng(
+    LatLng? actualmarker = LatLng(
         checkDouble(json['actualmarker_position']['latitude']),
         checkDouble(json['actualmarker_position']['longitude']));
-    LatLng driverlocation = LatLng(
+    LatLng? driverlocation = LatLng(
         checkDouble(json['driver_location']['latitude']),
         checkDouble(json['driver_location']['longitude']));
 

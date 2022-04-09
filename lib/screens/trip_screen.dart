@@ -32,8 +32,8 @@ class TripScreen extends StatefulWidget {
 class _TripScreenState extends State<TripScreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
-  var requestxcontroller = Get.find<Requestdatacontroller>();
-  var passengerxcontroller = Get.find<PassengerController>();
+  var requestxcontroller = Get.put(Requestdatacontroller());
+  var passengerxcontroller = Get.put(PassengerController());
   bool hasongointrip = false;
   bool loadingrequest = true;
 
@@ -154,7 +154,7 @@ class _TripScreenState extends State<TripScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
 
-                              
+                              requestxcontroller.monitorcurrentrequest.value == null? Container(height:0) :  
                               RequestBuilder(picklocationname: '${requestxcontroller.monitorcurrentrequest.value.pickaddress_name}', droplocationname: '${requestxcontroller.monitorcurrentrequest.value.dropddress_name}', pickicon: FontAwesomeIcons.mapMarkerAlt, dropicon: FontAwesomeIcons.mapPin),
                               Verticalspace(12),
                                Row(

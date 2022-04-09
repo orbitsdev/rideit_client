@@ -151,7 +151,7 @@ class DialogCollection {
                   SizedBox(
                     height: 12,
                   ),
-                  Text(mesage.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 20, fontWeight: FontWeight.w600)),
+                  Text(mesage.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 20, fontWeight: FontWeight.w600), textAlign: TextAlign.center,),
                   Verticalspace(16),
 
                   Container(

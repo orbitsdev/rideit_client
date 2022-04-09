@@ -23,7 +23,7 @@ const Dashboard({ Key? key }) : super(key: key);
 
 class _DashboardState extends State<Dashboard> {
 
-  var passengerxcontroller = Get.find<PassengerController>();
+  var passengerxcontroller = Get.put(PassengerController());
 
   @override
   void initState() {

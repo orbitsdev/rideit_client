@@ -10,8 +10,9 @@ class Users {
   String? image_file;
   String? device_token;
   bool? new_acount;
-  String? map_mode;
  
+  String? map_mode;
+  bool? authorize;
  
   Users({
     this.id,
@@ -23,6 +24,7 @@ class Users {
     this.device_token,
     this.new_acount,
     this.map_mode,
+    this.authorize,
     
   });
 
@@ -41,11 +43,12 @@ class Users {
     user.device_token = json["device_token"];
     user.new_acount = json["new_acount"];
     user.map_mode = json["map_mode"];
+    user.authorize = json["authorize"];
 
     return user;
   }
   Map<String, dynamic> toJson()=>{
-     'id':id,
+   'id':id,
    'name':    name,
    'email':    email,
    'phone':    phone,
@@ -53,7 +56,8 @@ class Users {
    'image_file':    image_file,
    'device_token':    device_token,
    'new_acount':    new_acount,
-   'map_mode': map_mode
+   'map_mode': map_mode,
+   'authorize': authorize
   };
    
 }

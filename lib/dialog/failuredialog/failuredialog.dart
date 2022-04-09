@@ -23,7 +23,7 @@ static void noDataDialog(BuildContext context, String title, String body){
              ),
            
             
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(25),
               child: Column(
 
@@ -83,22 +83,22 @@ static void showErrorDialog(BuildContext context, String title, String body){
              ),
            
             
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 70, 10, 10),
+            child: SingleChildScrollView(
+               padding: const EdgeInsets.fromLTRB(10, 70, 10, 10),
               child: Column(
-
-
+            
+            
                 mainAxisSize: MainAxisSize.min,
                 children: 
                 [ 
-
+            
                   Container(
                   
                     width: double.infinity,
                     child:  Lottie.asset('assets/images/84655-swinging-sad-emoji.json', )
                   ),
-
             
+              
                   Column(
                     children: [
                       Text(title.toUpperCase(), style:Get.textTheme.headline1,),

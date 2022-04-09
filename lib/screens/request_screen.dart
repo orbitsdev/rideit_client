@@ -40,7 +40,6 @@ class _RequestScreenState extends State<RequestScreen> {
   MapType maptype = MapType.hybrid;
 
   void getCurrenMaptyoe() {
-    print(authcontroller.user.value.map_mode);
     if (authcontroller.user.value.map_mode == 'normal') {
 
       setState(() {
@@ -75,8 +74,7 @@ class _RequestScreenState extends State<RequestScreen> {
   }
 
   void mapTypeChange(MapMode value) async {
-    print('MAP MODE');
-    print(value);
+   
 
     if (value == MapMode.normal) {
       setState(() {
@@ -140,7 +138,6 @@ class _RequestScreenState extends State<RequestScreen> {
     setState(() {
       paymentmethod = value;
     });
-    print(paymentmethod);
   }
 
   double mappadding = 0;
@@ -589,7 +586,6 @@ class _RequestScreenState extends State<RequestScreen> {
                                                       color: LIGHT_CONTAINER,
                                                       child: InkWell(
                                                         onTap: () {
-                                                          print('hey');
                                                           moveCamera(LatLng(
                                                             mapdatacontroller
                                                                 .droplocationDetails
@@ -661,23 +657,17 @@ class _RequestScreenState extends State<RequestScreen> {
                                                                               if (mapdatacontroller.lastropmarkerposition.toString() != mapdatacontroller.actualdropmarkerposition.toString()) {
                                                                                 isRouteReady = await mapdatacontroller.prepaireRoute(context);
                                                                                 if (isRouteReady) {
-                                                                                  print('ready napo sir');
-                                                                                  print(isRouteReady);
+                                                                             
                                                                                   setState(() {
                                                                                     setCurrentStep(1);
                                                                                   });
 
                                                                                   setPolylines();
                                                                                 } else {
-                                                                                  print(isRouteReady);
-                                                                                  print('yugs di pa ready');
+                                                                                
                                                                                 }
                                                                               } else {
-                                                                                print(mapdatacontroller.lastropmarkerposition.toString() + ' actual marker');
-                                                                                print('_____________________________________________--');
-                                                                                print('_____________________________________________');
-                                                                                print(mapdatacontroller.actualdropmarkerposition.toString() + ' actual marker');
-                                                                                print('bri thi ma procceess');
+                                                                       
                                                                                 setCurrentStep(1);
                                                                               }
 

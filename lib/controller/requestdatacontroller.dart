@@ -25,8 +25,8 @@ import 'package:tricycleapp/screens/rating_screen.dart';
 
 class Requestdatacontroller extends GetxController {
   var listofavailabledriver = <Availabledriver>[].obs;
-  var autxcontroller = Get.find<Authcontroller>();
-  var mapxcontroller = Get.find<Mapdatacontroller>();
+  var autxcontroller = Get.put(Authcontroller());
+  var mapxcontroller = Get.put(Mapdatacontroller());
   var devicetokens = <String?>[].obs;
 
   var currentrequest = RequestDetails().obs;
@@ -41,6 +41,7 @@ class Requestdatacontroller extends GetxController {
   var isPaymentShowed = false.obs;
   var isRatingShowed = false.obs;
   var isDriverShowed = false.obs;
+  var isCanceledShowed= false.obs;
 
   void createRequest(BuildContext context) async {
     Map<String, dynamic> picklocation = {
@@ -229,7 +230,7 @@ class Requestdatacontroller extends GetxController {
 
   Future<bool> checkTripData() async {
     bool isTripData = false;
-    print('checkdata');
+ 
     await requestrefference
         .doc(authinstance.currentUser!.uid)
         .collection('ongoingtrip')
@@ -239,7 +240,7 @@ class Requestdatacontroller extends GetxController {
       if (value.exists) {
         ongoingtrip(
             OngoingTripDetails.fromJson(value.data() as Map<String, dynamic>));
-        print(ongoingtrip.toJson());
+        
         isTripData = true;
       } else {
         isTripData = false;
@@ -254,22 +255,23 @@ class Requestdatacontroller extends GetxController {
   }
 
   Future<void> monitorOngoingTrip() async {
-    print('trip minotr caleed');
-    ongoingtripstream!.listen((event) async {
+
+      ongoingtripstream!.listen((event) async {
 
       if(event.exists){
-           print('______________________');
-      print('________________________');
-
-      print(ongoingtrip.toJson());
-      //print(ongoingtrip.value.tripstatus);
+      
+ 
 
       ongoingtrip(
           OngoingTripDetails.fromJson(event.data() as Map<String, dynamic>));
         
-      
+        
       if(ongoingtrip.value.tripstatus == "canceled"){
-          DialogCollection.showCancelInfo('Your Trip has been canceled');
+            if(isCanceledShowed==false){
+              DialogCollection.showCancelInfo('Your Trip has been canceled');
+              isCanceledShowed(true);
+            }
+              
           
       }
 
@@ -308,42 +310,43 @@ class Requestdatacontroller extends GetxController {
         }
       }
 
-      print('__________TRIPS STATUS');
-      print(currentStatus);
       }
-      //print('event.data()');
+    
      
     });
   }
 
   void monitorRequest() async {
-    print('MONITOR REQUEST START');
+   
     requestrefference
         .doc(authinstance.currentUser!.uid)
         .snapshots()
         .listen((event) {
       if (event.exists) {
         monitorcurrentrequest(RequestDetails.fromJson(event.data() as Map<String, dynamic>));
-        print(monitorcurrentrequest.toJson());
+       
       } else {
         monitorcurrentrequest(RequestDetails());
-          print('NO REQUET FOUND');
+        
       }
     });
   }
 
 void monitorTrip() async {
 
-    print(isPaymentShowed.value);
-        print('MONITOR ONGOING TRIP START');
+    
     ongoingtripstream!.listen((event) async {
       if (event.exists) {
         monitorongoingtrip(  OngoingTripDetails.fromJson(event.data() as Map<String, dynamic>));
 
            if(monitorongoingtrip.value.tripstatus == "canceled"){
-          DialogCollection.showCancelInfo('Your Trip has been canceled');
+         if(isCanceledShowed==false){
+              DialogCollection.showCancelInfo('Your Trip has been canceled');
+              isCanceledShowed(true);
+            }
           
         }
+        
 
 
         if(monitorongoingtrip.value.tripstatus =="arrived"){
@@ -416,13 +419,13 @@ Future<void> deleteTrip() async{
     await requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).delete().then((value) async {
        await requestrefference.doc(authinstance.currentUser!.uid).delete();
     });
-    await clearLocalData();
     Get.back();
-   Get.offAndToNamed(HomeScreenManager.screenName);
+    await clearLocalData();
+    Get.offAll(HomeScreenManager());
   }catch(e){
     Get.back();
     Infodialog.showInfoToastCenter(e.toString());
-   Get.offAndToNamed(HomeScreenManager.screenName);
+    Get.offAll(HomeScreenManager());
   };
 
   
@@ -440,6 +443,7 @@ Future<void> clearLocalData()async{
    isPaymentShowed(false);
    isRatingShowed(false);
    isDriverShowed(false);
+   isCanceledShowed(false);
   
 }
 
@@ -450,7 +454,7 @@ void monitorAdminData() async{
            
           publicdata(PublicData.fromJson(event.data() as Map<String, dynamic>));
 
-          print(publicdata.toJson());
+   
         
       }
 

@@ -246,7 +246,7 @@ class Mapdatacontroller extends GetxController {
 
   Future<bool> getDirection(
       BuildContext context, String origin_place_id,  LatLng currentlocation , LatLng destination) async {
-    Mapdialog.showMapProgress(context, 'Prepairing direction detais...');
+    Mapdialog.showMapProgress(context, 'Prepairing direction details...');
     //String url = "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${origin_place_id}&destination=${destination.latitude},${destination.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     String url = "https://maps.googleapis.com/maps/api/directions/json?origin=${currentlocation.latitude},${currentlocation.longitude}&destination=${destination.latitude},${destination.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     var response = await Mapservices.mapRequest(url);

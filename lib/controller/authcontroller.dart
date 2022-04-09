@@ -12,6 +12,7 @@ import 'package:tricycleapp/emailverifying_screen.dart';
 import 'package:tricycleapp/helper/firebasehelper.dart';
 import 'package:tricycleapp/home_screen_manager.dart';
 import 'package:tricycleapp/model/users.dart';
+import 'package:tricycleapp/screens/block_account_screen.dart';
 import 'package:tricycleapp/screens/onboard_screen.dart';
 import 'package:tricycleapp/verifyingemail_screen.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
@@ -19,12 +20,14 @@ import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 class Authcontroller extends GetxController {
   var hasinternet = false.obs;
   var user = Users().obs;
+  var monitoruseracount = Users().obs;
   late TwilioPhoneVerify _twilioPhoneVerify;
   
   var isSignUpLoading = false.obs;
   var isCodeSent = false.obs;
   var isVerifying = false.obs;
   bool mailverified = false;
+  var isscreenshowed = false.obs;
 
   String? gname;
   String? gphone;
@@ -47,9 +50,7 @@ class Authcontroller extends GetxController {
   Future<void> getDeviceToken() async {
     devicetoken = await messaginginstance.getToken();
 
-    if (devicetoken != null) {
-      print('device  token is here__________________');
-    }
+    
   }
 
   void createUser(String name, String phone, String email, String password,
@@ -66,7 +67,8 @@ class Authcontroller extends GetxController {
           .createUserWithEmailAndPassword(
               email: gemail as String, password: gpassword as String)
           .then((credential) async {
-        progressDialog('Checking..');
+
+        Authdialog.showAuthProGress('Checking...');
 
         await getDeviceToken();
         Map<String, dynamic> userdetailstostore = {
@@ -77,7 +79,8 @@ class Authcontroller extends GetxController {
           "image_file": null,
           'device_token': devicetoken,
           'new_acount': true,
-          'map_type': null,
+          'map_mode': null,
+          'authorize': true,
         };
         await firestore
             .collection('passengers')
@@ -101,7 +104,8 @@ class Authcontroller extends GetxController {
             Future.delayed(Duration(milliseconds: 300),
                 () =>Get.offAndToNamed(VerifyingemailScreen.screenName));
           } else {
-            progressDialog('Authenticating..');
+          
+            Authdialog.showAuthProGress('Authenticating...');
             Future.delayed(Duration(seconds: 1), () {
               clearFields();
               Get.back();
@@ -135,10 +139,10 @@ class Authcontroller extends GetxController {
     } else {
       isSignUpLoading(false);
       isCodeSent(false);
-      print('______from twiilio');
-      print(twilioResponse.statusCode);
+    
+     
       notificationDialog(context, twilioResponse.errorMessage.toString());
-      print(twilioResponse.errorMessage);
+     
     }
   }
 
@@ -149,7 +153,7 @@ class Authcontroller extends GetxController {
 
     if (twilioResponse.successful as bool) {
       if (twilioResponse.verification!.status == VerificationStatus.approved) {
-        //print('Phone number is approved');
+      
         isVerifying(false);
         progressDialog('Authenticating...');
         Future.delayed(Duration(seconds: 1), () {
@@ -332,5 +336,32 @@ class Authcontroller extends GetxController {
        
        Infodialog.showInfoToastCenter(e.toString());  
      });
+   }
+
+   void monitorAccountifblock() async{
+       // monitoruseracount
+
+       userrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) async{ 
+         if(event.exists){
+           monitoruseracount(Users.fromJson(event.data() as Map<String, dynamic > ));
+           if(monitoruseracount.value.authorize == false){
+              await requestrefference.doc(authinstance.currentUser!.uid).get().then((value) {
+                if(value.exists){
+
+                }else{
+                    isscreenshowed(true);
+                    Get.offAll(BlockAccountScreen());
+                }
+              });
+           }else{
+              if(isscreenshowed.value){
+               Get.off(HomeScreenManager());
+             }
+           }
+         }else{
+           monitoruseracount(Users());
+         }
+       });
+    
    }
 }
