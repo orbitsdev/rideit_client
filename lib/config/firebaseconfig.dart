@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 class Firebaseconfig {
 
 static const String FIREBASE_API_KEY ="AIzaSyBAu_0jNcwH8OC8Mva4f_5ARKEgsu6Hz5U";
-static const String FIREBASE_APP_ID ="1:162571879335:android:8b1e81380c3c34f417ac82";
+static const String FIREBASE_APP_ID ="1:162571879335:android:34f938d0e1b4dfbb17ac82";
 static const String FIREBASE_MESSAGING_ID ="162571879335";
 static const String FIREBASE_PROJECT_ID ="tricyleapp-f8fff";
 

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "162571879335",
+    "firebase_url": "https://tricyleapp-f8fff-default-rtdb.firebaseio.com",
     "project_id": "tricyleapp-f8fff",
     "storage_bucket": "tricyleapp-f8fff.appspot.com"
   },
@@ -10,6 +11,80 @@
         "mobilesdk_app_id": "1:162571879335:android:8b1e81380c3c34f417ac82",
         "android_client_info": {
           "package_name": "com.example.tricycleapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "162571879335-0cpfe9pvsvc51etotp954cqmsh95q3hd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tricycleapp",
+            "certificate_hash": "7647dcf65e5df363ec495602525f9bf9f8bcd4b1"
+          }
+        },
+        {
+          "client_id": "162571879335-09v25grgc15r3g8uglupc9eucs268s9q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyBh1oNe0wqgv4NBQ3AjbxGYIh5mvl9YU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "162571879335-09v25grgc15r3g8uglupc9eucs268s9q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162571879335:android:a5d578c78b77241617ac82",
+        "android_client_info": {
+          "package_name": "com.example.tricycleappdriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "162571879335-3ughkc2aqe387mtgj3rvul51d21jn1m5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tricycleappdriver",
+            "certificate_hash": "7647dcf65e5df363ec495602525f9bf9f8bcd4b1"
+          }
+        },
+        {
+          "client_id": "162571879335-09v25grgc15r3g8uglupc9eucs268s9q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyBh1oNe0wqgv4NBQ3AjbxGYIh5mvl9YU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "162571879335-09v25grgc15r3g8uglupc9eucs268s9q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162571879335:android:34f938d0e1b4dfbb17ac82",
+        "android_client_info": {
+          "package_name": "com.orbinobrian.rideit"
         }
       },
       "oauth_client": [

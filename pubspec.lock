@@ -328,13 +328,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
-  flutter_launcher_icons:
-    dependency: "direct main"
-    description:
-      name: flutter_launcher_icons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.9.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -436,20 +429,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.2.0"
-  geo_firestore_flutter:
-    dependency: "direct main"
-    description:
-      name: geo_firestore_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.4"
-  geoflutterfire:
-    dependency: "direct main"
-    description:
-      name: geoflutterfire
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.2"
   geolocator:
     dependency: "direct main"
     description:
@@ -590,6 +569,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   lottie:
     dependency: "direct main"
     description:
@@ -744,13 +730,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.4"
-  rxdart:
-    dependency: transitive
+  rename:
+    dependency: "direct main"
     description:
-      name: rxdart
+      name: rename
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.27.3"
+    version: "2.0.1"
   simple_animations:
     dependency: transitive
     description:

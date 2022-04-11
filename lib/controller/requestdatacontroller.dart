@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleapp/config/cloudmessagingconfig.dart';
 import 'package:tricycleapp/controller/authcontroller.dart';
@@ -321,15 +322,23 @@ class Requestdatacontroller extends GetxController {
     requestrefference
         .doc(authinstance.currentUser!.uid)
         .snapshots()
-        .listen((event) {
+        .listen((event) async {
+          
       if (event.exists) {
         monitorcurrentrequest(RequestDetails.fromJson(event.data() as Map<String, dynamic>));
+        
+
+        
        
       } else {
         monitorcurrentrequest(RequestDetails());
         
       }
     });
+  }
+
+  void deleteOngoingTrip() async{
+
   }
 
 void monitorTrip() async {
@@ -374,6 +383,19 @@ void monitorTrip() async {
         
       } else {
         monitorongoingtrip(OngoingTripDetails());
+        if(boolisdeleting.value == false){
+             await requestrefference.doc(authinstance.currentUser!.uid).get().then((value) async{
+          if(value.exists){
+              var data = value.data() as Map<String, dynamic>;
+              if(data['status']=="accepted"){
+                    await requestrefference.doc(authinstance.currentUser!.uid).delete().then((value) {
+                    Infodialog.showToastCenter(Colors.red, Colors.white, 'Request accepted but no ongoingtrip found');
+                  });
+              }
+          }
+        });
+        }
+       
       }
     });
   }
@@ -412,17 +434,21 @@ void rateDriver(String? comment, int rate, String ratedescription) async{
 
 }
 
+var boolisdeleting = false.obs;
 Future<void> deleteTrip() async{
 
   try{
+    boolisdeleting(true);
        Authdialog.showAuthProGress('Please wait...');
     await requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).delete().then((value) async {
        await requestrefference.doc(authinstance.currentUser!.uid).delete();
     });
+        boolisdeleting(false);
     Get.back();
     await clearLocalData();
     Get.offAll(HomeScreenManager());
   }catch(e){
+        boolisdeleting(false);
     Get.back();
     Infodialog.showInfoToastCenter(e.toString());
     Get.offAll(HomeScreenManager());

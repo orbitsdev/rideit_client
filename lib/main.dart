@@ -34,7 +34,6 @@ import 'package:tricycleapp/screens/trip_screen.dart';
 import 'package:tricycleapp/signin_screen.dart';
 import 'package:tricycleapp/sigup_screen.dart';
 import 'package:tricycleapp/testotp.dart';
-import 'package:tricycleapp/testsign_screen.dart';
 import 'package:tricycleapp/uiconstant/constant.dart';
 import 'package:tricycleapp/verifyingemail_screen.dart';
 import 'package:tricycleapp/constant.dart';
