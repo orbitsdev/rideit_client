@@ -34,7 +34,7 @@ class Mapdatacontroller extends GetxController {
   LatLng? actualdropmarkerposition;
 
   
-  void clearRequestForm() {
+  Future<void> clearRequestForm() async {
     
     pickuplocationDetails(Placeaddress());
     droplocationDetails(Placeaddress());
@@ -201,7 +201,7 @@ class Mapdatacontroller extends GetxController {
 
   Future<bool> gelocationDetailsandSetRoutDeriction(
       BuildContext context) async {
-    Mapdialog.showMapProgress(context, 'Prepairing location details');
+    Mapdialog.showMapProgress('Prepairing location details');
     if (currentPosition == null) {
       currentPosition = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
@@ -245,7 +245,7 @@ class Mapdatacontroller extends GetxController {
 
   Future<bool> getDirection(
       BuildContext context, String origin_place_id,  LatLng currentlocation , LatLng destination) async {
-    Mapdialog.showMapProgress(context, 'Prepairing direction details...');
+    Mapdialog.showMapProgress( 'Prepairing direction details...');
     //String url = "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${origin_place_id}&destination=${destination.latitude},${destination.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     String url = "https://maps.googleapis.com/maps/api/directions/json?origin=${currentlocation.latitude},${currentlocation.longitude}&destination=${destination.latitude},${destination.longitude}&mode=walking&key=${Mapconfig.GOOGLE_MAP_API_KEY}";
     var response = await Mapservices.mapRequest(url);

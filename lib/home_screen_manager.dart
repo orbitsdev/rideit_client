@@ -66,6 +66,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
       vsync: this,
     );
     
+
     authxcontroller.monitorUserAccount();
     driverxcontroller.monitorAvailableDriver();
     passengerxcontroller.listenToAllTrip();
@@ -159,9 +160,39 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
       floatingActionButton: Obx((){
 
           if(requesstxcontroller.monitorcurrentrequest.value.drop_location_id != null){
-            return Container(height: 0,);
+
+              if(requesstxcontroller.isBroken.value){
+              return  GestureDetector(
+        onTap: () {
+            Infodialog.brokenInfo(context, 'You have a completed request but we couldn\'t not find trip data. This error occur when the app unexpetedly close while  at the state of the process. 2 Admin deleted some data on datadabase' );
+        },
+        child: ClipOval(
+          child: Container(
+            height: 80,
+            width: 80,
+            decoration: BoxDecoration(
+              color: BACKGROUND_BLACK,
+            ),
+            child:
+            Center(
+              child:  
+              Center(
+                  child: FaIcon(
+                FontAwesomeIcons.exclamation,
+                size: 32,
+                color: ELSA_PINK,
+              )),
+              ),
+            ),
+          ),
+        );
+          }else{
+              return Container(height: 0,);
           }
-        
+
+         
+          }
+          
         return GestureDetector(
         onTap: () {
            //print(Get.find<Requestdatacontroller>().listofavailabledriver.length);
@@ -204,32 +235,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
         );
       
       })  ,
-      //      floatingActionButton:  GFFloatingWidget(
-
-      //      child: GFIconBadge(
-
-      //             child:  ClipOval(
-      //               child: Container(
-
-      //                 height: 100,
-      //                 width: 100,
-      //                 decoration: BoxDecoration(
-      //                 color: Colors.red,
-
-      //                 ),
-      //                       child: Text('data'),
-      //                     ),
-      //             ),
-      //          counterChild:  GFBadge(
-      //            color: Colors.transparent,
-      //          text: '',
-      //          shape: GFBadgeShape.circle,
-      //          )
-      //       ),
-
-      //   verticalPosition: MediaQuery.of(context).size.height * 0.88,
-      //   horizontalPosition: MediaQuery.of(context).size.width / 2.933333333 ,
-      // )  ,
+      
       body: TabBarView(
         physics:
             NeverScrollableScrollPhysics(), // swipe navigation handling is not supported

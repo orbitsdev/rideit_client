@@ -10,19 +10,20 @@ import 'package:tricycleapp/widgets/verticalspace.dart';
 
 class Mapdialog {
 
-static void showMapProgress(BuildContext context, String message) {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            child: Container(
+static void showMapProgress( String message) {
+    Get.defaultDialog(
+      title: '',
+      radius: 6,
+      titlePadding: EdgeInsets.all(0),
+     contentPadding:   EdgeInsets.only(right: 18, left: 18, bottom: 0, top: 18),
+      barrierDismissible: false,
+      backgroundColor: Colors.black,
+      content:Container(
               decoration: BoxDecoration(
-                color: Colors.black,
+              
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
-              padding: EdgeInsets.all(16),
+           
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -42,8 +43,8 @@ textAlign: TextAlign.center,
                 ],
               ),
             ),
-          );
-        });
+    );
+    
         
         }
         static void showMapOption(BuildContext context, Function changeMapType) {

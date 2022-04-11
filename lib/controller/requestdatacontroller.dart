@@ -43,7 +43,8 @@ class Requestdatacontroller extends GetxController {
   var isRatingShowed = false.obs;
   var isDriverShowed = false.obs;
   var isCanceledShowed= false.obs;
-  var isFinishing = false.obs;
+  var isBroken  = false.obs;
+ 
 
   void createRequest(BuildContext context) async {
     Map<String, dynamic> picklocation = {
@@ -108,7 +109,7 @@ class Requestdatacontroller extends GetxController {
                 Future.delayed(Duration(seconds: 1), () {
                   Get.back();
                   Mapdialog.showMapProgress(
-                      context, 'Prepairing trip please wait...');
+                      'Prepairing trip please wait...');
                 });
               }
 
@@ -333,7 +334,7 @@ class Requestdatacontroller extends GetxController {
        
       } else {
         monitorcurrentrequest(RequestDetails());
-        
+        isBroken(false);
       }
     });
   }
@@ -370,8 +371,7 @@ void monitorTrip() async {
 
         }
       
-         
-
+      
         
          if(monitorongoingtrip.value.tripstatus =="complete" && monitorongoingtrip.value.payed==true){
           
@@ -383,34 +383,36 @@ void monitorTrip() async {
         }
         
       } else {
+        isBroken(false);
         monitorongoingtrip(OngoingTripDetails());
-        if(isFinishing.value == false){
-             await requestrefference.doc(authinstance.currentUser!.uid).get().then((value) async{
+          
+        await requestrefference.doc(authinstance.currentUser!.uid).get().then((value) async{
           if(value.exists){
               var data = value.data() as Map<String, dynamic>;
-              if(data['status']=="accepted"){
-                    await requestrefference.doc(authinstance.currentUser!.uid).delete().then((value) {   
-                    Infodialog.showToastCenter(Colors.red, Colors.white, 'Request accepted but no ongoingtrip found');
-                  });
-              }
+            if(data['status']=="accepted"){
+              print('is broken');
+              isBroken(true);
+              print(isBroken);
+             }
+          }else{
+              print('is broken');
+              isBroken(false);
+              print(isBroken);
           }
-        });
-        }
-       
+        });  
+          
       }
     });
   }
 
 
 
-var boolisdeleting = false.obs;
+
 var isRatingload = false.obs;
 void rateDriver(String? comment, int rate, String ratedescription) async{
 
-
-isFinishing(true);
     try{
-      boolisdeleting(true);
+   
       isRatingload(true);
        await ratingsrefference.doc(monitorongoingtrip.value.driver_id).collection('ratings').doc().set({
 
@@ -422,14 +424,17 @@ isFinishing(true);
       'rate_description':ratedescription,
       'created_at': DateTime.now().toString(), 
       
+    }).then((value) async{
+
+      await deleteTrip();
+      isRatingload(false);
+
     });
-    await deleteTrip();
-    isRatingload(false);
-    boolisdeleting(false);
     }catch(e){
-      boolisdeleting(false);
+   
       isRatingload(false);
       Infodialog.showInfoToastCenter(e.toString());
+      Get.offAll(HomeScreenManager());
     }
    
 
@@ -438,25 +443,46 @@ isFinishing(true);
 
 }
 
+Future<void> deleteRequest() async{
+     try {
+       Authdialog.showAuthProGress('Please wait...');
+           
+          await requestrefference.doc(authinstance.currentUser!.uid).delete().then((value) async{
+       
+          Get.back();
+          await clearLocalData();
+          await mapxcontroller.clearRequestForm();
+          Get.offAll(HomeScreenManager());
+          });
+     } on Exception catch (e) {
+          Get.back();
+          await clearLocalData();
+          await mapxcontroller.clearRequestForm();
+          Get.offAll(HomeScreenManager());
+     }
+        
+}
 
 Future<void> deleteTrip() async{
-isFinishing(true);
+
   try{
-    boolisdeleting(true);
+    
        Authdialog.showAuthProGress('Please wait...');
     await requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).delete().then((value) async {
        await requestrefference.doc(authinstance.currentUser!.uid).delete();
-       isFinishing(false);
+        
+      
     });
-        boolisdeleting(false);
-        isFinishing(false);
+      
     Get.back();
     
     await clearLocalData();
+    mapxcontroller.clearRequestForm();
     Get.offAll(HomeScreenManager());
   }catch(e){
-        boolisdeleting(false);
+      
     Get.back();
+     mapxcontroller.clearRequestForm();
     Infodialog.showInfoToastCenter(e.toString());
     Get.offAll(HomeScreenManager());
   };

@@ -19,7 +19,7 @@ class RatingScreen extends StatefulWidget {
 }
 
 class _RatingScreenState extends State<RatingScreen> {
-  var requestxcontroller = Get.find<Requestdatacontroller>();
+  var requestxcontroller = Get.put(Requestdatacontroller());
 
   var comment  = TextEditingController();
   ConfettiController? conffetecontroller;
@@ -56,7 +56,7 @@ class _RatingScreenState extends State<RatingScreen> {
   }else{
      commentvalue =  reservvalue;
   }
-    
+  
     requestxcontroller.rateDriver(commentvalue, rate, ratedescription);
  
   }
