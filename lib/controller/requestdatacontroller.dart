@@ -43,6 +43,7 @@ class Requestdatacontroller extends GetxController {
   var isRatingShowed = false.obs;
   var isDriverShowed = false.obs;
   var isCanceledShowed= false.obs;
+  var isFinishing = false.obs;
 
   void createRequest(BuildContext context) async {
     Map<String, dynamic> picklocation = {
@@ -383,7 +384,7 @@ void monitorTrip() async {
         
       } else {
         monitorongoingtrip(OngoingTripDetails());
-        if(boolisdeleting.value == false){
+        if(isFinishing.value == false){
              await requestrefference.doc(authinstance.currentUser!.uid).get().then((value) async{
           if(value.exists){
               var data = value.data() as Map<String, dynamic>;
@@ -402,12 +403,12 @@ void monitorTrip() async {
 
 
 
-
+var boolisdeleting = false.obs;
 var isRatingload = false.obs;
 void rateDriver(String? comment, int rate, String ratedescription) async{
 
 
-
+isFinishing(true);
     try{
       boolisdeleting(true);
       isRatingload(true);
@@ -437,17 +438,20 @@ void rateDriver(String? comment, int rate, String ratedescription) async{
 
 }
 
-var boolisdeleting = false.obs;
-Future<void> deleteTrip() async{
 
+Future<void> deleteTrip() async{
+isFinishing(true);
   try{
     boolisdeleting(true);
        Authdialog.showAuthProGress('Please wait...');
     await requestrefference.doc(authinstance.currentUser!.uid).collection('ongoingtrip').doc(authinstance.currentUser!.uid).delete().then((value) async {
        await requestrefference.doc(authinstance.currentUser!.uid).delete();
+       isFinishing(false);
     });
         boolisdeleting(false);
+        isFinishing(false);
     Get.back();
+    
     await clearLocalData();
     Get.offAll(HomeScreenManager());
   }catch(e){
