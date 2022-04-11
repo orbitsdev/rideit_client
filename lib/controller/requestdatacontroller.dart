@@ -388,7 +388,7 @@ void monitorTrip() async {
           if(value.exists){
               var data = value.data() as Map<String, dynamic>;
               if(data['status']=="accepted"){
-                    await requestrefference.doc(authinstance.currentUser!.uid).delete().then((value) {
+                    await requestrefference.doc(authinstance.currentUser!.uid).delete().then((value) {   
                     Infodialog.showToastCenter(Colors.red, Colors.white, 'Request accepted but no ongoingtrip found');
                   });
               }
@@ -409,6 +409,7 @@ void rateDriver(String? comment, int rate, String ratedescription) async{
 
 
     try{
+      boolisdeleting(true);
       isRatingload(true);
        await ratingsrefference.doc(monitorongoingtrip.value.driver_id).collection('ratings').doc().set({
 
@@ -423,7 +424,9 @@ void rateDriver(String? comment, int rate, String ratedescription) async{
     });
     await deleteTrip();
     isRatingload(false);
+    boolisdeleting(false);
     }catch(e){
+      boolisdeleting(false);
       isRatingload(false);
       Infodialog.showInfoToastCenter(e.toString());
     }
