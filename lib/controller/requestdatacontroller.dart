@@ -410,11 +410,11 @@ void monitorTrip() async {
 
 var isRatingload = false.obs;
 void rateDriver(String? comment, int rate, String ratedescription) async{
-
+   print(ongoingtrip.value.driver_id);
     try{
    
       isRatingload(true);
-       await ratingsrefference.doc(monitorongoingtrip.value.driver_id).collection('ratings').doc().set({
+       await ratingsrefference.doc(ongoingtrip.value.driver_id).collection('ratings').doc().set({
 
       'rate': rate,
       'comment': comment,
