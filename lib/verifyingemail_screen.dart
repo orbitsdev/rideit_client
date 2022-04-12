@@ -86,7 +86,7 @@ class _VerifyingemailScreenState extends State<VerifyingemailScreen>
       _start = 60;
       canreSendEmail = false;
     });
-    //await authxcontroller.sendVerification();
+    await authxcontroller.sendVerification();
 
     startTimer();
   }
