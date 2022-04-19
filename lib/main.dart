@@ -104,9 +104,9 @@ class _TricycleAppState extends State<TricycleApp> {
   void initState() {
         Future.delayed(Duration.zero).then((value){
             listenToInternetConnection(context);
-     Get.put(Permissioncontroller());
+    //  Get.put(Permissioncontroller());
 
-     pirmissioncontroller.geolocationServicePermission();
+    //  pirmissioncontroller.geolocationServicePermission();
 
 
     Gextbinding().dependencies();

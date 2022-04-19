@@ -54,8 +54,8 @@ android {
         applicationId "com.orbinobrian.rideit"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        versionCode 3
+        versionName "1.0.0"
         multiDexEnabled true
 
     }

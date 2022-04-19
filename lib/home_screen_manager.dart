@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-badge.widget.dart';
@@ -9,6 +10,7 @@ import 'package:tricycleapp/controller/authcontroller.dart';
 import 'package:tricycleapp/controller/drivercontroller.dart';
 import 'package:tricycleapp/controller/pagecontroller.dart';
 import 'package:tricycleapp/controller/passenger_controller.dart';
+import 'package:tricycleapp/controller/permissioncontroller.dart';
 import 'package:tricycleapp/controller/requestdatacontroller.dart';
 import 'package:tricycleapp/dialog/authenticating.dart';
 import 'package:tricycleapp/dialog/infodialog/infodialog.dart';
@@ -41,6 +43,11 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
     var passengerxcontroller = Get.put(PassengerController());
   var authxcontroller = Get.put(Authcontroller());
   var driverxcontroller = Get.put(Drivercontroller());
+  var pirmissioncontroller = Get.put(Permissioncontroller());
+
+ 
+
+   
 
   Color colorwhite = HexColor("#fbfefb");
   Color iconcolor = HexColor("#2F2191");
@@ -66,7 +73,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
       vsync: this,
     );
     
-
+    askpermission();
     authxcontroller.monitorUserAccount();
     driverxcontroller.monitorAvailableDriver();
     passengerxcontroller.listenToAllTrip();
@@ -74,6 +81,12 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
     requesstxcontroller.monitorRequest();
     requesstxcontroller.monitorTrip();  
     authxcontroller.monitorAccountifblock();
+
+  }
+
+  void askpermission() async{
+
+    await pirmissioncontroller.geolocationServicePermission();
 
   }
 
@@ -92,6 +105,18 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
   void dispose() {
     super.dispose();
     _tabController!.dispose();
+  }
+
+  void checkPermissionBeforeProcceed () async{
+        await pirmissioncontroller.geolocationServicePermission();
+
+           
+                   Get.to(() => RequestScreen(),
+                  fullscreenDialog: true,
+                  transition: Transition.circularReveal,
+                  duration: Duration(milliseconds: 700));
+            
+                
   }
 
   @override
@@ -194,7 +219,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
           }
           
         return GestureDetector(
-        onTap: () {
+        onTap: () async{
            //print(Get.find<Requestdatacontroller>().listofavailabledriver.length);
           if (requesstxcontroller.monitorcurrentrequest.value.drop_location_id == null) {
             
@@ -202,11 +227,8 @@ class _HomeScreenManagerState extends State<HomeScreenManager>
               Infodialog.showInfoToastCenter('No available drivers found');
              
             } else {
-            
-              Get.to(() => RequestScreen(),
-                  fullscreenDialog: true,
-                  transition: Transition.circularReveal,
-                  duration: Duration(milliseconds: 700));
+              
+             checkPermissionBeforeProcceed();
             }
           } else {
             Infodialog.showInfoToastCenter(
