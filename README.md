@@ -1,6 +1,6 @@
-# tricycleapp
+# Rideit
 
-A new Flutter project.
+A ride service app for passenger
 
 ## Getting Started
 
